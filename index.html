@@ -1210,20 +1210,20 @@ function applyMapStyle(index) {
   document.body.classList.toggle("map-night", style.id === "night");
   document.body.classList.toggle("map-satellite", style.id === "satellite");
   Object.keys(state.layers).forEach(id => state.layers[id].setStyle(getBaseStyle(id)));
-  localStorage.setItem("geo_map_style", index);
+  localStorage.setItem("geo_user_map_style", index);
   showToast(`${style.icon} ${style.name}`, "info");
 }
 
 /* НАСТРОЙКИ */
 function saveSettings() {
-  try { localStorage.setItem("geo_settings_final", JSON.stringify({
+  try { localStorage.setItem("geo_user_settings", JSON.stringify({
     mode:state.mode, region:state.region, atlasMode:state.atlasMode,
     highlights:state.highlights, savedLists:state.savedLists, hintsLeft:state.hintsLeft,
   })); } catch(e) {}
 }
 function loadSettings() {
   try {
-    const s = JSON.parse(localStorage.getItem("geo_settings_final") || "null");
+    const s = JSON.parse(localStorage.getItem("geo_user_settings") || "null");
     if (!s) return;
     if (s.mode) state.mode = s.mode;
     if (s.region) state.region = s.region;
@@ -1236,14 +1236,14 @@ function loadSettings() {
 
 /* ПРОГРЕСС */
 function saveProgress() {
-  try { localStorage.setItem("geo_progress_final", JSON.stringify({
+  try { localStorage.setItem("geo_user_progress", JSON.stringify({
     mode:state.mode, region:state.region,
     solved:[...state.solved], wrongIds:[...state.wrongIds],
     correct:state.correct, errors:state.errors, hintsLeft:state.hintsLeft,
   })); } catch(e) {}
 }
-function loadProgress() { try { return JSON.parse(localStorage.getItem("geo_progress_final") || "null"); } catch(e) { return null; } }
-function clearProgress() { try { localStorage.removeItem("geo_progress_final"); } catch(e) {} }
+function loadProgress() { try { return JSON.parse(localStorage.getItem("geo_user_progress") || "null"); } catch(e) { return null; } }
+function clearProgress() { try { localStorage.removeItem("geo_user_progress"); } catch(e) {} }
 
 /* ТЕМА */
 function applyTheme(theme) {
@@ -1251,9 +1251,9 @@ function applyTheme(theme) {
   else document.body.classList.remove("light");
   const btn = document.getElementById("themeToggle");
   if (btn) btn.textContent = theme === "light" ? "☀️" : "🌙";
-  localStorage.setItem("geo_theme_final", theme);
+  localStorage.setItem("geo_user_theme", theme);
 }
-function loadTheme() { applyTheme(localStorage.getItem("geo_theme_final") || "dark"); }
+function loadTheme() { applyTheme(localStorage.getItem("geo_user_theme") || "dark"); }
 
 /* UI */
 const modeNames = { find:"Найди страну", capital:"Найди столицу", free:"Свободная закраска", review:"Повтор ошибок" };
@@ -1306,7 +1306,7 @@ function restoreProgressOrStart() {
   state.pool = getPool();
   state.solved.forEach(id => { if (state.layers[id]) state.layers[id].setStyle(correctStyle()); });
   applySettingsToUI(); updateStats();
-  showToast(`↩️ Прогресс восстановлен: ${state.solved.size} стран`, "info");
+  // showToast(`↩️ Прогресс восстановлен: ${state.solved.size} стран`, "info");
   nextQuestion();
 }
 function nextQuestion() {
@@ -1614,7 +1614,7 @@ fetch(DATA_URL)
         layer.on("click", () => onCountryClick(iso));
       }
     }).addTo(map);
-    const savedMapStyle = parseInt(localStorage.getItem("geo_map_style") || "0", 10);
+    const savedMapStyle = parseInt(localStorage.getItem("geo_user_map_style") || "0", 10);
     currentMapStyleIndex = isNaN(savedMapStyle) ? 0 : savedMapStyle;
     applyMapStyle(currentMapStyleIndex);
     loadSettings();
@@ -1755,7 +1755,7 @@ window.addEventListener("beforeunload", () => { saveProgress(); saveSettings(); 
 })();
  /* ============ ФОНОВАЯ МУЗЫКА ============ */
 const MUSIC_URL = "nejnoe-probujdenie-2148.mp3";
-let musicOn = localStorage.getItem("geo_music") === "on";
+let musicOn = localStorage.getItem("geo_user_music") === "on";
 let musicInitialized = false;
 
 function initMusic() {
@@ -1779,7 +1779,7 @@ function updateMusicBtn() {
 document.getElementById("musicBtn").addEventListener("click", () => {
   if (!musicAudio) initMusic();
   musicOn = !musicOn;
-  localStorage.setItem("geo_music", musicOn ? "on" : "off");
+  localStorage.setItem("geo_user_music", musicOn ? "on" : "off");
   if (musicOn) {
     musicAudio.volume = 0.2;
     musicAudio.play().then(() => {
@@ -1787,7 +1787,7 @@ document.getElementById("musicBtn").addEventListener("click", () => {
     }).catch(err => {
       showToast("❌ Не удалось включить музыку: " + err.message, "err");
       musicOn = false;
-      localStorage.setItem("geo_music", "off");
+      localStorage.setItem("geo_user_music", "off");
       updateMusicBtn();
     });
   } else {
@@ -1933,7 +1933,7 @@ function checkCertificate() {
 
   if (pct >= 100) {
     const regionName = REGION_RU[state.region] || state.region;
-    const certKey = "geo_cert_" + state.region + "_" + state.pool.length;
+    const certKey = "geo_user_cert_" + state.region + "_" + state.pool.length;
     if (localStorage.getItem(certKey) === "yes") return;
     localStorage.setItem(certKey, "yes");
     showCertificate(regionName);
@@ -1952,7 +1952,7 @@ function showCertificate(regionName) {
 
   const overlay = document.getElementById("certOverlay");
   document.getElementById("certRegion").textContent = regionName;
-  const savedName = localStorage.getItem("geo_cert_name") || "";
+  const savedName = localStorage.getItem("geo_user_cert_name") || "";
   document.getElementById("certNameInput").value = savedName;
   const d = new Date();
   document.getElementById("certDate").textContent = 
@@ -1970,7 +1970,7 @@ function closeCertificate() {
 }
 
 document.getElementById("certNameInput").addEventListener("input", e => {
-  localStorage.setItem("geo_cert_name", e.target.value);
+  localStorage.setItem("geo_user_cert_name", e.target.value);
 });
 
 document.getElementById("certCloseBtn").addEventListener("click", closeCertificate);
@@ -2013,6 +2013,41 @@ onCountryClick = function(id) {
   const s = document.createElement("script");
   s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
   document.head.appendChild(s);
+})();
+  /* ============ ПЕРВЫЙ ВХОД: СБРОС ДЛЯ НОВОГО ПОЛЬЗОВАТЕЛЯ ============ */
+(function initNewUser() {
+  const isNewUser = !localStorage.getItem("geo_user_seen");
+  if (isNewUser) {
+    // Помечаем, что пользователь у нас
+    localStorage.setItem("geo_user_seen", "yes");
+
+    // Сбрасываем все ключи, чтобы всё началось с нуля
+    try {
+      localStorage.removeItem("geo_user_settings");
+      localStorage.removeItem("geo_user_progress");
+      localStorage.removeItem("geo_user_map_style");
+      localStorage.removeItem("geo_user_music");
+      localStorage.removeItem("geo_user_cert_name");
+      // Удаляем все сертификаты
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith("geo_user_cert_")) localStorage.removeItem(k);
+      });
+      // Тема — тёмная по умолчанию
+      localStorage.setItem("geo_user_theme", "dark");
+    } catch(e) {}
+
+    // Сбрасываем состояние в коде
+    state.mode = "find";
+    state.region = "all";
+    state.atlasMode = true;
+    state.hintsLeft = 10;
+    state.solved = new Set();
+    state.wrongIds = new Set();
+    state.correct = 0;
+    state.errors = 0;
+    state.highlights = {};
+    state.savedLists = [];
+  }
 })();
 loadTheme();
 updateColorSelection();
