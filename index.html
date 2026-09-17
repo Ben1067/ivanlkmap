@@ -1307,11 +1307,10 @@ function startGame() {
     if (p) {
       p.classList.remove("pulse");
       p.classList.remove("hint-flash");
-      p.classList.remove("country-disabled"); // убираем серость
+      p.classList.remove("country-disabled");
     }
   });
 
-  // Восстанавливаем кликабельность всех стран
   Object.keys(state.layers).forEach(id => {
     state.layers[id].setStyle(getBaseStyle(id));
   });
