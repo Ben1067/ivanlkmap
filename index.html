@@ -639,15 +639,204 @@
   }
   #exitFsBtn:hover { background: #38bdf8; color: #0f172a; }
 
-  @media (max-width: 640px) {
-    header, .controls, .question, .footer { padding-left: 14px; padding-right: 14px; }
-    h1 { font-size: 15px; }
-    h1 .author { display: none; }
-    .controls button, .controls select { padding: 7px 12px; font-size: 12px; }
-    .question { font-size: 15px; padding: 12px 14px; }
-    .question .target { font-size: 17px; }
-    .stat-chip { padding: 5px 10px; font-size: 11px; }
+   /* ============ ТАЙМЕР ============ */
+  .timer-bar {
+    height: 4px;
+    background: var(--bg-3);
+    overflow: hidden;
+    display: none;
+    z-index: 998;
   }
+  .timer-bar.show { display: block; }
+  .timer-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #22c55e, #38bdf8, #a855f7);
+    transition: width 0.1s linear;
+  }
+  .timer-fill.warning { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+  .timer-fill.danger { background: #ef4444; animation: timerPulse 0.5s infinite; }
+  @keyframes timerPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* ============ СЕРТИФИКАТ ============ */
+  .cert-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 6000;
+    display: none; align-items: center; justify-content: center;
+    padding: 16px;
+    animation: fadeIn 0.3s ease;
+  }
+  .cert-overlay.show { display: flex; }
+  .cert-card {
+    max-width: 640px; width: 100%;
+    max-height: 95vh;
+    overflow-y: auto;
+    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .cert-frame {
+    background: linear-gradient(135deg, #fdfbf5 0%, #f5ecd7 100%);
+    border: 8px solid transparent;
+    background-image: 
+      linear-gradient(#fdfbf5, #f5ecd7) padding-box,
+      linear-gradient(135deg, #d4af37, #f5e6a8, #b8860b, #d4af37) border-box;
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 0 60px rgba(212,175,55,0.1);
+  }
+  .cert-content {
+    border: 2px solid #d4af37;
+    border-radius: 8px;
+    padding: 32px 24px;
+    text-align: center;
+    color: #4a3a1a;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: 
+      radial-gradient(circle at center, rgba(212,175,55,0.08), transparent 70%),
+      #fdfbf5;
+  }
+  .cert-seal {
+    font-size: 54px;
+    line-height: 1;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 4px 8px rgba(212,175,55,0.5));
+  }
+  .cert-title {
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: 12px;
+    color: #b8860b;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 4px rgba(212,175,55,0.3);
+  }
+  .cert-sub {
+    font-size: 14px;
+    color: #8a6d3b;
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+  .cert-name-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 14px;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Georgia', serif;
+    color: #4a3a1a;
+    background: rgba(212, 175, 55, 0.08);
+    border: none;
+    border-bottom: 2px solid #d4af37;
+    border-radius: 4px 4px 0 0;
+    text-align: center;
+    outline: none;
+    margin-bottom: 16px;
+    transition: 0.2s;
+  }
+  .cert-name-input:focus {
+    background: rgba(212, 175, 55, 0.15);
+    border-bottom-color: #b8860b;
+  }
+  .cert-name-input::placeholder {
+    color: #b8a878;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 18px;
+  }
+  .cert-text {
+    font-size: 18px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .cert-text b { color: #b8860b; font-weight: 800; }
+  .cert-date {
+    font-size: 14px;
+    color: #8a6d3b;
+    margin-bottom: 16px;
+  }
+  .cert-signature {
+    font-size: 13px;
+    color: #8a6d3b;
+    border-top: 1px solid rgba(212,175,55,0.4);
+    padding-top: 12px;
+    margin-top: 12px;
+    font-style: italic;
+  }
+  .cert-signature b { color: #b8860b; }
+  .cert-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .cert-actions button {
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: 0.2s;
+  }
+
+  /* ============ КОМПАКТНОЕ МЕНЮ НА ТЕЛЕФОНЕ ============ */
+  @media (max-width: 768px) {
+    header { padding: 8px 12px; gap: 6px; }
+    h1 { font-size: 14px; gap: 5px; }
+    h1 .author { display: none; }
+
+    .stats { gap: 5px; }
+    .stat-chip { padding: 3px 8px; font-size: 10px; border-radius: 14px; gap: 4px; }
+    .stat-chip .lbl { font-size: 10px; }
+    .stat-chip b { font-size: 11px; }
+
+    .controls { padding: 6px 10px; gap: 5px; }
+    .controls button, .controls select {
+      padding: 5px 9px;
+      font-size: 11px;
+      border-radius: 8px;
+      gap: 3px;
+    }
+    .controls button.theme-btn { padding: 5px 8px; font-size: 13px; }
+    .hint-count { font-size: 10px; padding: 3px 6px; margin-left: -3px; }
+
+    .question { padding: 8px 12px; font-size: 14px; min-height: 46px; gap: 2px; }
+    .question .target { font-size: 16px; }
+    .question .hint { font-size: 11px; }
+
+    .footer { padding: 6px 12px; font-size: 10.5px; gap: 5px; }
+    .footer button { padding: 4px 9px; font-size: 11px; }
+
+    .toast { top: 100px; padding: 9px 16px; font-size: 13px; border-radius: 12px; }
+    .toast .flag { font-size: 18px; }
+
+    .panel { max-width: 95vw; border-radius: 16px; }
+    .panel-header { padding: 12px 16px; }
+    .panel-header h2 { font-size: 15px; }
+    .panel-body { padding: 14px 16px; gap: 12px; }
+    .field textarea { min-height: 100px; font-size: 13px; }
+    .panel-footer { padding: 12px 16px; gap: 6px; }
+    .panel-footer button { padding: 8px 14px; font-size: 13px; }
+
+    #exitFsBtn { top: 8px; right: 8px; padding: 7px 12px; font-size: 12px; }
+
+    .cert-title { font-size: 24px; letter-spacing: 8px; }
+    .cert-name-input { font-size: 20px; }
+    .cert-text { font-size: 15px; }
+  }
+  @media (max-width: 400px) {
+    .controls button, .controls select { padding: 4px 7px; font-size: 10.5px; }
+    .stat-chip { padding: 2px 6px; }
+    .stat-chip b { font-size: 10px; }
+    h1 { font-size: 12.5px; }
+  }
+  
 </style>
 </head>
 <body>
@@ -678,6 +867,7 @@
   <button data-mode="capital">🏛 Найди столицу</button>
   <button data-mode="free">🎨 Свободная закраска</button>
   <button data-mode="review">🔁 Повтор ошибок</button>
+  <button data-mode="timed" id="timedModeBtn">⏱ На время</button>
   <select id="regionSelect">
     <option value="all">🌐 Весь мир</option>
     <option value="Europe">Европа</option>
@@ -690,15 +880,20 @@
   <button id="styleToggle" class="active">🎨 Атлас</button>
   <button id="hintBtn" class="hint-btn">🔔 Подсказка</button>
   <span class="hint-count" id="hintCount">×3</span>
+  <button id="skipBtn">⏭ Пропустить</button>
   <button id="openPanelBtn" class="highlight-btn">✏️ Свой список</button>
   <button id="mapStyleBtn" title="Переключить вид карты">🗺 Политическая</button>
+  <button id="musicBtn" class="theme-btn" title="Фоновая музыка">🎵</button>
   <button id="downloadBtn" class="theme-btn" title="Скачать HTML-файл">💾</button>
   <button id="fullscreenBtn" class="theme-btn" title="Полный экран (F)">⛶</button>
   <button id="themeToggle" class="theme-btn" title="Переключить тему">🌙</button>
 </div>
-
+  
 <div class="question" id="question"><span class="loading-spinner"></span> Загрузка карты…</div>
-
+  <div class="timer-bar" id="timerBar">
+  <div class="timer-fill" id="timerFill"></div>
+</div>
+  
 <div id="map"></div>
 
 <div class="footer">
@@ -706,7 +901,51 @@
   <div class="author-foot">Создатель: <b>Иван Лукинский</b></div>
   <button id="resetBtn">🔄 Сбросить прогресс</button>
 </div>
+<!-- Сертификат -->
+<div class="cert-overlay" id="certOverlay">
+  <div class="cert-card">
+    <div class="cert-frame">
+      <div class="cert-content">
+        <div class="cert-seal">🏆</div>
+        <div class="cert-title">СЕРТИФИКАТ</div>
+        <div class="cert-sub">Настоящим подтверждается, что</div>
+        <input type="text" class="cert-name-input" id="certNameInput" placeholder="Впишите ваше имя…" maxlength="40">
+        <div class="cert-text">успешно изучил(а) <b id="certRegion">Европу</b> на <b>100%</b></div>
+        <div class="cert-date" id="certDate"></div>
+        <div class="cert-signature">Создатель игры — <b>Лукинский Иван</b></div>
+      </div>
+    </div>
+    <div class="cert-actions">
+      <button class="btn-cancel" id="certCloseBtn">Закрыть</button>
+      <button class="btn-apply" id="certDownloadBtn">📥 Скачать PNG</button>
+    </div>
+  </div>
+</div>
 
+<!-- Режим «На время»: настройка -->
+<div class="panel-overlay" id="timedOverlay">
+  <div class="panel">
+    <div class="panel-header">
+      <h2>⏱ Режим «На время»</h2>
+      <button class="panel-close" id="timedCloseBtn">×</button>
+    </div>
+    <div class="panel-body">
+      <div class="field">
+        <label>Свой список стран (по одному в строке, пусто = весь регион)</label>
+        <textarea id="timedCountryInput" placeholder="Россия&#10;США&#10;Китай"></textarea>
+      </div>
+      <div class="field">
+        <label>Время на каждый вопрос (секунд)</label>
+        <input type="text" id="timedSeconds" value="15">
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn-cancel" id="timedCancelBtn">Отмена</button>
+      <button class="btn-apply" id="timedStartBtn">▶ Начать</button>
+    </div>
+  </div>
+</div>
+  
 <div class="toast" id="toast"></div>
 
 <div class="panel-overlay" id="panelOverlay">
@@ -1494,6 +1733,224 @@ window.addEventListener("beforeunload", () => { saveProgress(); saveSettings(); 
   } else {
     sessionStorage.setItem("splashShown", "yes");
   }
+})();
+  /* ============ ФОНОВАЯ МУЗЫКА ============ */
+const MUSIC_URL = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=relaxing-145038.mp3";
+let musicAudio = null;
+let musicOn = localStorage.getItem("geo_music") === "on";
+
+function initMusic() {
+  if (!musicAudio) {
+    musicAudio = new Audio(MUSIC_URL);
+    musicAudio.loop = true;
+    musicAudio.volume = 0.25;
+  }
+  updateMusicBtn();
+  if (musicOn) {
+    musicAudio.play().catch(() => {});
+  }
+}
+function updateMusicBtn() {
+  const btn = document.getElementById("musicBtn");
+  if (!btn) return;
+  btn.textContent = musicOn ? "🔊" : "🎵";
+  btn.title = musicOn ? "Выключить музыку" : "Включить музыку";
+  btn.classList.toggle("active", musicOn);
+}
+document.getElementById("musicBtn").addEventListener("click", () => {
+  musicOn = !musicOn;
+  localStorage.setItem("geo_music", musicOn ? "on" : "off");
+  if (musicOn) musicAudio.play().catch(() => {});
+  else musicAudio.pause();
+  updateMusicBtn();
+  showToast(musicOn ? "🎵 Музыка включена" : "🔇 Музыка выключена", "info");
+});
+initMusic();
+
+/* ============ ТАЙМЕР ============ */
+let timerInterval = null;
+let timerSeconds = 15;
+let timerCurrent = 0;
+let timedMode = false;
+
+function startTimer() {
+  if (!timedMode || !state.current) return;
+  stopTimer();
+  timerCurrent = timerSeconds;
+  const bar = document.getElementById("timerBar");
+  const fill = document.getElementById("timerFill");
+  bar.classList.add("show");
+  fill.style.width = "100%";
+  fill.className = "timer-fill";
+
+  timerInterval = setInterval(() => {
+    timerCurrent -= 0.1;
+    if (timerCurrent <= 0) {
+      stopTimer();
+      // Время вышло — ошибка
+      state.errors++;
+      state.wrongIds.add(state.current.id);
+      const correctLayer = state.layers[state.current.id];
+      if (correctLayer) {
+        correctLayer.setStyle(revealStyle()); correctLayer.bringToFront();
+        const p = correctLayer.getElement && correctLayer.getElement();
+        if (p) p.classList.add("pulse");
+        setTimeout(() => {
+          if (p) p.classList.remove("pulse");
+          if (!state.solved.has(state.current.id)) correctLayer.setStyle(getBaseStyle(state.current.id));
+        }, 1500);
+      }
+      showToast(`⏱ Время вышло! Это ${state.current.name}`, "err", state.current.name);
+      updateStats(); saveProgress();
+      setTimeout(nextQuestion, 1500);
+      return;
+    }
+    const pct = (timerCurrent / timerSeconds) * 100;
+    fill.style.width = pct + "%";
+    fill.className = "timer-fill" + (pct < 30 ? " danger" : pct < 60 ? " warning" : "");
+  }, 100);
+}
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+/* Настройка режима «На время» */
+document.getElementById("timedModeBtn").addEventListener("click", () => {
+  document.getElementById("timedOverlay").classList.add("show");
+});
+document.getElementById("timedCloseBtn").addEventListener("click", () => {
+  document.getElementById("timedOverlay").classList.remove("show");
+});
+document.getElementById("timedCancelBtn").addEventListener("click", () => {
+  document.getElementById("timedOverlay").classList.remove("show");
+});
+document.getElementById("timedStartBtn").addEventListener("click", () => {
+  const secs = parseInt(document.getElementById("timedSeconds").value) || 15;
+  timerSeconds = Math.max(5, Math.min(60, secs));
+
+  // Свой список стран
+  const lines = document.getElementById("timedCountryInput").value
+    .split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
+
+  timedMode = true;
+  document.querySelectorAll(".controls button[data-mode]").forEach(b => b.classList.remove("active"));
+  document.getElementById("timedModeBtn").classList.add("active");
+  document.getElementById("timedOverlay").classList.remove("show");
+
+  if (lines.length > 0) {
+    const ids = [];
+    lines.forEach(line => {
+      const id = findCountryByQuery(line);
+      if (id) ids.push(id);
+    });
+    if (ids.length === 0) {
+      showToast("Не найдено ни одной страны", "err");
+      timedMode = false;
+      return;
+    }
+    state.pool = ids.map(id => ({ id, ...state.layerData[id] }));
+    state.mode = "find";
+    state.solved.clear(); state.wrongIds.clear();
+    state.correct = 0; state.errors = 0; state.freeClicked.clear();
+    state.hintsLeft = 3; state.hintsUsedThisQuestion = false;
+    Object.keys(state.layers).forEach(id => state.layers[id].setStyle(getBaseStyle(id)));
+    updateStats();
+    showToast(`⏱ Режим «На время»: ${ids.length} стран, ${timerSeconds} сек`, "ok");
+    nextQuestion();
+  } else {
+    // Без своего списка — весь регион
+    startGame();
+    showToast(`⏱ Режим «На время»: ${timerSeconds} сек на вопрос`, "ok");
+  }
+});
+
+/* ============ ПРОПУСТИТЬ ВОПРОС ============ */
+document.getElementById("skipBtn").addEventListener("click", () => {
+  if (!state.current) return;
+  showToast(`⏭ Пропущено: ${state.current.name}`, "info", state.current.name);
+  state.wrongIds.add(state.current.id);
+  stopTimer();
+  setTimeout(nextQuestion, 400);
+});
+
+/* ============ СЕРТИФИКАТ ============ */
+const REGION_RU = {
+  "Europe":"Европу", "Asia":"Азию", "Africa":"Африку",
+  "North America":"Северную Америку", "South America":"Южную Америку",
+  "Oceania":"Океанию", "all":"весь мир"
+};
+
+function checkCertificate() {
+  if (state.pool.length === 0) return;
+  const solved = state.pool.filter(c => state.solved.has(c.id)).length;
+  const pct = Math.round((solved / state.pool.length) * 100);
+
+  if (pct >= 100) {
+    const regionName = REGION_RU[state.region] || state.region;
+    const certKey = "geo_cert_" + state.region + "_" + state.pool.length;
+    if (localStorage.getItem(certKey) === "yes") return;
+    localStorage.setItem(certKey, "yes");
+    showCertificate(regionName);
+  }
+}
+
+function showCertificate(regionName) {
+  const overlay = document.getElementById("certOverlay");
+  document.getElementById("certRegion").textContent = regionName;
+  const savedName = localStorage.getItem("geo_cert_name") || "";
+  document.getElementById("certNameInput").value = savedName;
+  const d = new Date();
+  document.getElementById("certDate").textContent = 
+    `Выдан ${d.getDate()}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`;
+  overlay.classList.add("show");
+}
+
+document.getElementById("certNameInput").addEventListener("input", e => {
+  localStorage.setItem("geo_cert_name", e.target.value);
+});
+
+document.getElementById("certCloseBtn").addEventListener("click", () => {
+  document.getElementById("certOverlay").classList.remove("show");
+});
+
+document.getElementById("certDownloadBtn").addEventListener("click", () => {
+  const cert = document.querySelector(".cert-frame");
+  if (!cert) return;
+  if (typeof html2canvas === "undefined") {
+    showToast("Скачивание пока недоступно, попробуйте позже", "err");
+    return;
+  }
+  html2canvas(cert, { scale: 2, backgroundColor: "#fdfbf5" }).then(canvas => {
+    const link = document.createElement("a");
+    link.download = "certificate.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    showToast("📥 Сертификат скачан!", "ok");
+  }).catch(() => {
+    showToast("Не удалось скачать", "err");
+  });
+});
+
+/* ============ ОБНОВЛЯЕМ nextQuestion и onCountryClick ============ */
+const _origNextQuestion = nextQuestion;
+nextQuestion = function() {
+  _origNextQuestion();
+  startTimer();
+};
+
+const _origOnCountryClick = onCountryClick;
+onCountryClick = function(id) {
+  _origOnCountryClick(id);
+  stopTimer();
+  // Проверка сертификата после каждого правильного ответа
+  setTimeout(checkCertificate, 800);
+};
+
+/* ============ ДОБАВЛЯЕМ html2canvas ДЛЯ СКАЧИВАНИЯ СЕРТИФИКАТА ============ */
+(function loadHtml2Canvas() {
+  const s = document.createElement("script");
+  s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+  document.head.appendChild(s);
 })();
 loadTheme();
 updateColorSelection();
