@@ -952,7 +952,7 @@
         <input type="text" id="timedSeconds" value="15">
       </div>
     </div>
-<div class="panel-footer">
+    <div class="panel-footer">
   <button class="btn-cancel" id="cancelBtn">Отмена</button>
   <button class="btn-clear" id="clearHighlightsBtn">Очистить выделение</button>
   <button class="btn-apply" id="applyBtn">Выделить</button>
@@ -1319,6 +1319,7 @@ function startGame() {
   updateStats(); updateHintUI();
   clearProgress(); nextQuestion();
 }
+}
 function restoreProgressOrStart() {
   const p = loadProgress();
   if (!p || !p.solved || p.solved.length === 0) { startGame(); return; }
@@ -1582,6 +1583,7 @@ function renderSavedLists() {
   });
 }
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
 const EXAMPLES = {
   europe:["Россия","Германия","Франция","Италия","Испания","Польша","Украина","Великобритания","Швеция","Норвегия"],
   asia:["Китай","Индия","Япония","Казахстан","Монголия","Турция","Иран","Саудовская Аравия","Таиланд","Вьетнам"],
@@ -1600,79 +1602,93 @@ document.getElementById("openPanelBtn").addEventListener("click", openPanel);
 document.getElementById("closePanelBtn").addEventListener("click", closePanel);
 document.getElementById("cancelBtn").addEventListener("click", closePanel);
 document.getElementById("applyBtn").addEventListener("click", applyHighlight);
-/* ============ ИГРА ПО СВОЕМУ СПИСКУ ============ */
-(function() {
-  const btn = document.getElementById("playListBtn");
-  if (!btn) return;
+  /* ============ ИГРА ПО СВОЕМУ СПИСКУ ============ */
+document.getElementById("playListBtn").addEventListener("click", () => {
+  const lines = countryInput.value.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
 
-  btn.addEventListener("click", () => {
-    const lines = countryInput.value.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
-    if (lines.length === 0) { showToast("Введите хотя бы одну страну", "err"); return; }
+  if (lines.length === 0) {
+    showToast("Введите хотя бы одну страну", "err");
+    return;
+  }
 
-    const ids = [];
-    const notFound = [];
-    lines.forEach(line => {
-      const id = findCountryByQuery(line);
-      if (id) ids.push(id); else notFound.push(line);
-    });
-
-    if (ids.length === 0) { showToast("Не найдено ни одной страны", "err"); return; }
-    if (notFound.length > 0) showToast(`Не найдено: ${notFound.slice(0,3).join(", ")}`, "err");
-
-    // Формируем пул только из этих стран
-    state.pool = ids.map(id => ({ id, ...state.layerData[id] }));
-
-    // Сбрасываем игру
-    state.mode = "find";
-    state.solved.clear();
-    state.wrongIds.clear();
-    state.correct = 0;
-    state.errors = 0;
-    state.freeClicked.clear();
-    state.hintsLeft = 3;
-    state.hintsUsedThisQuestion = false;
-    state.hintedCountryId = null;
-
-    // Стираем стили у всех
-    Object.keys(state.layers).forEach(id => {
-      const el = state.layers[id];
-      const p = el.getElement && el.getElement();
-      if (p) {
-        p.classList.remove("pulse");
-        p.classList.remove("hint-flash");
-        p.classList.remove("country-disabled");
-      }
-      el.setStyle(getBaseStyle(id));
-    });
-
-    // Делаем серыми все, кроме выбранных
-    const activeIds = new Set(ids);
-    Object.keys(state.layers).forEach(id => {
-      if (!activeIds.has(id)) {
-        const p = state.layers[id].getElement && state.layers[id].getElement();
-        if (p) p.classList.add("country-disabled");
-        state.layers[id].setStyle({
-          color: "#334155", weight: 0.5,
-          fillColor: "#475569", fillOpacity: 0.3
-        });
-      }
-    });
-
-    // Обновляем UI
-    document.querySelectorAll(".controls button[data-mode]").forEach(b => b.classList.remove("active"));
-    const findBtn = document.querySelector('.controls button[data-mode="find"]');
-    if (findBtn) findBtn.classList.add("active");
-    document.getElementById("modeInfo").textContent = "Найди страну (свой список)";
-    document.getElementById("countInfo").textContent = `· Стран в списке: ${ids.length}`;
-
-    closePanel();
-    updateStats();
-    updateHintUI();
-    clearProgress();
-    nextQuestion();
-    showToast(`🎯 Игра по списку: ${ids.length} стран`, "ok");
+  // Ищем id стран
+  const ids = [];
+  const notFound = [];
+  lines.forEach(line => {
+    const id = findCountryByQuery(line);
+    if (id) ids.push(id);
+    else notFound.push(line);
   });
-})();
+
+  if (ids.length === 0) {
+    showToast("Не найдено ни одной страны", "err");
+    return;
+  }
+
+  if (notFound.length > 0) {
+    showToast(`Не найдено: ${notFound.slice(0,3).join(", ")}${notFound.length>3?"…":""}`, "err");
+  }
+
+  // Формируем пул только из этих стран
+  state.pool = ids.map(id => ({ id, ...state.layerData[id] }));
+
+  // Сбрасываем игру
+  state.mode = "find";
+  state.solved.clear();
+  state.wrongIds.clear();
+  state.correct = 0;
+  state.errors = 0;
+  state.freeClicked.clear();
+  state.hintsLeft = 3;
+  state.hintsUsedThisQuestion = false;
+  state.hintedCountryId = null;
+
+  // Сбрасываем все страны
+  Object.keys(state.layers).forEach(id => {
+    const el = state.layers[id];
+    el.setStyle(getBaseStyle(id));
+    const p = el.getElement && el.getElement();
+    if (p) { p.classList.remove("pulse"); p.classList.remove("hint-flash"); el.classList.remove("country-disabled"); }
+  });
+
+  // Делаем все страны ВНЕ списка серыми и некликабельными
+  const activeIds = new Set(ids);
+  Object.keys(state.layers).forEach(id => {
+    if (!activeIds.has(id)) {
+      const p = state.layers[id].getElement && state.layers[id].getElement();
+      if (p) p.classList.add("country-disabled");
+      state.layers[id].setStyle({
+        color: "#334155",
+        weight: 0.5,
+        fillColor: "#475569",
+        fillOpacity: 0.3
+      });
+    }
+  });
+
+  // Оставляем активные страны цветными
+  ids.forEach(id => {
+    if (state.layers[id]) state.layers[id].setStyle(getBaseStyle(id));
+  });
+
+  // Обновляем интерфейс
+  document.querySelectorAll(".controls button[data-mode]").forEach(b => b.classList.remove("active"));
+  const findBtn = document.querySelector('.controls button[data-mode="find"]');
+  if (findBtn) findBtn.classList.add("active");
+  document.getElementById("modeInfo").textContent = "Найди страну (свой список)";
+  document.getElementById("countInfo").textContent = `· Стран в списке: ${ids.length}`;
+
+  // Прячем панель
+  closePanel();
+
+  // Запускаем игру
+  updateStats();
+  updateHintUI();
+  clearProgress();
+  nextQuestion();
+
+  showToast(`🎯 Игра по списку: ${ids.length} стран`, "ok");
+});
 document.getElementById("clearHighlightsBtn").addEventListener("click", clearHighlights);
 panelOverlay.addEventListener("click", e => { if (e.target === panelOverlay) closePanel(); });
 
