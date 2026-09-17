@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Политическая карта мира — Иван Лукинский</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg-1: #0a0e1a;
+    --bg-2: #111827;
+    --bg-3: #1e293b;
+    --panel: rgba(30, 41, 59, 0.72);
+    --panel-solid: #1e293b;
+    --panel-hover: rgba(51, 65, 85, 0.8);
+    --text: #f1f5f9;
+    --text-dim: #94a3b8;
+    --text-mute: #64748b;
+    --accent: #38bdf8;
+    --accent-2: #a855f7;
+    --accent-3: #22c55e;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --border: rgba(148, 163, 184, 0.15);
+    --border-strong: rgba(148, 163, 184, 0.3);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.5);
+    --map-bg: #0c4a6e;
+    --tooltip-bg: #1e293b;
+    --tooltip-text: #f1f5f9;
+  }
+  body.light {
+    --bg-1: #eef2f7;
+    --bg-2: #ffffff;
+    --bg-3: #e2e8f0;
+    --panel: rgba(255, 255, 255, 0.85);
+    --panel-solid: #ffffff;
+    --panel-hover: rgba(241, 245, 249, 0.9);
+    --text: #0f172a;
+    --text-dim: #475569;
+    --text-mute: #64748b;
+    --accent: #0284c7;
+    --accent-2: #9333ea;
+    --border: rgba(15, 23, 42, 0.1);
+    --border-strong: rgba(15, 23, 42, 0.2);
+    --map-bg: #cfe6f7;
+    --tooltip-bg: #ffffff;
+    --tooltip-text: #0f172a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* ============ ЗАСТАВКА ============ */
+  .splash-screen {
+    position: fixed; inset: 0;
+    background: radial-gradient(circle at center, #0a1628 0%, #050a15 100%);
+    z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .splash-screen.hide {
+    opacity: 0;
+    transform: scale(1.08);
+    pointer-events: none;
+  }
+  .splash-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.25) 0%, transparent 65%);
+    border-radius: 50%;
+    animation: splashPulse 3s ease-in-out infinite;
+  }
+  @keyframes splashPulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.15); opacity: 1; }
+  }
+  .splash-content {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    animation: splashIn 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 2;
+  }
+  @keyframes splashIn {
+    from { opacity: 0; transform: translateY(30px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .splash-photo-wrap {
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid transparent;
+    background: linear-gradient(#0a1628, #0a1628) padding-box,
+                linear-gradient(135deg, #d4af37, #f5e6a8, #b8860b) border-box;
+    box-shadow: 
+      0 0 0 8px rgba(212, 175, 55, 0.15),
+      0 0 60px rgba(212, 175, 55, 0.4),
+      0 20px 60px rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center;
+    animation: photoGlow 2.5s ease-in-out infinite alternate;
+  }
+  @keyframes photoGlow {
+    from { box-shadow: 0 0 0 8px rgba(212,175,55,0.15), 0 0 60px rgba(212,175,55,0.4), 0 20px 60px rgba(0,0,0,0.6); }
+    to   { box-shadow: 0 0 0 12px rgba(212,175,55,0.25), 0 0 90px rgba(212,175,55,0.6), 0 20px 60px rgba(0,0,0,0.6); }
+  }
+  .splash-photo {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .splash-role {
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 8px;
+    color: #d4af37;
+    font-weight: 600;
+    margin-top: 10px;
+    text-shadow: 0 0 20px rgba(212,175,55,0.5);
+  }
+  .splash-name {
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #d4af37 0%, #f5e6a8 50%, #d4af37 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+    filter: drop-shadow(0 4px 12px rgba(212,175,55,0.4));
+  }
+  .splash-skip {
+    position: absolute;
+    bottom: 30px; right: 30px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    background: rgba(212, 175, 55, 0.1);
+    color: #d4af37;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    backdrop-filter: blur(10px);
+    transition: 0.2s;
+    z-index: 3;
+  }
+  .splash-skip:hover {
+    background: rgba(212, 175, 55, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+  }
+  @media (max-width: 640px) {
+    .splash-photo-wrap { width: 160px; height: 160px; }
+    .splash-name { font-size: 26px; }
+    .splash-role { font-size: 13px; letter-spacing: 5px; }
+    .splash-skip { bottom: 20px; right: 20px; padding: 8px 14px; font-size: 13px; }
+  }
+  html, body { height: 100%; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+  body {
+    display: flex; flex-direction: column;
+    background: var(--bg-1);
+    background-image:
+      radial-gradient(circle at 15% 5%, rgba(56, 189, 248, 0.08), transparent 40%),
+      radial-gradient(circle at 85% 95%, rgba(168, 85, 247, 0.08), transparent 40%);
+    color: var(--text);
+    overflow: hidden;
+    transition: background 0.4s ease, color 0.3s ease;
+  }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); background-clip: padding-box; }
+
+  header {
+    padding: 14px 22px;
+    background: var(--panel);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+    border-bottom: 1px solid var(--border);
+    z-index: 1000;
+    box-shadow: var(--shadow-sm);
+  }
+  h1 {
+    font-size: 18px; font-weight: 800; letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  h1 .author {
+    font-size: 11px; color: var(--text-mute); font-weight: 500;
+    margin-left: 4px; letter-spacing: 0.02em;
+    -webkit-text-fill-color: var(--text-mute);
+    background: none;
+    text-transform: uppercase;
+  }
+
+  .stats { display: flex; gap: 10px; font-size: 12px; flex-wrap: wrap; }
+  .stat-chip {
+    background: var(--bg-3);
+    padding: 6px 12px; border-radius: 20px;
+    display: flex; align-items: center; gap: 6px;
+    border: 1px solid var(--border);
+    font-weight: 500;
+    transition: 0.2s;
+  }
+  .stat-chip:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  .stat-chip .lbl { color: var(--text-dim); }
+  .stat-chip b { color: var(--accent); font-weight: 700; }
+  .stat-chip.err b { color: var(--danger); }
+  .stat-chip.ok b { color: var(--accent-3); }
+
+  .controls {
+    padding: 12px 22px;
+    background: var(--panel);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    border-bottom: 1px solid var(--border);
+    z-index: 999;
+  }
+  .controls button, .controls select {
+    padding: 8px 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-3);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex; align-items: center; gap: 6px;
+    white-space: nowrap;
+  }
+  .controls button:hover {
+    background: var(--panel-hover);
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  .controls button:active { transform: translateY(0); }
+  .controls button.active {
+    background: linear-gradient(135deg, var(--accent), #0ea5e9);
+    color: #fff;
+    border-color: transparent;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+  }
+  .controls button.highlight-btn {
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    border-color: transparent;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+  }
+  .controls button.highlight-btn:hover { box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5); }
+  .controls button.hint-btn {
+    background: linear-gradient(135deg, #eab308, #f59e0b);
+    border-color: transparent;
+    color: #422006;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(234, 179, 8, 0.35);
+  }
+  .controls button.hint-btn:hover { box-shadow: 0 6px 20px rgba(234, 179, 8, 0.55); }
+  .controls button.hint-btn:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; transform: none; }
+  .controls button.theme-btn {
+    background: transparent;
+    font-size: 16px;
+    padding: 7px 11px;
+    border: 1px solid var(--border);
+  }
+  .controls button.theme-btn:hover { background: var(--bg-3); transform: rotate(15deg) scale(1.1); }
+
+  .hint-count {
+    font-size: 11px;
+    color: var(--text-mute);
+    font-weight: 700;
+    margin-left: -4px;
+    background: var(--bg-3);
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .question {
+    padding: 16px 22px;
+    text-align: center;
+    background: var(--panel);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    font-size: 17px;
+    font-weight: 500;
+    border-bottom: 1px solid var(--border);
+    min-height: 62px;
+    z-index: 998;
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+    gap: 4px;
+    animation: slideDown 0.3s ease;
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .question .target {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+    font-size: 19px;
+    padding: 0 4px;
+  }
+  .question .hint { color: var(--text-dim); font-size: 12.5px; }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(148,163,184,0.3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  #map {
+    flex: 1; width: 100%;
+    background: var(--map-bg);
+    animation: fadeIn 0.6s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .leaflet-container { background: var(--map-bg) !important; font-family: inherit !important; }
+  .country-tooltip {
+    background: var(--tooltip-bg) !important;
+    color: var(--tooltip-text) !important;
+    border: 1px solid var(--accent) !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 5px 10px !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+  .country-tooltip::before { display: none !important; }
+  .leaflet-control-zoom a {
+    background: var(--panel-solid) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    backdrop-filter: blur(10px);
+    font-weight: 700 !important;
+    transition: 0.2s;
+  }
+  .leaflet-control-zoom a:hover {
+    background: var(--accent) !important;
+    color: #fff !important;
+    transform: scale(1.08);
+  }
+  .leaflet-control-attribution {
+    background: var(--panel) !important;
+    color: var(--text-mute) !important;
+    backdrop-filter: blur(10px);
+    font-size: 10px !important;
+    border-radius: 6px 0 0 0;
+  }
+  .leaflet-control-attribution a { color: var(--accent) !important; }
+
+  .toast {
+    position: fixed; top: 140px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    padding: 12px 24px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 15px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 2000;
+    max-width: 90vw;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(10px);
+    display: flex; align-items: center; gap: 10px;
+    justify-content: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.ok { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
+  .toast.err { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+  .toast.info { background: linear-gradient(135deg, var(--accent), #0284c7); color: #fff; }
+  .toast.hint { background: linear-gradient(135deg, #facc15, #f59e0b); color: #422006; }
+  .toast .flag {
+    font-size: 22px;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+
+  .footer {
+    padding: 10px 22px;
+    background: var(--panel);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    border-top: 1px solid var(--border);
+    z-index: 998;
+    align-items: center;
+  }
+  .footer button {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-3);
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    transition: 0.2s;
+  }
+  .footer button:hover { background: var(--panel-hover); border-color: var(--border-strong); }
+  .footer .author-foot b {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { stroke-opacity: 1; }
+    50% { stroke-opacity: 0.3; }
+  }
+  .pulse path, .pulse { animation: pulseGlow 1s infinite; }
+  @keyframes hintFlash {
+    0% { stroke: #eab308; stroke-width: 1; }
+    50% { stroke: #fde047; stroke-width: 6; }
+    100% { stroke: #eab308; stroke-width: 1; }
+  }
+  .hint-flash { animation: hintFlash 0.5s infinite; }
+
+  .panel-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 3000;
+    display: none; align-items: center; justify-content: center;
+    padding: 16px;
+    animation: fadeIn 0.25s ease;
+  }
+  .panel-overlay.show { display: flex; }
+  .panel {
+    background: var(--panel-solid);
+    border-radius: 20px;
+    width: 100%; max-width: 540px; max-height: 90vh;
+    display: flex; flex-direction: column;
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-lg);
+    color: var(--text);
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .panel-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(135deg, rgba(168,85,247,0.08), transparent);
+  }
+  .panel-header h2 {
+    font-size: 17px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-2), var(--accent));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .panel-close {
+    background: var(--bg-3); border: 1px solid var(--border);
+    color: var(--text-dim);
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    font-size: 20px; cursor: pointer;
+    line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.2s;
+  }
+  .panel-close:hover { background: var(--danger); color: #fff; border-color: var(--danger); transform: rotate(90deg); }
+  .panel-body {
+    padding: 20px 22px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field label {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .field textarea, .field input[type="text"] {
+    width: 100%; padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-1);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    transition: 0.2s;
+  }
+  .field textarea { min-height: 140px; line-height: 1.5; }
+  .field textarea:focus, .field input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+  }
+  .color-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .color-swatch {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: var(--shadow-sm);
+  }
+  .color-swatch:hover { transform: scale(1.15) translateY(-2px); box-shadow: var(--shadow-md); }
+  .color-swatch.selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 3px var(--accent), var(--shadow-md);
+    transform: scale(1.1);
+  }
+  .color-row input[type="color"] {
+    width: 46px; height: 36px;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 2px;
+  }
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; }
+  .examples button {
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg-3);
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 500;
+    transition: 0.2s;
+  }
+  .examples button:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
+  }
+  .panel-footer {
+    padding: 16px 22px;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end;
+    background: var(--bg-3);
+  }
+  .panel-footer button {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .btn-apply { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; box-shadow: 0 4px 14px rgba(34,197,94,0.4); }
+  .btn-apply:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(34,197,94,0.5); }
+  .btn-clear { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; box-shadow: 0 4px 14px rgba(239,68,68,0.4); }
+  .btn-clear:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239,68,68,0.5); }
+  .btn-cancel { background: var(--bg-3); color: var(--text); border: 1px solid var(--border-strong); }
+  .btn-cancel:hover { background: var(--panel-hover); }
+  .hint-text { font-size: 12px; color: var(--text-mute); line-height: 1.5; }
+  .saved-lists { display: flex; flex-direction: column; gap: 8px; }
+  .saved-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg-1);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .saved-item:hover { border-color: var(--accent); transform: translateX(3px); }
+  .saved-item .swatch { width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+  .saved-item .name { flex: 1; color: var(--text); font-weight: 500; }
+  .saved-item .count { color: var(--text-mute); font-size: 12px; font-weight: 600; }
+  .saved-item .del {
+    background: transparent; border: none;
+    color: var(--danger); cursor: pointer;
+    font-size: 18px; padding: 0 6px;
+    border-radius: 6px; transition: 0.2s;
+  }
+  .saved-item .del:hover { background: rgba(239,68,68,0.15); }
+
+  #exitFsBtn {
+    position: fixed; top: 14px; right: 14px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(148,163,184,0.3);
+    background: rgba(30,41,59,0.9);
+    backdrop-filter: blur(10px);
+    color: #f1f5f9;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    z-index: 5000;
+    display: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    transition: 0.2s;
+  }
+  #exitFsBtn:hover { background: #38bdf8; color: #0f172a; }
+
+  @media (max-width: 640px) {
+    header, .controls, .question, .footer { padding-left: 14px; padding-right: 14px; }
+    h1 { font-size: 15px; }
+    h1 .author { display: none; }
+    .controls button, .controls select { padding: 7px 12px; font-size: 12px; }
+    .question { font-size: 15px; padding: 12px 14px; }
+    .question .target { font-size: 17px; }
+    .stat-chip { padding: 5px 10px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="splash-screen" id="splashScreen">
+  <div class="splash-glow"></div>
+  <div class="splash-content">
+    <div class="splash-photo-wrap">
+      <img src="creator.jpg" alt="Создатель игры" class="splash-photo" 
+           onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'font-size:80px; text-align:center;\'>👑</div>';">
+    </div>
+    <div class="splash-role">Создатель игры</div>
+    <div class="splash-name">Лукинский Иван</div>
+  </div>
+  <button class="splash-skip" id="skipSplash">Пропустить →</button>
+</div>
+<header>
+  <h1>🌍 Политическая карта мира <span class="author">· создатель Иван Лукинский</span></h1>
+  <div class="stats">
+    <div class="stat-chip"><span class="lbl">Осталось</span> <b id="left">0</b></div>
+    <div class="stat-chip ok"><span class="lbl">Верно</span> <b id="ok">0</b></div>
+    <div class="stat-chip err"><span class="lbl">Ошибок</span> <b id="err">0</b></div>
+  </div>
+</header>
+
+<div class="controls">
+  <button data-mode="find" class="active">🔍 Найди страну</button>
+  <button data-mode="capital">🏛 Найди столицу</button>
+  <button data-mode="free">🎨 Свободная закраска</button>
+  <button data-mode="review">🔁 Повтор ошибок</button>
+  <select id="regionSelect">
+    <option value="all">🌐 Весь мир</option>
+    <option value="Europe">Европа</option>
+    <option value="Asia">Азия</option>
+    <option value="Africa">Африка</option>
+    <option value="North America">Северная Америка</option>
+    <option value="South America">Южная Америка</option>
+    <option value="Oceania">Океания</option>
+  </select>
+  <button id="styleToggle" class="active">🎨 Атлас</button>
+  <button id="hintBtn" class="hint-btn">🔔 Подсказка</button>
+  <span class="hint-count" id="hintCount">×3</span>
+  <button id="openPanelBtn" class="highlight-btn">✏️ Свой список</button>
+  <button id="mapStyleBtn" title="Переключить вид карты">🗺 Политическая</button>
+  <button id="downloadBtn" class="theme-btn" title="Скачать HTML-файл">💾</button>
+  <button id="fullscreenBtn" class="theme-btn" title="Полный экран (F)">⛶</button>
+  <button id="themeToggle" class="theme-btn" title="Переключить тему">🌙</button>
+</div>
+
+<div class="question" id="question"><span class="loading-spinner"></span> Загрузка карты…</div>
+
+<div id="map"></div>
+
+<div class="footer">
+  <div>Режим: <b id="modeInfo">Найди страну</b> · <span id="countInfo"></span> <span id="highlightInfo"></span></div>
+  <div class="author-foot">Создатель: <b>Иван Лукинский</b></div>
+  <button id="resetBtn">🔄 Сбросить прогресс</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="panel-overlay" id="panelOverlay">
+  <div class="panel">
+    <div class="panel-header">
+      <h2>✏️ Свой список стран</h2>
+      <button class="panel-close" id="closePanelBtn">×</button>
+    </div>
+    <div class="panel-body">
+      <div class="field">
+        <label>Названия стран — по одному в строке</label>
+        <textarea id="countryInput" placeholder="Россия&#10;США&#10;Китай&#10;Бразилия"></textarea>
+        <div class="hint-text">Можно по-русски, по-английски или кодами (RU, US).</div>
+      </div>
+      <div class="field">
+        <label>Примеры</label>
+        <div class="examples">
+          <button data-example="europe">Европа</button>
+          <button data-example="asia">Азия</button>
+          <button data-example="africa">Африка</button>
+          <button data-example="big">Крупные страны</button>
+          <button data-example="clear">Очистить</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Цвет выделения</label>
+        <div class="color-row" id="colorRow">
+          <div class="color-swatch" data-color="#a855f7" style="background:#a855f7"></div>
+          <div class="color-swatch" data-color="#22c55e" style="background:#22c55e"></div>
+          <div class="color-swatch" data-color="#ef4444" style="background:#ef4444"></div>
+          <div class="color-swatch" data-color="#f59e0b" style="background:#f59e0b"></div>
+          <div class="color-swatch" data-color="#38bdf8" style="background:#38bdf8"></div>
+          <div class="color-swatch" data-color="#ec4899" style="background:#ec4899"></div>
+          <div class="color-swatch" data-color="#84cc16" style="background:#84cc16"></div>
+          <div class="color-swatch" data-color="#06b6d4" style="background:#06b6d4"></div>
+          <input type="color" id="customColor" value="#a855f7" title="Свой цвет">
+        </div>
+      </div>
+      <div class="field">
+        <label>Сохранённые списки</label>
+        <div class="saved-lists" id="savedLists"></div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn-cancel" id="cancelBtn">Отмена</button>
+      <button class="btn-clear" id="clearHighlightsBtn">Очистить выделение</button>
+      <button class="btn-apply" id="applyBtn">Выделить</button>
+    </div>
+  </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+/* ============================================================
+   КОНФИГ
+   ============================================================ */
+const DATA_URL = "https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@master/geojson/ne_110m_admin_0_countries.geojson";
+
+/* ФЛАГИ СТРАН */
+const FLAGS = {
+  "Россия":"🇷🇺","США":"🇺🇸","Китай":"🇨🇳","Бразилия":"🇧🇷","Индия":"🇮🇳",
+  "Франция":"🇫🇷","Германия":"🇩🇪","Италия":"🇮🇹","Испания":"🇪🇸","Великобритания":"🇬🇧",
+  "Япония":"🇯🇵","Египет":"🇪🇬","Турция":"🇹🇷","Казахстан":"🇰🇿","Украина":"🇺🇦",
+  "Беларусь":"🇧🇾","Канада":"🇨🇦","Австралия":"🇦🇺","Мексика":"🇲🇽","Аргентина":"🇦🇷",
+  "Польша":"🇵🇱","Швеция":"🇸🇪","Норвегия":"🇳🇴","Финляндия":"🇫🇮","Греция":"🇬🇷",
+  "Португалия":"🇵🇹","Нидерланды":"🇳🇱","Бельгия":"🇧🇪","Швейцария":"🇨🇭","Австрия":"🇦🇹",
+  "Чехия":"🇨🇿","Венгрия":"🇭🇺","Румыния":"🇷🇴","Болгария":"🇧🇬","Сербия":"🇷🇸",
+  "Хорватия":"🇭🇷","Дания":"🇩🇰","Ирландия":"🇮🇪","Исландия":"🇮🇸","Южная Корея":"🇰🇷",
+  "КНДР":"🇰🇵","Монголия":"🇲🇳","Иран":"🇮🇷","Ирак":"🇮🇶","Саудовская Аравия":"🇸🇦",
+  "ОАЭ":"🇦🇪","Пакистан":"🇵🇰","Афганистан":"🇦🇫","Узбекистан":"🇺🇿","Туркменистан":"🇹🇲",
+  "Киргизия":"🇰🇬","Таджикистан":"🇹🇯","Непал":"🇳🇵","Бангладеш":"🇧🇩","Мьянма":"🇲🇲",
+  "Таиланд":"🇹🇭","Вьетнам":"🇻🇳","Малайзия":"🇲🇾","Индонезия":"🇮🇩","Филиппины":"🇵🇭",
+  "ЮАР":"🇿🇦","Нигерия":"🇳🇬","Кения":"🇰🇪","Эфиопия":"🇪🇹","Марокко":"🇲🇦",
+  "Алжир":"🇩🇿","Ливия":"🇱🇾","Судан":"🇸🇩","Танзания":"🇹🇿","Мозамбик":"🇲🇿",
+  "Мадагаскар":"🇲🇬","Колумбия":"🇨🇴","Венесуэла":"🇻🇪","Перу":"🇵🇪","Чили":"🇨🇱",
+  "Боливия":"🇧🇴","Эквадор":"🇪🇨","Парагвай":"🇵🇾","Уругвай":"🇺🇾","Куба":"🇨🇺",
+  "Новая Зеландия":"🇳🇿","Израиль":"🇮🇱","Сирия":"🇸🇾","Иордания":"🇯🇴","Ливан":"🇱🇧",
+  "Йемен":"🇾🇪","Оман":"🇴🇲","Катар":"🇶🇦","Кувейт":"🇰🇼","Грузия":"🇬🇪",
+  "Армения":"🇦🇲","Азербайджан":"🇦🇿","Молдова":"🇲🇩","Литва":"🇱🇹","Латвия":"🇱🇻",
+  "Эстония":"🇪🇪","Словакия":"🇸🇰","Словения":"🇸🇮","Албания":"🇦🇱","Черногория":"🇲🇪",
+  "Люксембург":"🇱🇺","Мальта":"🇲🇹","Кипр":"🇨🇾","Тунис":"🇹🇳","Гана":"🇬🇭",
+};
+function getFlag(name) { return FLAGS[name] || "🏳"; }
+
+/* РУССКИЕ НАЗВАНИЯ СТРАН */
+const RU_NAMES = {
+  "Afghanistan":"Афганистан","Albania":"Албания","Algeria":"Алжир","Andorra":"Андорра",
+  "Angola":"Ангола","Antigua and Barbuda":"Антигуа и Барбуда","Argentina":"Аргентина",
+  "Armenia":"Армения","Australia":"Австралия","Austria":"Австрия","Azerbaijan":"Азербайджан",
+  "Bahamas":"Багамы","Bahrain":"Бахрейн","Bangladesh":"Бангладеш","Barbados":"Барбадос",
+  "Belarus":"Беларусь","Belgium":"Бельгия","Belize":"Белиз","Benin":"Бенин","Bhutan":"Бутан",
+  "Bolivia":"Боливия","Bosnia and Herzegovina":"Босния и Герцеговина","Botswana":"Ботсвана",
+  "Brazil":"Бразилия","Brunei":"Бруней","Bulgaria":"Болгария","Burkina Faso":"Буркина-Фасо",
+  "Burundi":"Бурунди","Cambodia":"Камбоджа","Cameroon":"Камерун","Canada":"Канада",
+  "Cape Verde":"Кабо-Верде","Central African Republic":"ЦАР","Chad":"Чад","Chile":"Чили",
+  "China":"Китай","Colombia":"Колумбия","Comoros":"Коморы","Congo":"Конго",
+  "Democratic Republic of the Congo":"ДР Конго","Costa Rica":"Коста-Рика","Croatia":"Хорватия",
+  "Cuba":"Куба","Cyprus":"Кипр","Czechia":"Чехия","Denmark":"Дания","Djibouti":"Джибути",
+  "Dominica":"Доминика","Dominican Republic":"Доминикана","Ecuador":"Эквадор","Egypt":"Египет",
+  "El Salvador":"Сальвадор","Equatorial Guinea":"Экваториальная Гвинея","Eritrea":"Эритрея",
+  "Estonia":"Эстония","Eswatini":"Эсватини","Ethiopia":"Эфиопия","Fiji":"Фиджи",
+  "Finland":"Финляндия","France":"Франция","Gabon":"Габон","Gambia":"Гамбия","Georgia":"Грузия",
+  "Germany":"Германия","Ghana":"Гана","Greece":"Греция","Grenada":"Гренада","Guatemala":"Гватемала",
+  "Guinea":"Гвинея","Guinea-Bissau":"Гвинея-Бисау","Guyana":"Гайана","Haiti":"Гаити",
+  "Honduras":"Гондурас","Hungary":"Венгрия","Iceland":"Исландия","India":"Индия",
+  "Indonesia":"Индонезия","Iran":"Иран","Iraq":"Ирак","Ireland":"Ирландия","Israel":"Израиль",
+  "Italy":"Италия","Ivory Coast":"Кот-д’Ивуар","Jamaica":"Ямайка","Japan":"Япония",
+  "Jordan":"Иордания","Kazakhstan":"Казахстан","Kenya":"Кения","Kiribati":"Кирибати",
+  "Kuwait":"Кувейт","Kyrgyzstan":"Киргизия","Laos":"Лаос","Latvia":"Латвия","Lebanon":"Ливан",
+  "Lesotho":"Лесото","Liberia":"Либерия","Libya":"Ливия","Liechtenstein":"Лихтенштейн",
+  "Lithuania":"Литва","Luxembourg":"Люксембург","Madagascar":"Мадагаскар","Malawi":"Малави",
+  "Malaysia":"Малайзия","Maldives":"Мальдивы","Mali":"Мали","Malta":"Мальта",
+  "Marshall Islands":"Маршалловы Острова","Mauritania":"Мавритания","Mauritius":"Маврикий",
+  "Mexico":"Мексика","Micronesia":"Микронезия","Moldova":"Молдова","Monaco":"Монако",
+  "Mongolia":"Монголия","Montenegro":"Черногория","Morocco":"Марокко","Mozambique":"Мозамбик",
+  "Myanmar":"Мьянма","Namibia":"Намибия","Nauru":"Науру","Nepal":"Непал","Netherlands":"Нидерланды",
+  "New Zealand":"Новая Зеландия","Nicaragua":"Никарагуа","Niger":"Нигер","Nigeria":"Нигерия",
+  "North Korea":"КНДР","North Macedonia":"Северная Македония","Norway":"Норвегия","Oman":"Оман",
+  "Pakistan":"Пакистан","Palau":"Палау","Palestine":"Палестина","Panama":"Панама",
+  "Papua New Guinea":"Папуа — Новая Гвинея","Paraguay":"Парагвай","Peru":"Перу",
+  "Philippines":"Филиппины","Poland":"Польша","Portugal":"Португалия","Qatar":"Катар",
+  "Romania":"Румыния","Russia":"Россия","Rwanda":"Руанда","Saint Kitts and Nevis":"Сент-Китс и Невис",
+  "Saint Lucia":"Сент-Люсия","Saint Vincent and the Grenadines":"Сент-Винсент и Гренадины",
+  "Samoa":"Самоа","San Marino":"Сан-Марино","Sao Tome and Principe":"Сан-Томе и Принсипи",
+  "Saudi Arabia":"Саудовская Аравия","Senegal":"Сенегал","Serbia":"Сербия","Seychelles":"Сейшелы",
+  "Sierra Leone":"Сьерра-Леоне","Singapore":"Сингапур","Slovakia":"Словакия","Slovenia":"Словения",
+  "Solomon Islands":"Соломоновы Острова","Somalia":"Сомали","South Africa":"ЮАР",
+  "South Korea":"Южная Корея","South Sudan":"Южный Судан","Spain":"Испания","Sri Lanka":"Шри-Ланка",
+  "Sudan":"Судан","Suriname":"Суринам","Sweden":"Швеция","Switzerland":"Швейцария",
+  "Syria":"Сирия","Taiwan":"Тайвань","Tajikistan":"Таджикистан","Tanzania":"Танзания",
+  "Thailand":"Таиланд","Timor-Leste":"Восточный Тимор","Togo":"Того","Tonga":"Тонга",
+  "Trinidad and Tobago":"Тринидад и Тобаго","Tunisia":"Тунис","Turkey":"Турция",
+  "Turkmenistan":"Туркменистан","Tuvalu":"Тувалу","Uganda":"Уганда","Ukraine":"Украина",
+  "United Arab Emirates":"ОАЭ","United Kingdom":"Великобритания","United States of America":"США",
+  "Uruguay":"Уругвай","Uzbekistan":"Узбекистан","Vanuatu":"Вануату","Vatican":"Ватикан",
+  "Venezuela":"Венесуэла","Vietnam":"Вьетнам","Yemen":"Йемен","Zambia":"Замбия","Zimbabwe":"Зимбабве",
+  "Western Sahara":"Западная Сахара","Greenland":"Гренландия","Puerto Rico":"Пуэрто-Рико",
+  "Hong Kong":"Гонконг","Macao":"Макао","Falkland Islands":"Фолклендские острова",
+  "French Guiana":"Французская Гвиана","New Caledonia":"Новая Каледония","Kosovo":"Косово"
+};
+
+/* СТОЛИЦЫ */
+const CAPITALS = {
+  "Россия":"Москва","США":"Вашингтон","Китай":"Пекин","Бразилия":"Бразилиа","Индия":"Нью-Дели",
+  "Франция":"Париж","Германия":"Берлин","Италия":"Рим","Испания":"Мадрид","Великобритания":"Лондон",
+  "Япония":"Токио","Египет":"Каир","Турция":"Анкара","Казахстан":"Астана","Украина":"Киев",
+  "Беларусь":"Минск","Канада":"Оттава","Австралия":"Канберра","Мексика":"Мехико","Аргентина":"Буэнос-Айрес",
+  "Польша":"Варшава","Швеция":"Стокгольм","Норвегия":"Осло","Финляндия":"Хельсинки","Греция":"Афины",
+  "Португалия":"Лиссабон","Нидерланды":"Амстердам","Бельгия":"Брюссель","Швейцария":"Берн",
+  "Австрия":"Вена","Чехия":"Прага","Венгрия":"Будапешт","Румыния":"Бухарест","Болгария":"София",
+  "Сербия":"Белград","Хорватия":"Загреб","Дания":"Копенгаген","Ирландия":"Дублин","Исландия":"Рейкьявик",
+  "Южная Корея":"Сеул","КНДР":"Пхеньян","Монголия":"Улан-Батор","Иран":"Тегеран","Ирак":"Багдад",
+  "Саудовская Аравия":"Эр-Рияд","ОАЭ":"Абу-Даби","Пакистан":"Исламабад","Афганистан":"Кабул",
+  "Узбекистан":"Ташкент","Туркменистан":"Ашхабад","Киргизия":"Бишкек","Таджикистан":"Душанбе",
+  "Непал":"Катманду","Бангладеш":"Дакка","Мьянма":"Нейпьидо","Таиланд":"Бангкок","Вьетнам":"Ханой",
+  "Малайзия":"Куала-Лумпур","Индонезия":"Джакарта","Филиппины":"Манила","ЮАР":"Претория",
+  "Нигерия":"Абуджа","Кения":"Найроби","Эфиопия":"Аддис-Абеба","Марокко":"Рабат","Алжир":"Алжир",
+  "Ливия":"Триполи","Судан":"Хартум","Танзания":"Додома","Мозамбик":"Мапуту","Мадагаскар":"Антананариву",
+  "Колумбия":"Богота","Венесуэла":"Каракас","Перу":"Лима","Чили":"Сантьяго","Боливия":"Ла-Пас",
+  "Эквадор":"Кито","Парагвай":"Асунсьон","Уругвай":"Монтевидео","Куба":"Гавана","Новая Зеландия":"Веллингтон",
+  "Албания":"Тирана","Андорра":"Андорра-ла-Велья","Ангола":"Луанда","Антигуа и Барбуда":"Сент-Джонс",
+  "Армения":"Ереван","Азербайджан":"Баку","Багамы":"Нассау","Бахрейн":"Манама","Барбадос":"Бриджтаун",
+  "Белиз":"Бельмопан","Бенин":"Порто-Ново","Бутан":"Тхимпху","Босния и Герцеговина":"Сараево",
+  "Ботсвана":"Габороне","Бруней":"Бандар-Сери-Бегаван","Буркина-Фасо":"Уагадугу","Бурунди":"Бужумбура",
+  "Камбоджа":"Пномпень","Камерун":"Яунде","Кабо-Верде":"Прая","ЦАР":"Банги","Чад":"Нджамена",
+  "Коморы":"Морони","Конго":"Браззавиль","ДР Конго":"Киншаса","Коста-Рика":"Сан-Хосе","Кипр":"Никосия",
+  "Джибути":"Джибути","Доминика":"Розо","Доминикана":"Санто-Доминго","Сальвадор":"Сан-Сальвадор",
+  "Экваториальная Гвинея":"Малабо","Эритрея":"Асмара","Эстония":"Таллин","Эсватини":"Мбабане",
+  "Фиджи":"Сува","Габон":"Либревиль","Гамбия":"Банжул","Грузия":"Тбилиси","Гана":"Аккра",
+  "Гренада":"Сент-Джорджес","Гватемала":"Гватемала","Гвинея":"Конакри","Гвинея-Бисау":"Бисау",
+  "Гайана":"Джорджтаун","Гаити":"Порт-о-Пренс","Гондурас":"Тегусигальпа","Кот-д’Ивуар":"Ямусукро",
+  "Ямайка":"Кингстон","Иордания":"Амман","Кирибати":"Южная Тарава","Кувейт":"Эль-Кувейт",
+  "Лаос":"Вьентьян","Латвия":"Рига","Ливан":"Бейрут","Лесото":"Масеру","Либерия":"Монровия",
+  "Лихтенштейн":"Вадуц","Литва":"Вильнюс","Люксембург":"Люксембург","Малави":"Лилонгве",
+  "Мальдивы":"Мале","Мали":"Бамако","Мальта":"Валлетта","Маршалловы Острова":"Маджуро",
+  "Мавритания":"Нуакшот","Маврикий":"Порт-Луи","Микронезия":"Паликир","Молдова":"Кишинёв",
+  "Монако":"Монако","Черногория":"Подгорица","Намибия":"Виндхук","Науру":"Ярен",
+  "Никарагуа":"Манагуа","Нигер":"Ниамей","Северная Македония":"Скопье","Оман":"Маскат",
+  "Палау":"Нгерулмуд","Палестина":"Рамалла","Панама":"Панама","Папуа — Новая Гвинея":"Порт-Морсби",
+  "Катар":"Доха","Руанда":"Кигали","Сент-Китс и Невис":"Бастер","Сент-Люсия":"Кастри",
+  "Сент-Винсент и Гренадины":"Кингстаун","Самоа":"Апиа","Сан-Марино":"Сан-Марино",
+  "Сан-Томе и Принсипи":"Сан-Томе","Сенегал":"Дакар","Сейшелы":"Виктория","Сьерра-Леоне":"Фритаун",
+  "Сингапур":"Сингапур","Словакия":"Братислава","Словения":"Любляна","Соломоновы Острова":"Хониара",
+  "Сомали":"Могадишо","Южный Судан":"Джуба","Шри-Ланка":"Коломбо","Суринам":"Парамарибо",
+  "Сирия":"Дамаск","Тайвань":"Тайбэй","Восточный Тимор":"Дили","Того":"Ломе","Тонга":"Нукуалофа",
+  "Тринидад и Тобаго":"Порт-оф-Спейн","Тунис":"Тунис","Тувалу":"Фунафути","Уганда":"Кампала",
+  "Вануату":"Порт-Вила","Ватикан":"Ватикан","Йемен":"Сана","Замбия":"Лусака","Зимбабве":"Хараре",
+  "Гренландия":"Нуук","Пуэрто-Рико":"Сан-Хуан","Гонконг":"Гонконг","Макао":"Макао",
+  "Фолклендские острова":"Стэнли","Французская Гвиана":"Кайенна","Новая Каледония":"Нумеа",
+  "Косово":"Приштина","Западная Сахара":"Эль-Аюн"
+};
+/* АТЛАСНАЯ ПАЛИТРА */
+const ATLAS_PALETTE = [
+  "#f4a261","#e76f51","#2a9d8f","#e9c46a","#90be6d","#f94144","#577590","#f9844a",
+  "#43aa8b","#f9c74f","#4d908e","#f8961e","#277da1","#9c6644","#c77dff","#7b2cbf",
+  "#ff99c8","#ffb4a2","#b5838d","#a3b18a","#588157","#bc6c25","#dda15e","#6d597a"
+];
+function hashStr(s) { let h=0; for (let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))|0; return Math.abs(h); }
+function atlasColor(name) { return ATLAS_PALETTE[hashStr(name) % ATLAS_PALETTE.length]; }
+
+/* КАРТА */
+const map = L.map('map', { center:[20,0], zoom:2, minZoom:2, maxZoom:19, worldCopyJump:true, zoomControl:true });
+
+/* ВИДЫ КАРТЫ */
+const MAP_STYLES = [
+  { id:"political", name:"Политическая", icon:"🗺",
+    url:"https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+    attribution:"© OpenStreetMap, © CARTO", maxZoom:19 },
+  { id:"physical", name:"Физическая", icon:"⛰",
+    url:"https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    attribution:"© OpenTopoMap, © OpenStreetMap", maxZoom:17 },
+  { id:"topo", name:"Топографическая", icon:"📐",
+    url:"https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    attribution:"© OpenTopoMap, © OpenStreetMap", maxZoom:17 },
+  { id:"satellite", name:"Спутниковая", icon:"🛰",
+    url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    attribution:"© Esri, Maxar, Earthstar Geographics", maxZoom:19 },
+  { id:"night", name:"Ночная", icon:"🌃",
+    url:"https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    attribution:"© OpenStreetMap, © CARTO", maxZoom:19 },
+];
+let currentMapStyleIndex = 0;
+let tileLayer = null;
+
+/* СОСТОЯНИЕ */
+const state = {
+  mode:"find", region:"all", atlasMode:true,
+  pool:[], current:null, correct:0, errors:0,
+  wrongIds:new Set(), solved:new Set(), freeClicked:new Set(),
+  layers:{}, layerData:{}, highlights:{}, savedLists:[],
+  hintsLeft:3, hintsUsedThisQuestion:false, hintedCountryId:null,
+};
+
+/* СТИЛИ СТРАН */
+function isLight() { return document.body.classList.contains("light"); }
+function getBaseStyle(id) {
+  const d = state.layerData[id];
+  if (state.highlights[id]) return { color:"#fff", weight:2, fillColor:state.highlights[id], fillOpacity:0.9 };
+  const isNight = document.body.classList.contains("map-night");
+  const isSat = document.body.classList.contains("map-satellite");
+  if (state.atlasMode && d) {
+    const fillOpacity = isSat ? 0.35 : (isNight ? 0.5 : 0.75);
+    return { color: isLight()?"#ffffff":"#1e293b", weight:0.5, fillColor:atlasColor(d.name), fillOpacity:fillOpacity };
+  }
+  return { color: isLight()?"#94a3b8":"#0f172a", weight:0.6, fillColor: isLight()?"#cbd5e1":"#64748b", fillOpacity:0.55 };
+}
+const hoverStyle = { weight:2, color:"#38bdf8", fillOpacity:0.9 };
+function correctStyle() { return { color:"#052e16", weight:2.5, fillColor:"#22c55e", fillOpacity:0.8 }; }
+function wrongStyle()   { return { color:"#450a0a", weight:2.5, fillColor:"#ef4444", fillOpacity:0.8 }; }
+function revealStyle()  { return { color:"#78350f", weight:3, fillColor:"#f59e0b", fillOpacity:0.85, className:"pulse" }; }
+function freeStyle()    { return { color:"#1e3a8a", weight:2.5, fillColor:"#3b82f6", fillOpacity:0.7 }; }
+function hintStyle()    { return { color:"#eab308", weight:4, fillColor:"#fde047", fillOpacity:0.7, className:"hint-flash" }; }
+
+/* ПРИМЕНЕНИЕ ВИДА КАРТЫ */
+function applyMapStyle(index) {
+  const style = MAP_STYLES[index];
+  if (tileLayer) map.removeLayer(tileLayer);
+  tileLayer = L.tileLayer(style.url, { attribution: style.attribution, maxZoom: style.maxZoom }).addTo(map);
+  tileLayer.bringToBack();
+  const btn = document.getElementById("mapStyleBtn");
+  if (btn) btn.textContent = `${style.icon} ${style.name}`;
+  document.body.classList.toggle("map-night", style.id === "night");
+  document.body.classList.toggle("map-satellite", style.id === "satellite");
+  Object.keys(state.layers).forEach(id => state.layers[id].setStyle(getBaseStyle(id)));
+  localStorage.setItem("geo_map_style", index);
+  showToast(`${style.icon} ${style.name}`, "info");
+}
+
+/* НАСТРОЙКИ */
+function saveSettings() {
+  try { localStorage.setItem("geo_settings_final", JSON.stringify({
+    mode:state.mode, region:state.region, atlasMode:state.atlasMode,
+    highlights:state.highlights, savedLists:state.savedLists, hintsLeft:state.hintsLeft,
+  })); } catch(e) {}
+}
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem("geo_settings_final") || "null");
+    if (!s) return;
+    if (s.mode) state.mode = s.mode;
+    if (s.region) state.region = s.region;
+    if (typeof s.atlasMode === "boolean") state.atlasMode = s.atlasMode;
+    if (s.highlights) state.highlights = s.highlights;
+    if (s.savedLists) state.savedLists = s.savedLists;
+    if (typeof s.hintsLeft === "number") state.hintsLeft = s.hintsLeft;
+  } catch(e) {}
+}
+
+/* ПРОГРЕСС */
+function saveProgress() {
+  try { localStorage.setItem("geo_progress_final", JSON.stringify({
+    mode:state.mode, region:state.region,
+    solved:[...state.solved], wrongIds:[...state.wrongIds],
+    correct:state.correct, errors:state.errors, hintsLeft:state.hintsLeft,
+  })); } catch(e) {}
+}
+function loadProgress() { try { return JSON.parse(localStorage.getItem("geo_progress_final") || "null"); } catch(e) { return null; } }
+function clearProgress() { try { localStorage.removeItem("geo_progress_final"); } catch(e) {} }
+
+/* ТЕМА */
+function applyTheme(theme) {
+  if (theme === "light") document.body.classList.add("light");
+  else document.body.classList.remove("light");
+  const btn = document.getElementById("themeToggle");
+  if (btn) btn.textContent = theme === "light" ? "☀️" : "🌙";
+  localStorage.setItem("geo_theme_final", theme);
+}
+function loadTheme() { applyTheme(localStorage.getItem("geo_theme_final") || "dark"); }
+
+/* UI */
+const modeNames = { find:"Найди страну", capital:"Найди столицу", free:"Свободная закраска", review:"Повтор ошибок" };
+function applySettingsToUI() {
+  document.querySelectorAll(".controls button[data-mode]").forEach(b => b.classList.toggle("active", b.dataset.mode === state.mode));
+  document.getElementById("modeInfo").textContent = modeNames[state.mode] || "Найди страну";
+  document.getElementById("regionSelect").value = state.region;
+  const styleBtn = document.getElementById("styleToggle");
+  styleBtn.classList.toggle("active", state.atlasMode);
+  styleBtn.textContent = state.atlasMode ? "🎨 Атлас" : "⬜ Однотонный";
+  updateHintUI();
+}
+function updateHintUI() {
+  const btn = document.getElementById("hintBtn");
+  if (btn) btn.disabled = state.hintsLeft <= 0 || state.mode === "free";
+  const cnt = document.getElementById("hintCount");
+  if (cnt) cnt.textContent = "×" + state.hintsLeft;
+}
+
+/* ИГРА */
+function getPool() {
+  const all = Object.keys(state.layerData).map(id => ({ id, ...state.layerData[id] }));
+  if (state.region === "all") return all;
+  return all.filter(c => (c.region || "").toLowerCase().includes(state.region.toLowerCase()));
+}
+function startGame() {
+  state.solved.clear(); state.wrongIds.clear();
+  state.correct = 0; state.errors = 0; state.freeClicked.clear();
+  state.pool = getPool();
+  state.hintsLeft = 3; state.hintsUsedThisQuestion = false; state.hintedCountryId = null;
+  Object.keys(state.layers).forEach(id => {
+    const el = state.layers[id];
+    el.setStyle(getBaseStyle(id));
+    const p = el.getElement && el.getElement();
+    if (p) { p.classList.remove("pulse"); p.classList.remove("hint-flash"); }
+  });
+  updateStats(); updateHintUI();
+  clearProgress(); nextQuestion();
+}
+function restoreProgressOrStart() {
+  const p = loadProgress();
+  if (!p || !p.solved || p.solved.length === 0) { startGame(); return; }
+  state.mode = p.mode || state.mode;
+  state.region = p.region || state.region;
+  state.solved = new Set(p.solved || []);
+  state.wrongIds = new Set(p.wrongIds || []);
+  state.correct = p.correct || 0;
+  state.errors = p.errors || 0;
+  state.hintsLeft = typeof p.hintsLeft === "number" ? p.hintsLeft : 3;
+  state.pool = getPool();
+  state.solved.forEach(id => { if (state.layers[id]) state.layers[id].setStyle(correctStyle()); });
+  applySettingsToUI(); updateStats();
+  showToast(`↩️ Прогресс восстановлен: ${state.solved.size} стран`, "info");
+  nextQuestion();
+}
+function nextQuestion() {
+  state.hintsUsedThisQuestion = false;
+  state.hintedCountryId = null;
+  Object.keys(state.layers).forEach(id => {
+    const el = state.layers[id];
+    const p = el.getElement && el.getElement();
+    if (p) { p.classList.remove("pulse"); p.classList.remove("hint-flash"); }
+    if (!state.solved.has(id) && !state.freeClicked.has(id)) el.setStyle(getBaseStyle(id));
+  });
+  updateHintUI();
+  if (state.mode === "free") {
+    setQuestion("🎨 Свободная закраска", "Кликайте по странам, чтобы выучить их");
+    state.current = null; return;
+  }
+  let pool = state.pool.filter(c => !state.solved.has(c.id));
+  if (state.mode === "review") {
+    pool = pool.filter(c => state.wrongIds.has(c.id));
+    if (pool.length === 0) { setQuestion("🎉 Ошибок нет!", "Все сложные страны изучены"); state.current = null; return; }
+  }
+  if (pool.length === 0) { endGame(); return; }
+  const next = pool[Math.floor(Math.random() * pool.length)];
+  state.current = next;
+  if (state.mode === "find") setQuestion(`Закрась: <span class="target">${next.name}</span>`, "Найдите страну и кликните");
+  else if (state.mode === "capital") {
+    const cap = CAPITALS[next.name] || "?";
+    setQuestion(`Где находится: <span class="target">${cap}</span>?`, `Столица — ${next.name}`);
+  } else if (state.mode === "review") setQuestion(`Повтор: <span class="target">${next.name}</span>`, "Вы ошибались здесь раньше");
+  saveProgress();
+}
+function setQuestion(html, hint) {
+  document.getElementById("question").innerHTML = html + (hint ? `<span class="hint">${hint}</span>` : "");
+}
+
+/* ПОДСКАЗКА */
+document.getElementById("hintBtn").addEventListener("click", () => {
+  if (state.hintsLeft <= 0 || !state.current) return;
+  if (state.hintsUsedThisQuestion) { showToast("Подсказка уже использована в этом вопросе", "info"); return; }
+  const id = state.current.id;
+  const layer = state.layers[id];
+  if (!layer) return;
+  state.hintsLeft--; state.hintsUsedThisQuestion = true; state.hintedCountryId = id;
+  layer.setStyle(hintStyle()); layer.bringToFront();
+  const p = layer.getElement && layer.getElement();
+  if (p) p.classList.add("hint-flash");
+  showToast(`Подсказка: страна мигает жёлтым!`, "hint", state.current.name);
+  setTimeout(() => {
+    if (p) p.classList.remove("hint-flash");
+    if (state.hintedCountryId === id && !state.solved.has(id)) {
+      layer.setStyle({ color:"#eab308", weight:2.5, fillColor:atlasColor(state.layerData[id].name), fillOpacity:0.85 });
+    }
+  }, 2000);
+  updateHintUI(); saveProgress(); saveSettings();
+});
+
+/* КЛИК ПО СТРАНЕ */
+function onCountryClick(id) {
+  const layer = state.layers[id];
+  if (!layer) return;
+  if (state.mode === "free") {
+    if (!state.freeClicked.has(id)) {
+      state.freeClicked.add(id);
+      layer.setStyle(freeStyle()); layer.bringToFront();
+      const d = state.layerData[id];
+      const cap = CAPITALS[d.name] ? ` — ${CAPITALS[d.name]}` : "";
+      showToast(`${d.name}${cap}`, "ok", d.name);
+    } else { state.freeClicked.delete(id); layer.setStyle(getBaseStyle(id)); }
+    return;
+  }
+  if (!state.current || state.solved.has(id)) return;
+  const target = state.current;
+  if (id === target.id) {
+    layer.setStyle(correctStyle()); layer.bringToFront();
+    state.solved.add(target.id); state.correct++;
+    state.hintedCountryId = null;
+    const cap = CAPITALS[target.name] ? ` — ${CAPITALS[target.name]}` : "";
+    showToast(`Верно! ${target.name}${cap}`, "ok", target.name);
+    updateStats(); saveProgress();
+    setTimeout(nextQuestion, 750);
+  } else {
+    layer.setStyle(wrongStyle()); layer.bringToFront();
+    state.errors++; state.wrongIds.add(target.id);
+    const correctLayer = state.layers[target.id];
+    if (correctLayer) {
+      correctLayer.setStyle(revealStyle()); correctLayer.bringToFront();
+      const p = correctLayer.getElement && correctLayer.getElement();
+      if (p) p.classList.add("pulse");
+      setTimeout(() => {
+        if (p) p.classList.remove("pulse");
+        if (!state.solved.has(target.id)) {
+          correctLayer.setStyle({ color:"#f59e0b", weight:2.5, fillColor:atlasColor(state.layerData[target.id].name), fillOpacity:0.8 });
+        }
+      }, 1800);
+    }
+    const other = state.layerData[id];
+    showToast(`Это ${other ? other.name : "?"}. Нужно: ${target.name}`, "err", target.name);
+    updateStats(); saveProgress();
+    setTimeout(() => { if (!state.freeClicked.has(id)) layer.setStyle(getBaseStyle(id)); }, 800);
+  }
+}
+
+/* СТАТИСТИКА */
+function updateStats() {
+  const left = state.pool.filter(c => !state.solved.has(c.id)).length;
+  document.getElementById("left").textContent = left;
+  document.getElementById("ok").textContent = state.correct;
+  document.getElementById("err").textContent = state.errors;
+  document.getElementById("countInfo").textContent = `· Стран в регионе: ${state.pool.length}`;
+  const hCount = Object.keys(state.highlights).length;
+  document.getElementById("highlightInfo").textContent = hCount ? `· Выделено: ${hCount}` : "";
+  updateHintUI();
+}
+function showToast(text, type, flagCountryName) {
+  const t = document.getElementById("toast");
+  if (flagCountryName) {
+    const flag = getFlag(flagCountryName);
+    t.innerHTML = `<span class="flag">${flag}</span><span>${text}</span>`;
+  } else {
+    t.textContent = text;
+  }
+  t.className = "toast show " + type;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.className = "toast " + type; }, 1900);
+}
+
+/* КОНЕЦ */
+function endGame() {
+  setQuestion(`🎉 Победа! Все страны угаданы. Ошибок: ${state.errors}`, "");
+  state.current = null; clearProgress();
+}
+
+/* ПОИСК СТРАНЫ */
+function findCountryByQuery(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) return null;
+  if (state.layerData[q]) return q;
+  for (const id in state.layerData) {
+    const d = state.layerData[id];
+    if (d.name.toLowerCase() === q) return id;
+    if (d.enName && d.enName.toLowerCase() === q) return id;
+  }
+  for (const id in state.layerData) {
+    const d = state.layerData[id];
+    if (d.name.toLowerCase().includes(q) && q.length >= 3) return id;
+  }
+  for (const id in state.layerData) {
+    const d = state.layerData[id];
+    if (d.enName && d.enName.toLowerCase().includes(q) && q.length >= 3) return id;
+  }
+  return null;
+}
+
+/* ПАНЕЛЬ СПИСКА */
+const panelOverlay = document.getElementById("panelOverlay");
+const countryInput = document.getElementById("countryInput");
+const colorRow = document.getElementById("colorRow");
+const customColor = document.getElementById("customColor");
+let selectedColor = "#a855f7";
+
+function openPanel() {
+  panelOverlay.classList.add("show");
+  const ids = Object.keys(state.highlights);
+  const names = ids.map(id => state.layerData[id] ? state.layerData[id].name : id).join("\n");
+  if (names) countryInput.value = names;
+  if (ids.length) { selectedColor = state.highlights[ids[0]]; updateColorSelection(); }
+  renderSavedLists();
+}
+function closePanel() { panelOverlay.classList.remove("show"); }
+function updateColorSelection() {
+  document.querySelectorAll(".color-swatch").forEach(sw => sw.classList.toggle("selected", sw.dataset.color.toLowerCase() === selectedColor.toLowerCase()));
+  customColor.value = selectedColor;
+}
+colorRow.addEventListener("click", e => {
+  const sw = e.target.closest(".color-swatch");
+  if (sw) { selectedColor = sw.dataset.color; updateColorSelection(); }
+});
+customColor.addEventListener("input", e => { selectedColor = e.target.value; updateColorSelection(); });
+
+function applyHighlight() {
+  const lines = countryInput.value.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
+  if (lines.length === 0) { showToast("Введите хотя бы одну страну", "err"); return; }
+  const newHighlights = {}; const notFound = [];
+  lines.forEach(line => {
+    const id = findCountryByQuery(line);
+    if (id) newHighlights[id] = selectedColor; else notFound.push(line);
+  });
+  state.highlights = newHighlights;
+  Object.keys(state.layers).forEach(id => state.layers[id].setStyle(getBaseStyle(id)));
+  let msg = `Выделено стран: ${Object.keys(newHighlights).length}`;
+  if (notFound.length) msg += ` · Не найдено: ${notFound.length}`;
+  showToast(msg, "ok");
+  if (notFound.length) setTimeout(() => showToast(`Не найдено: ${notFound.slice(0,3).join(", ")}${notFound.length>3?"…":""}`, "err"), 1800);
+  const listName = prompt("Название списка?", "Мой список") || "Без названия";
+  state.savedLists = state.savedLists.filter(l => l.name !== listName);
+  state.savedLists.push({ id:Date.now(), name:listName, color:selectedColor, ids:Object.keys(newHighlights) });
+  saveSettings(); updateStats(); closePanel();
+}
+function clearHighlights() {
+  state.highlights = {};
+  Object.keys(state.layers).forEach(id => state.layers[id].setStyle(getBaseStyle(id)));
+  saveSettings(); showToast("Выделение очищено", "info"); updateStats();
+}
+function renderSavedLists() {
+  const wrap = document.getElementById("savedLists");
+  if (!state.savedLists.length) { wrap.innerHTML = '<div class="hint-text">Пока пусто.</div>'; return; }
+  wrap.innerHTML = state.savedLists.map(l => `
+    <div class="saved-item" data-id="${l.id}">
+      <div class="swatch" style="background:${l.color}"></div>
+      <div class="name">${escapeHtml(l.name)}</div>
+      <div class="count">${l.ids.length} стр.</div>
+      <button class="del" title="Удалить">×</button>
+    </div>`).join("");
+  wrap.querySelectorAll(".saved-item").forEach(item => {
+    const id = Number(item.dataset.id);
+    item.addEventListener("click", e => {
+      if (e.target.classList.contains("del")) return;
+      const list = state.savedLists.find(l => l.id === id);
+      if (!list) return;
+      selectedColor = list.color; updateColorSelection();
+      countryInput.value = list.ids.map(cid => state.layerData[cid] ? state.layerData[cid].name : cid).join("\n");
+    });
+    item.querySelector(".del").addEventListener("click", e => {
+      e.stopPropagation();
+      state.savedLists = state.savedLists.filter(l => l.id !== id);
+      saveSettings(); renderSavedLists();
+    });
+  });
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+const EXAMPLES = {
+  europe:["Россия","Германия","Франция","Италия","Испания","Польша","Украина","Великобритания","Швеция","Норвегия"],
+  asia:["Китай","Индия","Япония","Казахстан","Монголия","Турция","Иран","Саудовская Аравия","Таиланд","Вьетнам"],
+  africa:["Египет","ЮАР","Нигерия","Кения","Марокко","Алжир","Эфиопия","Танзания","Судан","Гана"],
+  big:["Россия","США","Китай","Бразилия","Индия","Канада","Австралия","Мексика","Аргентина","Казахстан"],
+};
+document.querySelectorAll(".examples button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const key = btn.dataset.example;
+    if (key === "clear") { countryInput.value = ""; return; }
+    const list = EXAMPLES[key];
+    if (list) countryInput.value = list.join("\n");
+  });
+});
+document.getElementById("openPanelBtn").addEventListener("click", openPanel);
+document.getElementById("closePanelBtn").addEventListener("click", closePanel);
+document.getElementById("cancelBtn").addEventListener("click", closePanel);
+document.getElementById("applyBtn").addEventListener("click", applyHighlight);
+document.getElementById("clearHighlightsBtn").addEventListener("click", clearHighlights);
+panelOverlay.addEventListener("click", e => { if (e.target === panelOverlay) closePanel(); });
+
+/* ЗАГРУЗКА КАРТЫ */
+function setLoadingStatus(text) {
+  document.getElementById("question").innerHTML = `<span class="loading-spinner"></span> ${text}`;
+}
+setLoadingStatus("Загрузка границ стран…");
+
+fetch(DATA_URL)
+  .then(r => { if (!r.ok) throw new Error("Сервер вернул " + r.status); return r.json(); })
+  .then(geo => {
+    setLoadingStatus("Отрисовка карты…");
+    L.geoJSON(geo, {
+      style: (feature) => {
+        const props = feature.properties;
+        const enName = props.ADMIN || props.NAME || props.name;
+        const ruName = RU_NAMES[enName] || enName;
+        return state.atlasMode
+          ? { color: isLight()?"#fff":"#1e293b", weight:0.5, fillColor:atlasColor(ruName), fillOpacity:0.75 }
+          : { color: isLight()?"#94a3b8":"#0f172a", weight:0.6, fillColor: isLight()?"#cbd5e1":"#64748b", fillOpacity:0.55 };
+      },
+      onEachFeature: (feature, layer) => {
+        const props = feature.properties;
+        const enName = props.ADMIN || props.NAME || props.name;
+        const ruName = RU_NAMES[enName] || enName;
+        const iso = (props.ISO_A2 || props.iso_a2 || "").toLowerCase();
+        state.layers[iso] = layer;
+        state.layerData[iso] = { name: ruName, enName, iso, region: props.CONTINENT || props.continent };
+        layer.bindTooltip(ruName, { permanent:false, direction:"center", className:"country-tooltip" });
+        layer.on("mouseover", () => {
+          if (!state.solved.has(iso) && !state.freeClicked.has(iso) && state.mode !== "free") layer.setStyle(hoverStyle);
+        });
+        layer.on("mouseout", () => {
+          if (!state.solved.has(iso) && !state.freeClicked.has(iso)) layer.setStyle(getBaseStyle(iso));
+        });
+        layer.on("click", () => onCountryClick(iso));
+      }
+    }).addTo(map);
+    const savedMapStyle = parseInt(localStorage.getItem("geo_map_style") || "0", 10);
+    currentMapStyleIndex = isNaN(savedMapStyle) ? 0 : savedMapStyle;
+    applyMapStyle(currentMapStyleIndex);
+    loadSettings();
+    applySettingsToUI();
+    restoreProgressOrStart();
+  })
+  .catch(err => {
+    console.error("Ошибка загрузки карты:", err);
+    document.getElementById("question").innerHTML = `
+      <div style="color:#ef4444; font-weight:700;">❌ Не удалось загрузить карту</div>
+      <div style="font-size:13px; color:#94a3b8; margin-top:6px;">
+        Причина: ${err.message}<br>
+        <button onclick="location.reload()" style="margin-top:8px; padding:6px 14px; border-radius:8px; border:none; background:#38bdf8; color:#0f172a; font-weight:700; cursor:pointer;">Обновить страницу</button>
+      </div>
+    `;
+  });
+
+/* УПРАВЛЕНИЕ */
+document.querySelectorAll(".controls button[data-mode]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".controls button[data-mode]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.mode = btn.dataset.mode;
+    document.getElementById("modeInfo").textContent = modeNames[state.mode];
+    saveSettings(); startGame();
+  });
+});
+document.getElementById("regionSelect").addEventListener("change", e => { state.region = e.target.value; saveSettings(); startGame(); });
+document.getElementById("styleToggle").addEventListener("click", e => {
+  state.atlasMode = !state.atlasMode;
+  const btn = e.currentTarget;
+  btn.textContent = state.atlasMode ? "🎨 Атлас" : "⬜ Однотонный";
+  btn.classList.toggle("active", state.atlasMode);
+  Object.keys(state.layers).forEach(id => state.layers[id].setStyle(getBaseStyle(id)));
+  saveSettings();
+});
+document.getElementById("resetBtn").addEventListener("click", () => { if (confirm("Сбросить прогресс игры?")) startGame(); });
+document.getElementById("themeToggle").addEventListener("click", () => {
+  const isLightNow = document.body.classList.contains("light");
+  applyTheme(isLightNow ? "dark" : "light");
+  Object.keys(state.layers).forEach(id => state.layers[id].setStyle(getBaseStyle(id)));
+});
+document.getElementById("mapStyleBtn").addEventListener("click", () => {
+  currentMapStyleIndex = (currentMapStyleIndex + 1) % MAP_STYLES.length;
+  applyMapStyle(currentMapStyleIndex);
+});
+
+/* СКАЧАТЬ HTML */
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  try {
+    const html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const d = new Date();
+    const pad = n => String(n).padStart(2, "0");
+    const name = `geo-map-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.html`;
+    const a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast(`Файл сохранён: ${name}`, "ok");
+  } catch (e) { showToast("Не удалось сохранить: " + e.message, "err"); }
+});
+
+/* ПОЛНОЭКРАННЫЙ РЕЖИМ */
+const fsBtn = document.getElementById("fullscreenBtn");
+const exitFsBtn = document.createElement("button");
+exitFsBtn.id = "exitFsBtn";
+exitFsBtn.textContent = "⛶ Выйти";
+exitFsBtn.addEventListener("click", exitFullscreen);
+document.body.appendChild(exitFsBtn);
+function isFullscreen() { return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement); }
+function enterFullscreen() {
+  const el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen();
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  else if (el.msRequestFullscreen) el.msRequestFullscreen();
+}
+function exitFullscreen() {
+  if (document.exitFullscreen) document.exitFullscreen();
+  else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  else if (document.msExitFullscreen) document.msExitFullscreen();
+}
+fsBtn.addEventListener("click", () => { if (isFullscreen()) exitFullscreen(); else enterFullscreen(); });
+function updateFsUI() {
+  exitFsBtn.style.display = isFullscreen() ? "block" : "none";
+  setTimeout(() => map.invalidateSize(), 200);
+}
+document.addEventListener("fullscreenchange", updateFsUI);
+document.addEventListener("webkitfullscreenchange", updateFsUI);
+document.addEventListener("msfullscreenchange", updateFsUI);
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "f" || e.key === "F" || e.key === "а" || e.key === "А") {
+    e.preventDefault();
+    if (isFullscreen()) exitFullscreen(); else enterFullscreen();
+  }
+  if (e.key === "Escape" && isFullscreen()) exitFullscreen();
+});
+
+window.addEventListener("beforeunload", () => { saveProgress(); saveSettings(); });
+
+/* СТАРТ */
+/* ============ ЗАСТАВКА ============ */
+(function splashScreen() {
+  const splash = document.getElementById("splashScreen");
+  const skipBtn = document.getElementById("skipSplash");
+  let hidden = false;
+
+  function hideSplash() {
+    if (hidden) return;
+    hidden = true;
+    splash.classList.add("hide");
+    setTimeout(() => {
+      splash.style.display = "none";
+      // Пересчитываем размер карты, чтобы всё правильно отрисовалось
+      setTimeout(() => map.invalidateSize(), 300);
+    }, 800);
+  }
+
+  // Автоматически скрываем через 3 секунды
+  const autoHide = setTimeout(hideSplash, 3000);
+
+  // Кнопка "Пропустить"
+  skipBtn.addEventListener("click", () => {
+    clearTimeout(autoHide);
+    hideSplash();
+  });
+
+  // Показывать заставку только раз за сессию
+  if (sessionStorage.getItem("splashShown") === "yes") {
+    clearTimeout(autoHide);
+    splash.style.display = "none";
+    hidden = true;
+  } else {
+    sessionStorage.setItem("splashShown", "yes");
+  }
+})();
+loadTheme();
+updateColorSelection();
+</script>
+</body>
+</html>
