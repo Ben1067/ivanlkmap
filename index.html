@@ -879,7 +879,7 @@
   </select>
   <button id="styleToggle" class="active">🎨 Атлас</button>
   <button id="hintBtn" class="hint-btn">🔔 Подсказка</button>
-  <span class="hint-count" id="hintCount">×3</span>
+  <span class="hint-count" id="hintCount">×10</span>
   <button id="skipBtn">⏭ Пропустить</button>
   <button id="openPanelBtn" class="highlight-btn">✏️ Свой список</button>
   <button id="mapStyleBtn" title="Переключить вид карты">🗺 Политическая</button>
@@ -1176,7 +1176,7 @@ const state = {
   pool:[], current:null, correct:0, errors:0,
   wrongIds:new Set(), solved:new Set(), freeClicked:new Set(),
   layers:{}, layerData:{}, highlights:{}, savedLists:[],
-  hintsLeft:3, hintsUsedThisQuestion:false, hintedCountryId:null,
+  hintsLeft:10, hintsUsedThisQuestion:false, hintedCountryId:null,
 };
 
 /* СТИЛИ СТРАН */
@@ -1283,7 +1283,7 @@ function startGame() {
   state.solved.clear(); state.wrongIds.clear();
   state.correct = 0; state.errors = 0; state.freeClicked.clear();
   state.pool = getPool();
-  state.hintsLeft = 3; state.hintsUsedThisQuestion = false; state.hintedCountryId = null;
+  state.hintsLeft = 10; state.hintsUsedThisQuestion = false; state.hintedCountryId = null;
   Object.keys(state.layers).forEach(id => {
     const el = state.layers[id];
     el.setStyle(getBaseStyle(id));
@@ -1349,19 +1349,38 @@ document.getElementById("hintBtn").addEventListener("click", () => {
   const id = state.current.id;
   const layer = state.layers[id];
   if (!layer) return;
-  state.hintsLeft--; state.hintsUsedThisQuestion = true; state.hintedCountryId = id;
-  layer.setStyle(hintStyle()); layer.bringToFront();
+
+  state.hintsLeft--;
+  state.hintsUsedThisQuestion = true;
+  state.hintedCountryId = id;
+
+  // Подсветка — мигает и ОСТАЁТСЯ, пока не нажмут
+  layer.setStyle(hintStyle());
+  layer.bringToFront();
   const p = layer.getElement && layer.getElement();
   if (p) p.classList.add("hint-flash");
-  showToast(`Подсказка: страна мигает жёлтым!`, "hint", state.current.name);
-  setTimeout(() => {
-    if (p) p.classList.remove("hint-flash");
-    if (state.hintedCountryId === id && !state.solved.has(id)) {
-      layer.setStyle({ color:"#eab308", weight:2.5, fillColor:atlasColor(state.layerData[id].name), fillOpacity:0.85 });
-    }
-  }, 2000);
+
+  showToast(`🔔 Подсказка: страна мигает жёлтым!`, "hint", state.current.name);
   updateHintUI(); saveProgress(); saveSettings();
 });
+
+/* Снимаем подсказку при клике по любой стране */
+const _origClick = onCountryClick;
+onCountryClick = function(id) {
+  // Убираем мигание подсказки (если была)
+  if (state.hintedCountryId) {
+    const hintLayer = state.layers[state.hintedCountryId];
+    if (hintLayer) {
+      const p = hintLayer.getElement && hintLayer.getElement();
+      if (p) p.classList.remove("hint-flash");
+      if (!state.solved.has(state.hintedCountryId)) {
+        hintLayer.setStyle(getBaseStyle(state.hintedCountryId));
+      }
+    }
+    state.hintedCountryId = null;
+  }
+  _origClick(id);
+};
 
 /* КЛИК ПО СТРАНЕ */
 function onCountryClick(id) {
