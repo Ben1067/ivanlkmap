@@ -1735,21 +1735,36 @@ window.addEventListener("beforeunload", () => { saveProgress(); saveSettings(); 
   }
 })();
   /* ============ ФОНОВАЯ МУЗЫКА ============ */
-const MUSIC_URL = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=relaxing-145038.mp3";
+const MUSIC_URL = "https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3";
 let musicAudio = null;
 let musicOn = localStorage.getItem("geo_music") === "on";
+let musicInitialized = false;
 
 function initMusic() {
-  if (!musicAudio) {
-    musicAudio = new Audio(MUSIC_URL);
-    musicAudio.loop = true;
-    musicAudio.volume = 0.25;
-  }
+  if (musicInitialized) return;
+  musicInitialized = true;
+  musicAudio = new Audio(MUSIC_URL);
+  musicAudio.loop = true;
+  musicAudio.volume = 0.25;
+  musicAudio.preload = "auto";
   updateMusicBtn();
+
+  // Пробуем автозапуск, если уже было включено
   if (musicOn) {
-    musicAudio.play().catch(() => {});
+    const tryPlay = () => {
+      musicAudio.play().then(() => {
+        document.removeEventListener("click", tryPlay);
+        document.removeEventListener("touchstart", tryPlay);
+      }).catch(() => {});
+    };
+    musicAudio.play().catch(() => {
+      // Браузер заблокировал — ждём первого клика
+      document.addEventListener("click", tryPlay, { once: true });
+      document.addEventListener("touchstart", tryPlay, { once: true });
+    });
   }
 }
+
 function updateMusicBtn() {
   const btn = document.getElementById("musicBtn");
   if (!btn) return;
@@ -1757,15 +1772,30 @@ function updateMusicBtn() {
   btn.title = musicOn ? "Выключить музыку" : "Включить музыку";
   btn.classList.toggle("active", musicOn);
 }
+
 document.getElementById("musicBtn").addEventListener("click", () => {
+  if (!musicAudio) initMusic();
   musicOn = !musicOn;
   localStorage.setItem("geo_music", musicOn ? "on" : "off");
-  if (musicOn) musicAudio.play().catch(() => {});
-  else musicAudio.pause();
+  if (musicOn) {
+    musicAudio.volume = 0.25;
+    musicAudio.play().then(() => {
+      showToast("🎵 Музыка включена", "info");
+    }).catch(err => {
+      showToast("❌ Не удалось включить: " + err.message, "err");
+    });
+  } else {
+    musicAudio.pause();
+    showToast("🔇 Музыка выключена", "info");
+  }
   updateMusicBtn();
-  showToast(musicOn ? "🎵 Музыка включена" : "🔇 Музыка выключена", "info");
 });
-initMusic();
+
+// Инициализация при первом взаимодействии с сайтом
+document.addEventListener("click", function initOnce() {
+  initMusic();
+  document.removeEventListener("click", initOnce);
+}, { once: true });
 
 /* ============ ТАЙМЕР ============ */
 let timerInterval = null;
@@ -1895,6 +1925,15 @@ function checkCertificate() {
 }
 
 function showCertificate(regionName) {
+  // 1. Останавливаем таймер
+  stopTimer();
+  // 2. Блокируем игру
+  state.current = null;
+  state.solved.add("__CERT_SHOWN__");
+  // 3. Отключаем кнопку таймера
+  document.getElementById("timedModeBtn").classList.remove("active");
+  timedMode = false;
+
   const overlay = document.getElementById("certOverlay");
   document.getElementById("certRegion").textContent = regionName;
   const savedName = localStorage.getItem("geo_cert_name") || "";
@@ -1905,14 +1944,21 @@ function showCertificate(regionName) {
   overlay.classList.add("show");
 }
 
+function closeCertificate() {
+  document.getElementById("certOverlay").classList.remove("show");
+  stopTimer();
+  const bar = document.getElementById("timerBar");
+  if (bar) bar.classList.remove("show");
+  // Возвращаем игру — просто стартуем заново
+  setTimeout(() => startGame(), 400);
+}
+
 document.getElementById("certNameInput").addEventListener("input", e => {
   localStorage.setItem("geo_cert_name", e.target.value);
 });
 
-document.getElementById("certCloseBtn").addEventListener("click", () => {
-  document.getElementById("certOverlay").classList.remove("show");
-});
-
+document.getElementById("certCloseBtn").addEventListener("click", closeCertificate);
+  
 document.getElementById("certDownloadBtn").addEventListener("click", () => {
   const cert = document.querySelector(".cert-frame");
   if (!cert) return;
