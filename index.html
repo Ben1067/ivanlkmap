@@ -591,21 +591,8 @@
     font-family: inherit;
     transition: all 0.2s;
   }
-  .btn-play { background: linear-gradient(135deg, #38bdf8, #0284c7); color: #fff; box-shadow: 0 4px 14px rgba(56,189,248,0.4); }
-  .btn-play:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(56,189,248,0.5); }
-
-  /* Стиль для стран, которые не участвуют в игре */
-  .country-disabled {
-    fill: #475569 !important;
-    fill-opacity: 0.35 !important;
-    stroke-opacity: 0.4 !important;
-    cursor: not-allowed !important;
-    pointer-events: none !important;
-  }
-  body.light .country-disabled {
-    fill: #cbd5e1 !important;
-    fill-opacity: 0.5 !important;
-  }
+  .btn-apply { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; box-shadow: 0 4px 14px rgba(34,197,94,0.4); }
+  .btn-apply:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(34,197,94,0.5); }
   .btn-clear { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; box-shadow: 0 4px 14px rgba(239,68,68,0.4); }
   .btn-clear:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239,68,68,0.5); }
   .btn-cancel { background: var(--bg-3); color: var(--text); border: 1px solid var(--border-strong); }
@@ -953,11 +940,9 @@
       </div>
     </div>
     <div class="panel-footer">
-  <button class="btn-cancel" id="cancelBtn">Отмена</button>
-  <button class="btn-clear" id="clearHighlightsBtn">Очистить выделение</button>
-  <button class="btn-apply" id="applyBtn">Выделить</button>
-  <button class="btn-play" id="playListBtn">🎯 Играть по списку</button>
-</div>
+      <button class="btn-cancel" id="timedCancelBtn">Отмена</button>
+      <button class="btn-apply" id="timedStartBtn">▶ Начать</button>
+    </div>
   </div>
 </div>
   
@@ -1298,27 +1283,15 @@ function startGame() {
   state.solved.clear(); state.wrongIds.clear();
   state.correct = 0; state.errors = 0; state.freeClicked.clear();
   state.pool = getPool();
-  state.hintsLeft = 3; state.hintsUsedThisQuestion = false; state.hintedCountryId = null;
-
+  state.hintsLeft = 10; state.hintsUsedThisQuestion = false; state.hintedCountryId = null;
   Object.keys(state.layers).forEach(id => {
     const el = state.layers[id];
     el.setStyle(getBaseStyle(id));
     const p = el.getElement && el.getElement();
-    if (p) {
-      p.classList.remove("pulse");
-      p.classList.remove("hint-flash");
-      p.classList.remove("country-disabled"); // убираем серость
-    }
+    if (p) { p.classList.remove("pulse"); p.classList.remove("hint-flash"); }
   });
-
-  // Восстанавливаем кликабельность всех стран
-  Object.keys(state.layers).forEach(id => {
-    state.layers[id].setStyle(getBaseStyle(id));
-  });
-
   updateStats(); updateHintUI();
   clearProgress(); nextQuestion();
-}
 }
 function restoreProgressOrStart() {
   const p = loadProgress();
@@ -1602,93 +1575,6 @@ document.getElementById("openPanelBtn").addEventListener("click", openPanel);
 document.getElementById("closePanelBtn").addEventListener("click", closePanel);
 document.getElementById("cancelBtn").addEventListener("click", closePanel);
 document.getElementById("applyBtn").addEventListener("click", applyHighlight);
-  /* ============ ИГРА ПО СВОЕМУ СПИСКУ ============ */
-document.getElementById("playListBtn").addEventListener("click", () => {
-  const lines = countryInput.value.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
-
-  if (lines.length === 0) {
-    showToast("Введите хотя бы одну страну", "err");
-    return;
-  }
-
-  // Ищем id стран
-  const ids = [];
-  const notFound = [];
-  lines.forEach(line => {
-    const id = findCountryByQuery(line);
-    if (id) ids.push(id);
-    else notFound.push(line);
-  });
-
-  if (ids.length === 0) {
-    showToast("Не найдено ни одной страны", "err");
-    return;
-  }
-
-  if (notFound.length > 0) {
-    showToast(`Не найдено: ${notFound.slice(0,3).join(", ")}${notFound.length>3?"…":""}`, "err");
-  }
-
-  // Формируем пул только из этих стран
-  state.pool = ids.map(id => ({ id, ...state.layerData[id] }));
-
-  // Сбрасываем игру
-  state.mode = "find";
-  state.solved.clear();
-  state.wrongIds.clear();
-  state.correct = 0;
-  state.errors = 0;
-  state.freeClicked.clear();
-  state.hintsLeft = 3;
-  state.hintsUsedThisQuestion = false;
-  state.hintedCountryId = null;
-
-  // Сбрасываем все страны
-  Object.keys(state.layers).forEach(id => {
-    const el = state.layers[id];
-    el.setStyle(getBaseStyle(id));
-    const p = el.getElement && el.getElement();
-    if (p) { p.classList.remove("pulse"); p.classList.remove("hint-flash"); el.classList.remove("country-disabled"); }
-  });
-
-  // Делаем все страны ВНЕ списка серыми и некликабельными
-  const activeIds = new Set(ids);
-  Object.keys(state.layers).forEach(id => {
-    if (!activeIds.has(id)) {
-      const p = state.layers[id].getElement && state.layers[id].getElement();
-      if (p) p.classList.add("country-disabled");
-      state.layers[id].setStyle({
-        color: "#334155",
-        weight: 0.5,
-        fillColor: "#475569",
-        fillOpacity: 0.3
-      });
-    }
-  });
-
-  // Оставляем активные страны цветными
-  ids.forEach(id => {
-    if (state.layers[id]) state.layers[id].setStyle(getBaseStyle(id));
-  });
-
-  // Обновляем интерфейс
-  document.querySelectorAll(".controls button[data-mode]").forEach(b => b.classList.remove("active"));
-  const findBtn = document.querySelector('.controls button[data-mode="find"]');
-  if (findBtn) findBtn.classList.add("active");
-  document.getElementById("modeInfo").textContent = "Найди страну (свой список)";
-  document.getElementById("countInfo").textContent = `· Стран в списке: ${ids.length}`;
-
-  // Прячем панель
-  closePanel();
-
-  // Запускаем игру
-  updateStats();
-  updateHintUI();
-  clearProgress();
-  nextQuestion();
-
-  showToast(`🎯 Игра по списку: ${ids.length} стран`, "ok");
-});
 document.getElementById("clearHighlightsBtn").addEventListener("click", clearHighlights);
 panelOverlay.addEventListener("click", e => { if (e.target === panelOverlay) closePanel(); });
 
