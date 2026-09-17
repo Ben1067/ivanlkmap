@@ -1734,8 +1734,8 @@ window.addEventListener("beforeunload", () => { saveProgress(); saveSettings(); 
     sessionStorage.setItem("splashShown", "yes");
   }
 })();
-  /* ============ ФОНОВАЯ МУЗЫКА ============ */
-const MUSIC_URL = "https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3";
+ /* ============ ФОНОВАЯ МУЗЫКА ============ */
+const MUSIC_URL = "https://cdn.jsdelivr.net/gh/anars/blank-audio@master/2-seconds-of-silence.mp3";
 let musicAudio = null;
 let musicOn = localStorage.getItem("geo_music") === "on";
 let musicInitialized = false;
@@ -1745,24 +1745,9 @@ function initMusic() {
   musicInitialized = true;
   musicAudio = new Audio(MUSIC_URL);
   musicAudio.loop = true;
-  musicAudio.volume = 0.25;
+  musicAudio.volume = 0.2;
   musicAudio.preload = "auto";
   updateMusicBtn();
-
-  // Пробуем автозапуск, если уже было включено
-  if (musicOn) {
-    const tryPlay = () => {
-      musicAudio.play().then(() => {
-        document.removeEventListener("click", tryPlay);
-        document.removeEventListener("touchstart", tryPlay);
-      }).catch(() => {});
-    };
-    musicAudio.play().catch(() => {
-      // Браузер заблокировал — ждём первого клика
-      document.addEventListener("click", tryPlay, { once: true });
-      document.addEventListener("touchstart", tryPlay, { once: true });
-    });
-  }
 }
 
 function updateMusicBtn() {
@@ -1778,11 +1763,14 @@ document.getElementById("musicBtn").addEventListener("click", () => {
   musicOn = !musicOn;
   localStorage.setItem("geo_music", musicOn ? "on" : "off");
   if (musicOn) {
-    musicAudio.volume = 0.25;
+    musicAudio.volume = 0.2;
     musicAudio.play().then(() => {
       showToast("🎵 Музыка включена", "info");
     }).catch(err => {
-      showToast("❌ Не удалось включить: " + err.message, "err");
+      showToast("❌ Не удалось включить музыку: " + err.message, "err");
+      musicOn = false;
+      localStorage.setItem("geo_music", "off");
+      updateMusicBtn();
     });
   } else {
     musicAudio.pause();
@@ -1844,8 +1832,18 @@ function stopTimer() {
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 }
 
-/* Настройка режима «На время» */
 document.getElementById("timedModeBtn").addEventListener("click", () => {
+  // Если режим уже включён — выключаем
+  if (timedMode) {
+    timedMode = false;
+    stopTimer();
+    document.getElementById("timerBar").classList.remove("show");
+    document.getElementById("timedModeBtn").classList.remove("active");
+    showToast("⏱ Режим «На время» выключен", "info");
+    startGame();
+    return;
+  }
+  // Иначе — открываем настройки
   document.getElementById("timedOverlay").classList.add("show");
 });
 document.getElementById("timedCloseBtn").addEventListener("click", () => {
