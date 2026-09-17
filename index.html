@@ -1319,7 +1319,6 @@ function startGame() {
   updateStats(); updateHintUI();
   clearProgress(); nextQuestion();
 }
-}
 function restoreProgressOrStart() {
   const p = loadProgress();
   if (!p || !p.solved || p.solved.length === 0) { startGame(); return; }
