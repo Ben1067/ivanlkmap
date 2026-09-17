@@ -1167,8 +1167,8 @@ const map = L.map('map', { center:[20,0], zoom:2, minZoom:2, maxZoom:19, worldCo
 /* ВИДЫ КАРТЫ */
 const MAP_STYLES = [
   { id:"political", name:"Политическая", icon:"🗺",
-    url:"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    attribution:"© OpenStreetMap", maxZoom:19 },
+    url:"https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+    attribution:"© OpenStreetMap, © CARTO", maxZoom:19 },
   { id:"physical", name:"Физическая", icon:"⛰",
     url:"https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
     attribution:"© OpenTopoMap, © OpenStreetMap", maxZoom:17 },
@@ -1179,8 +1179,8 @@ const MAP_STYLES = [
     url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution:"© Esri, Maxar, Earthstar Geographics", maxZoom:19 },
   { id:"night", name:"Ночная", icon:"🌃",
-    url:"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    attribution:"© OpenStreetMap", maxZoom:19 },
+    url:"https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    attribution:"© OpenStreetMap, © CARTO", maxZoom:19 },
 ];
 let currentMapStyleIndex = 0;
 let tileLayer = null;
@@ -1307,16 +1307,18 @@ function startGame() {
     if (p) {
       p.classList.remove("pulse");
       p.classList.remove("hint-flash");
-      p.classList.remove("country-disabled");
+      p.classList.remove("country-disabled"); // убираем серость
     }
   });
 
+  // Восстанавливаем кликабельность всех стран
   Object.keys(state.layers).forEach(id => {
     state.layers[id].setStyle(getBaseStyle(id));
   });
 
   updateStats(); updateHintUI();
   clearProgress(); nextQuestion();
+}
 }
 function restoreProgressOrStart() {
   const p = loadProgress();
