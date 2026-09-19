@@ -54,6 +54,170 @@
     --tooltip-text: #0f172a;
   }
 
+	/* ============ ПОЛНОЭКРАННЫЙ РЕЖИМ ============ */
+/* ============ ПОЛНОЭКРАННЫЙ РЕЖИМ ============ */
+body.fullscreen-mode header,
+body.fullscreen-mode .control-panel,
+body.fullscreen-mode .controls,
+body.fullscreen-mode .footer {
+  display: none !important;
+}
+
+body.fullscreen-mode #map {
+  flex: 1;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Вопрос в fullscreen — по центру сверху, без фона */
+body.fullscreen-mode .question {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent !important;
+  border: none !important;
+  z-index: 1500;
+  min-height: auto;
+  padding: 0;
+  pointer-events: none;
+}
+
+body.fullscreen-mode .question .target {
+  font-size: 22px !important;
+  padding: 6px 20px !important;
+}
+
+.fs-side-btn {
+  position: fixed;
+  top: 60px;                 /* ← на одной высоте с вопросом */
+  display: none;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 14px;
+  color: #e2e8f0;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 2000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+body.fullscreen-mode .fs-side-btn {
+  display: flex !important;
+}
+
+.fs-side-btn .label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  writing-mode: horizontal-tb;
+  text-orientation: initial;
+  transform: none;
+  white-space: nowrap;
+}
+
+.fs-side-btn.left {
+  left: 400px;
+  border-color: rgba(234, 179, 8, 0.4);
+  color: #fde047;
+}
+
+.fs-side-btn.left:hover {
+  background: rgba(234, 179, 8, 0.2);
+  border-color: rgba(234, 179, 8, 0.7);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 0 40px rgba(234, 179, 8, 0.4);
+}
+
+.fs-side-btn.left:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: translateY(-50%);
+}
+
+.fs-side-btn.right {
+  right: 400px;
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+}
+
+.fs-side-btn.right:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.7);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 0 40px rgba(56, 189, 248, 0.4);
+}
+
+.fs-side-btn .fs-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 11px;
+  font-weight: 800;
+  background: #ef4444;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
+}
+
+body.fullscreen-mode #map {
+  flex: 1;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Подсказка «Нажмите Esc» */
+.fs-hint {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 12px;
+  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  z-index: 9999;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  white-space: nowrap;
+}
+.fs-hint.show {
+  opacity: 1;
+}
+.fs-hint kbd {
+  display: inline-block;
+  padding: 2px 8px;
+  margin: 0 4px;
+  background: linear-gradient(180deg, #334155, #1e293b);
+  border: 1px solid #475569;
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  font-family: 'Inter', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #38bdf8;
+}
   * { box-sizing: border-box; margin: 0; padding: 0; }
   /* ============ ЗАСТАВКА ============ */
   .splash-screen {
@@ -296,19 +460,23 @@
     border-radius: 8px;
     border: 1px solid var(--border);
   }
-
-  .question {
+	.question {
     padding: 16px 22px;
     text-align: center;
-    background: var(--panel);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-bottom: none !important;
     font-size: 17px;
     font-weight: 500;
-    border-bottom: 1px solid var(--border);
     min-height: 62px;
     z-index: 998;
-    display: flex; align-items: center; justify-content: center; flex-direction: column;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
     gap: 4px;
     animation: slideDown 0.3s ease;
   }
@@ -316,14 +484,24 @@
     from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  .question .target {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 800;
-    font-size: 19px;
-    padding: 0 4px;
-  }
+	.question .target {
+  display: inline-block !important;
+  background: var(--panel) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-radius: 12px !important;
+  padding: 4px 14px !important;
+  margin: 6px auto 0 auto !important;
+  border: 1px solid var(--border-strong) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+  font-weight: 800 !important;
+  font-size: 18px !important;
+  color: var(--accent) !important;
+  -webkit-text-fill-color: var(--accent) !important;
+  -webkit-background-clip: padding-box !important;
+  background-clip: padding-box !important;
+  text-align: center !important;
+}
   .question .hint { color: var(--text-dim); font-size: 12.5px; }
 
   .loading-spinner {
@@ -661,6 +839,18 @@
     50% { opacity: 0.5; }
   }
 
+	.country-disabled {
+  fill: #475569 !important;
+  fill-opacity: 0.35 !important;
+  stroke-opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+body.light .country-disabled {
+  fill: #cbd5e1 !important;
+  fill-opacity: 0.5 !important;
+}
+
   /* ============ СЕРТИФИКАТ ============ */
   .cert-overlay {
     position: fixed; inset: 0;
@@ -837,6 +1027,44 @@
     h1 { font-size: 12.5px; }
   }
   
+	.fs-keys-hint {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 16px;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 12px;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 2000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+body.fullscreen-mode .fs-keys-hint {
+  display: inline-flex !important;
+}
+
+.fs-keys-hint kbd {
+  display: inline-block;
+  padding: 2px 8px;
+  background: linear-gradient(180deg, #334155, #1e293b);
+  border: 1px solid #475569;
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  font-family: 'Inter', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
 </style>
 </head>
 <body>
@@ -890,7 +1118,7 @@
 </div>
   
 <div class="question" id="question"><span class="loading-spinner"></span> Загрузка карты…</div>
-  <div class="timer-bar" id="timerBar">
+  <div class="timer-bar" id="timerBar" >
   <div class="timer-fill" id="timerFill"></div>
 </div>
   
@@ -946,6 +1174,22 @@
   </div>
 </div>
   
+<!-- Кнопки полноэкранного режима по бокам -->
+<button class="fs-side-btn left" id="fsHintBtn">
+🔔
+<span class="label">Подсказка</span>
+<span class="fs-count" id="fsHintCount">10</span>
+</button>
+
+<button class="fs-side-btn right" id="fsSkipBtn">
+⏭
+<span class="label">Пропустить</span>
+</button>
+
+<div class="fs-keys-hint" id="fsKeysHint">
+<kbd>H</kbd> подсказка · <kbd>S</kbd> пропустить · <kbd>Esc</kbd> выйти
+</div>
+
 <div class="toast" id="toast"></div>
 
 <div class="panel-overlay" id="panelOverlay">
@@ -992,7 +1236,7 @@
     <div class="panel-footer">
       <button class="btn-cancel" id="cancelBtn">Отмена</button>
       <button class="btn-clear" id="clearHighlightsBtn">Очистить выделение</button>
-      <button class="btn-apply" id="applyBtn">Выделить</button>
+      <button class="btn-apply" id="applyBtn">🎯 Выделить и играть</button>
     </div>
   </div>
 </div>
@@ -1082,9 +1326,9 @@ const RU_NAMES = {
   "United Arab Emirates":"ОАЭ","United Kingdom":"Великобритания","United States of America":"США",
   "Uruguay":"Уругвай","Uzbekistan":"Узбекистан","Vanuatu":"Вануату","Vatican":"Ватикан",
   "Venezuela":"Венесуэла","Vietnam":"Вьетнам","Yemen":"Йемен","Zambia":"Замбия","Zimbabwe":"Зимбабве",
-  "Western Sahara":"Западная Сахара","Greenland":"Гренландия","Puerto Rico":"Пуэрто-Рико",
-  "Hong Kong":"Гонконг","Macao":"Макао","Falkland Islands":"Фолклендские острова",
-  "French Guiana":"Французская Гвиана","New Caledonia":"Новая Каледония","Kosovo":"Косово"
+	"Western Sahara":"Западная Сахара (Марокко)","Greenland":"Гренландия (Дания)","Puerto Rico":"Пуэрто-Рико (США)",
+"Hong Kong":"Гонконг (Китай)","Macao":"Макао (Китай)","Falkland Islands":"Фолклендские о-ва (Великобритания)",
+"French Guiana":"Французская Гвиана (Франция)","New Caledonia":"Новая Каледония (Франция)","Kosovo":"Косово (частично признано)"
 };
 
 /* СТОЛИЦЫ */
@@ -1277,34 +1521,46 @@ function getPool() {
   return all.filter(c => (c.region || "").toLowerCase().includes(state.region.toLowerCase()));
 }
 function startGame() {
-  state.solved.clear(); state.wrongIds.clear();
-  state.correct = 0; state.errors = 0; state.freeClicked.clear();
+  state.solved.clear();
+  state.wrongIds.clear();
+  state.correct = 0;
+  state.errors = 0;
+  state.freeClicked.clear();
+  state.current = null;
+  state.hintsLeft = 10;
+  state.hintsUsedThisQuestion = false;
+  state.hintedCountryId = null;
+
   state.pool = getPool();
-  state.hintsLeft = 10; state.hintsUsedThisQuestion = false; state.hintedCountryId = null;
+
+  if (state.pool.length === 0) {
+    console.warn("Пул стран пуст — карта не загружена");
+    return;
+  }
+
   Object.keys(state.layers).forEach(id => {
     const el = state.layers[id];
-    el.setStyle(getBaseStyle(id));
     const p = el.getElement && el.getElement();
-    if (p) { p.classList.remove("pulse"); p.classList.remove("hint-flash"); }
+    if (p) {
+      p.classList.remove("pulse");
+      p.classList.remove("hint-flash");
+      p.classList.remove("country-disabled");
+      p.style.pointerEvents = "auto";
+      p.style.cursor = "pointer";
+    }
+    el.setStyle(getBaseStyle(id));
   });
-  updateStats(); updateHintUI();
-  clearProgress(); nextQuestion();
+
+  state.highlights = {};
+
+  updateStats();
+  updateHintUI();
+  clearProgress();
+  nextQuestion();
 }
 function restoreProgressOrStart() {
-  const p = loadProgress();
-  if (!p || !p.solved || p.solved.length === 0) { startGame(); return; }
-  state.mode = p.mode || state.mode;
-  state.region = p.region || state.region;
-  state.solved = new Set(p.solved || []);
-  state.wrongIds = new Set(p.wrongIds || []);
-  state.correct = p.correct || 0;
-  state.errors = p.errors || 0;
-  state.hintsLeft = typeof p.hintsLeft === "number" ? p.hintsLeft : 3;
-  state.pool = getPool();
-  state.solved.forEach(id => { if (state.layers[id]) state.layers[id].setStyle(correctStyle()); });
-  applySettingsToUI(); updateStats();
-  showToast(`↩️ Прогресс восстановлен: ${state.solved.size} стран`, "info");
-  nextQuestion();
+  // Всегда начинаем новую игру — не восстанавливаем старое состояние
+  startGame();
 }
 function nextQuestion() {
   state.hintsUsedThisQuestion = false;
@@ -1449,10 +1705,59 @@ function showToast(text, type, flagCountryName) {
   t._timer = setTimeout(() => { t.className = "toast " + type; }, 1900);
 }
 
-/* КОНЕЦ */
 function endGame() {
-  setQuestion(`🎉 Победа! Все страны угаданы. Ошибок: ${state.errors}`, "");
-  state.current = null; clearProgress();
+  // Определяем, был ли это свой список
+  const isCustomList = state.pool.length > 0 && state.pool.length < Object.keys(state.layerData).length;
+
+  if (isCustomList) {
+    setQuestion(`🎉 Вы нашли все страны из списка! Возвращаемся к обычной игре…`, "");
+    showToast("🎉 Свой список пройден!", "ok");
+
+    // Через 2 секунды возвращаемся к обычной игре
+    setTimeout(() => {
+      // Сбрасываем выделения и серость
+      state.highlights = {};
+      Object.keys(state.layers).forEach(id => {
+        const p = state.layers[id].getElement && state.layers[id].getElement();
+        if (p) {
+          p.classList.remove("country-disabled");
+          p.style.pointerEvents = "auto";
+          p.style.cursor = "pointer";
+        }
+      });
+
+      // Возвращаем режим "Найди страну" на весь регион
+      state.mode = "find";
+      state.pool = getPool();
+      state.solved.clear();
+      state.wrongIds.clear();
+      state.correct = 0;
+      state.errors = 0;
+      state.freeClicked.clear();
+
+      // Обновляем UI
+      document.querySelectorAll(".controls button[data-mode]").forEach(b => b.classList.remove("active"));
+      const findBtn = document.querySelector('.controls button[data-mode="find"]');
+      if (findBtn) findBtn.classList.add("active");
+      document.getElementById("modeInfo").textContent = "Найди страну";
+
+      // Запускаем новую игру
+      startGame();
+      showToast("🔍 Обычная игра: найди страну", "info");
+    }, 2500);
+  } else {
+    // Обычная игра — все страны мира
+    setQuestion(`🎉 Победа! Все страны угаданы. Ошибок: ${state.errors}`, "");
+    showToast("🎉 Все страны мира угаданы!", "ok");
+
+    setTimeout(() => {
+      startGame();
+      showToast("🔍 Новая игра!", "info");
+    }, 2500);
+  }
+
+  state.current = null;
+  clearProgress();
 }
 
 /* ПОИСК СТРАНЫ */
@@ -1505,21 +1810,89 @@ customColor.addEventListener("input", e => { selectedColor = e.target.value; upd
 function applyHighlight() {
   const lines = countryInput.value.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
   if (lines.length === 0) { showToast("Введите хотя бы одну страну", "err"); return; }
-  const newHighlights = {}; const notFound = [];
+
+  // Ищем страны из списка
+  const newHighlights = {};
+  const notFound = [];
   lines.forEach(line => {
     const id = findCountryByQuery(line);
-    if (id) newHighlights[id] = selectedColor; else notFound.push(line);
+    if (id) newHighlights[id] = selectedColor;
+    else notFound.push(line);
   });
+
+  if (Object.keys(newHighlights).length === 0) {
+    showToast("Не найдено ни одной страны", "err");
+    return;
+  }
+
+  // Применяем выделение
   state.highlights = newHighlights;
-  Object.keys(state.layers).forEach(id => state.layers[id].setStyle(getBaseStyle(id)));
-  let msg = `Выделено стран: ${Object.keys(newHighlights).length}`;
+
+  // Сбрасываем стили всех стран
+  Object.keys(state.layers).forEach(id => {
+    const el = state.layers[id];
+    const p = el.getElement && el.getElement();
+    if (p) {
+      p.classList.remove("pulse");
+      p.classList.remove("hint-flash");
+      p.classList.remove("country-disabled");
+    }
+    el.setStyle(getBaseStyle(id));
+  });
+
+  // Сообщение
+  let msg = `🎯 Игра по списку: ${Object.keys(newHighlights).length} стран`;
   if (notFound.length) msg += ` · Не найдено: ${notFound.length}`;
   showToast(msg, "ok");
-  if (notFound.length) setTimeout(() => showToast(`Не найдено: ${notFound.slice(0,3).join(", ")}${notFound.length>3?"…":""}`, "err"), 1800);
+
+  // Сохраняем список
   const listName = prompt("Название списка?", "Мой список") || "Без названия";
   state.savedLists = state.savedLists.filter(l => l.name !== listName);
-  state.savedLists.push({ id:Date.now(), name:listName, color:selectedColor, ids:Object.keys(newHighlights) });
-  saveSettings(); updateStats(); closePanel();
+  state.savedLists.push({
+    id: Date.now(), name: listName, color: selectedColor,
+    ids: Object.keys(newHighlights)
+  });
+  saveSettings();
+
+  // 🔥 АВТОМАТИЧЕСКИ ЗАПУСКАЕМ ИГРУ ПО СПИСКУ
+  const ids = Object.keys(newHighlights);
+  state.pool = ids.map(id => ({ id, ...state.layerData[id] }));
+  state.mode = "find";
+  state.solved.clear();
+  state.wrongIds.clear();
+  state.correct = 0;
+  state.errors = 0;
+  state.freeClicked.clear();
+  state.hintsLeft = 10;
+  state.hintsUsedThisQuestion = false;
+  state.hintedCountryId = null;
+
+  // Делаем серыми все страны, КРОМЕ выбранных
+  const activeIds = new Set(ids);
+  Object.keys(state.layers).forEach(id => {
+    if (!activeIds.has(id)) {
+      const p = state.layers[id].getElement && state.layers[id].getElement();
+      if (p) p.classList.add("country-disabled");
+      state.layers[id].setStyle({
+        color: "#334155", weight: 0.5,
+        fillColor: "#475569", fillOpacity: 0.3
+      });
+    }
+  });
+
+  // Обновляем интерфейс
+  document.querySelectorAll(".controls button[data-mode]").forEach(b => b.classList.remove("active"));
+  const findBtn = document.querySelector('.controls button[data-mode="find"]');
+  if (findBtn) findBtn.classList.add("active");
+  document.getElementById("modeInfo").textContent = "Найди страну (свой список)";
+  document.getElementById("countInfo").textContent = `· Стран в списке: ${ids.length}`;
+
+  // Закрываем панель и запускаем игру
+  closePanel();
+  updateStats();
+  updateHintUI();
+  clearProgress();
+  nextQuestion();
 }
 function clearHighlights() {
   state.highlights = {};
@@ -1590,33 +1963,42 @@ fetch(DATA_URL)
         const props = feature.properties;
         const enName = props.ADMIN || props.NAME || props.name;
         const ruName = RU_NAMES[enName] || enName;
-        return state.atlasMode
+        return state.atlasMode 
           ? { color: isLight()?"#fff":"#1e293b", weight:0.5, fillColor:atlasColor(ruName), fillOpacity:0.75 }
           : { color: isLight()?"#94a3b8":"#0f172a", weight:0.6, fillColor: isLight()?"#cbd5e1":"#64748b", fillOpacity:0.55 };
-      },
-      onEachFeature: (feature, layer) => {
-        const props = feature.properties;
-        const enName = props.ADMIN || props.NAME || props.name;
-        const ruName = RU_NAMES[enName] || enName;
-        const iso = (props.ISO_A2 || props.iso_a2 || "").toLowerCase();
-        state.layers[iso] = layer;
-        state.layerData[iso] = { name: ruName, enName, iso, region: props.CONTINENT || props.continent };
-        layer.bindTooltip(ruName, { permanent:false, direction:"center", className:"country-tooltip" });
-        layer.on("mouseover", () => {
-          if (!state.solved.has(iso) && !state.freeClicked.has(iso) && state.mode !== "free") layer.setStyle(hoverStyle);
-        });
-        layer.on("mouseout", () => {
-          if (!state.solved.has(iso) && !state.freeClicked.has(iso)) layer.setStyle(getBaseStyle(iso));
-        });
-        layer.on("click", () => onCountryClick(iso));
-      }
+				},
+  onEachFeature: (feature, layer) => {
+    const props = feature.properties;
+    const enName = props.ADMIN || props.NAME || props.name;
+    const ruName = RU_NAMES[enName] || enName;
+    let iso = (props.ISO_A2 || props.iso_a2 || "").toLowerCase();
+    // Особая обработка для стран с повторяющимися ISO
+    const enNameForIso = props.ADMIN || props.NAME || "";
+    if (enNameForIso === "French Guiana") {
+      iso = "fr_guyana";
+    } else if (!iso || iso === "-99" || iso.length !== 2) {
+      const enForId = enNameForIso.toLowerCase().replace(/[^a-z]/g, "_");
+      iso = "x_" + enForId;
+    }
+
+    state.layers[iso] = layer;
+    state.layerData[iso] = { name: ruName, enName, iso, region: props.CONTINENT || props.continent };
+    layer.bindTooltip(ruName, { permanent:false, direction:"center", className:"country-tooltip" });
+    layer.on("mouseover", () => {
+      if (!state.solved.has(iso) && !state.freeClicked.has(iso) && state.mode !== "free") layer.setStyle(hoverStyle);
+    });
+    layer.on("mouseout", () => {
+      if (!state.solved.has(iso) && !state.freeClicked.has(iso)) layer.setStyle(getBaseStyle(iso));
+    });
+    layer.on("click", () => onCountryClick(iso));
+  }
     }).addTo(map);
     const savedMapStyle = parseInt(localStorage.getItem("geo_map_style") || "0", 10);
     currentMapStyleIndex = isNaN(savedMapStyle) ? 0 : savedMapStyle;
     applyMapStyle(currentMapStyleIndex);
     loadSettings();
     applySettingsToUI();
-    restoreProgressOrStart();
+		setTimeout(() => startGame(), 1000);
   })
   .catch(err => {
     console.error("Ошибка загрузки карты:", err);
@@ -1697,19 +2079,67 @@ function exitFullscreen() {
 }
 fsBtn.addEventListener("click", () => { if (isFullscreen()) exitFullscreen(); else enterFullscreen(); });
 function updateFsUI() {
-  exitFsBtn.style.display = isFullscreen() ? "block" : "none";
-  setTimeout(() => map.invalidateSize(), 200);
+  const fs = isFullscreen();
+
+  // Показываем/скрываем кнопку выхода
+  exitFsBtn.style.display = fs ? "block" : "none";
+
+  // Включаем/выключаем класс "fullscreen-mode" на body
+  document.body.classList.toggle("fullscreen-mode", fs);
+
+  // Показываем подсказку «Нажмите Esc» на 3 секунды
+  const hint = document.getElementById("fsHint");
+  if (fs && hint) {
+    hint.classList.add("show");
+    clearTimeout(hint._timer);
+    hint._timer = setTimeout(() => {
+      hint.classList.remove("show");
+    }, 3500);
+  } else if (hint) {
+    hint.classList.remove("show");
+  }
+
+  // Пересчитываем размер карты
+  setTimeout(() => map.invalidateSize(), 300);
 }
 document.addEventListener("fullscreenchange", updateFsUI);
 document.addEventListener("webkitfullscreenchange", updateFsUI);
 document.addEventListener("msfullscreenchange", updateFsUI);
 document.addEventListener("keydown", e => {
+  // Не срабатывает в полях ввода
   if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+
+  // F — вход/выход из полноэкранного режима (работает всегда)
   if (e.key === "f" || e.key === "F" || e.key === "а" || e.key === "А") {
     e.preventDefault();
     if (isFullscreen()) exitFullscreen(); else enterFullscreen();
+    return;
   }
-  if (e.key === "Escape" && isFullscreen()) exitFullscreen();
+
+  // Escape — выход из fullscreen
+  if (e.key === "Escape" && isFullscreen()) {
+    exitFullscreen();
+    return;
+  }
+
+  // === БЫСТРЫЕ КЛАВИШИ ТОЛЬКО В ПОЛНОЭКРАННОМ РЕЖИМЕ ===
+  if (!isFullscreen()) return;
+
+  // H или Р — подсказка
+  if (e.key === "h" || e.key === "H" || e.key === "р" || e.key === "Р") {
+    e.preventDefault();
+    const btn = document.getElementById("hintBtn");
+    if (btn && !btn.disabled) btn.click();
+    return;
+  }
+
+  // S или Ы — пропустить
+  if (e.key === "s" || e.key === "S" || e.key === "ы" || e.key === "Ы") {
+    e.preventDefault();
+    const btn = document.getElementById("skipBtn");
+    if (btn) btn.click();
+    return;
+  }
 });
 
 window.addEventListener("beforeunload", () => { saveProgress(); saveSettings(); });
@@ -2011,6 +2441,47 @@ onCountryClick = function(id) {
   s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
   document.head.appendChild(s);
 })();
+/* ============================================================
+   КНОПКИ HUD В ПОЛНОЭКРАННОМ РЕЖИМЕ
+   ============================================================ */
+	 const fsHintBtn = document.getElementById("fsHintBtn");
+const fsHintCount = document.getElementById("fsHintCount");
+const fsSkipBtn = document.getElementById("fsSkipBtn");
+
+if (fsHintBtn) {
+  fsHintBtn.addEventListener("click", () => {
+    // Клик по основной кнопке подсказки
+    const mainHint = document.getElementById("hintBtn");
+    if (mainHint && !mainHint.disabled) mainHint.click();
+    updateFsCounters();
+  });
+}
+
+if (fsSkipBtn) {
+  fsSkipBtn.addEventListener("click", () => {
+    const mainSkip = document.getElementById("skipBtn");
+    if (mainSkip) mainSkip.click();
+  });
+}
+
+function updateFsCounters() {
+  if (fsHintCount) fsHintCount.textContent = state.hintsLeft;
+  if (fsHintBtn) fsHintBtn.disabled = state.hintsLeft <= 0;
+}
+
+// Обновляем счётчики при входе/выходе из fullscreen
+const _origUpdateFsUI2 = updateFsUI;
+updateFsUI = function() {
+  _origUpdateFsUI2();
+  updateFsCounters();
+};
+
+// Обновляем счётчик при использовании подсказки
+const _origUpdateHintUI2 = updateHintUI;
+updateHintUI = function() {
+  _origUpdateHintUI2();
+  updateFsCounters();
+};
 loadTheme();
 updateColorSelection();
 </script>
