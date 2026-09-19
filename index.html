@@ -4,11 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Политическая карта мира — Иван Лукинский</title>
-
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+<meta name="theme-color" content="#38bdf8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="География">
+<meta name="msapplication-TileImage" content="icon.png">
 
 <style>
   :root {
@@ -753,12 +761,39 @@ body.fullscreen-mode #map {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
   }
-  .panel-footer {
+  
+	.panel-footer {
     padding: 16px 22px;
     border-top: 1px solid var(--border);
-    display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 10px;
     background: var(--bg-3);
+    align-items: center;
   }
+  /* Отмена — слева снизу */
+  .panel-footer #cancelBtn {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+  }
+  /* Очистить выделение — слева сверху */
+  .panel-footer #clearHighlightsBtn {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+  }
+  /* Выделить и играть — справа */
+  .panel-footer #applyBtn {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    justify-self: end;
+    align-self: center;
+    padding: 20px 40px;
+    font-size: 15px;
+  }
+
   .panel-footer button {
     padding: 10px 20px;
     border-radius: 10px;
@@ -1241,7 +1276,6 @@ body.fullscreen-mode .fs-keys-hint {
   </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
 /* ============================================================
    КОНФИГ
@@ -2484,6 +2518,18 @@ updateHintUI = function() {
 };
 loadTheme();
 updateColorSelection();
+/* ============ PWA — РЕГИСТРАЦИЯ SERVICE WORKER ============ */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js")
+      .then(reg => {
+        console.log("[PWA] Service Worker зарегистрирован:", reg.scope);
+      })
+      .catch(err => {
+        console.warn("[PWA] Ошибка регистрации Service Worker:", err);
+      });
+  });
+}
 </script>
 </body>
 </html>
