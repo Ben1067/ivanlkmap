@@ -259,25 +259,66 @@
 }
 
 /* ============================================================
-   КНОПКА СОХРАНЕНИЯ ПРОГРЕССА
+   КНОПКИ В ФУТЕРЕ — РЯДОМ
    ============================================================ */
-.save-progress-btn {
-  padding: 6px 12px;
-  font-size: 12px;
-  border-radius: 8px;
-  border: 1px solid #22c55e;
-  background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(22,163,74,0.1));
-  color: #86efac;
-  cursor: pointer;
-  font-family: inherit;
-  font-weight: 600;
-  transition: 0.2s;
+   .footer-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
 }
-.save-progress-btn:hover {
-  background: linear-gradient(135deg, rgba(34,197,94,0.35), rgba(22,163,74,0.25));
+
+.footer-btn {
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: 0.2s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-btn.save-btn {
+  background: linear-gradient(135deg, rgba(34,197,94,0.25), rgba(22,163,74,0.15));
+  border-color: #22c55e;
+  color: #86efac;
+}
+.footer-btn.save-btn:hover {
+  background: linear-gradient(135deg, rgba(34,197,94,0.45), rgba(22,163,74,0.3));
   color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(34,197,94,0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(34,197,94,0.4);
+}
+
+.footer-btn.reset-btn {
+  background: rgba(30,41,59,0.8);
+  border-color: rgba(148,163,184,0.3);
+  color: #cbd5e1;
+}
+.footer-btn.reset-btn:hover {
+  background: rgba(239,68,68,0.2);
+  border-color: #ef4444;
+  color: #fca5a5;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239,68,68,0.3);
+}
+
+@media (max-width: 768px) {
+  .footer-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  .footer-btn {
+    padding: 8px 14px;
+    font-size: 12px;
+    flex: 1;
+    justify-content: center;
+  }
 }
 
 /* ============================================================
@@ -2251,7 +2292,6 @@ body.fullscreen-mode .fs-keys-hint {
   <button id="openPanelBtn" class="highlight-btn">✏️ Свой список</button>
   <button id="mapStyleBtn" title="Переключить вид карты">🗺 Политическая</button>
   <button id="musicBtn" class="theme-btn" title="Фоновая музыка">🎵</button>
-  <button id="downloadBtn" class="theme-btn" title="Скачать HTML-файл">💾</button>
   <button id="fullscreenBtn" class="theme-btn" title="Полный экран (F)">⛶</button>
   <button id="themeToggle" class="theme-btn" title="Переключить тему">🌙</button>
 </div>
@@ -2264,10 +2304,12 @@ body.fullscreen-mode .fs-keys-hint {
 <div id="map"></div>
 
 <div class="footer">
-  <div>Режим: <b id="modeInfo">Найди страну</b> · <span id="countInfo"></span> <span id="highlightInfo"></span></div>
-  <div class="author-foot">Создатель: <b>Иван Лукинский</b></div>
-  <button id="saveProgressBtn" class="save-progress-btn">💾 Сохранить прогресс</button>
-  <button id="resetBtn">🔄 Сбросить прогресс</button>
+<div>Режим: <b id="modeInfo">Найди страну</b> · <span id="countInfo"></span> <span id="highlightInfo"></span></div>
+<div class="author-foot">Создатель: <b>Иван Лукинский</b></div>
+<div class="footer-actions">
+  <button id="saveProgressBtn" class="footer-btn save-btn">💾 Сохранить прогресс</button>
+  <button id="resetBtn" class="footer-btn reset-btn">🔄 Сбросить прогресс</button>
+</div>
 </div>
 <!-- Сертификат -->
 <div class="cert-overlay" id="certOverlay">
@@ -2820,7 +2862,9 @@ function startGame() {
   nextQuestion();
 }
 function restoreProgressOrStart() {
-  // Всегда начинаем новую игру — не восстанавливаем старое состояние
+  // НЕ восстанавливаем старый общий прогресс
+  // Прогресс берём ТОЛЬКО из аккаунта пользователя
+  localStorage.removeItem("geo_progress_final");
   startGame();
 }
 function nextQuestion() {
@@ -3302,22 +3346,6 @@ document.getElementById("mapStyleBtn").addEventListener("click", () => {
   applyMapStyle(currentMapStyleIndex);
 });
 
-/* СКАЧАТЬ HTML */
-document.getElementById("downloadBtn").addEventListener("click", () => {
-  try {
-    const html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const d = new Date();
-    const pad = n => String(n).padStart(2, "0");
-    const name = `geo-map-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.html`;
-    const a = document.createElement("a");
-    a.href = url; a.download = name;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    showToast(`Файл сохранён: ${name}`, "ok");
-  } catch (e) { showToast("Не удалось сохранить: " + e.message, "err"); }
-});
 
 /* ПОЛНОЭКРАННЫЙ РЕЖИМ */
 const fsBtn = document.getElementById("fullscreenBtn");
@@ -3776,6 +3804,11 @@ function getUserKey(first, last, cls) {
 function registerOrLogin(first, last, cls, password) {
   const key = getUserKey(first, last, cls);
   const users = getAllUsers();
+  // ПРИНУДИТЕЛЬНО очищаем состояние перед сменой пользователя
+localStorage.removeItem("geo_progress_final");
+state.solved = new Set();
+state.correct = 0;
+state.errors = 0;
 
   if (users[key]) {
     // Пользователь есть — проверяем пароль
@@ -3830,14 +3863,34 @@ function saveUserProgress() {
   }
 }
 
-// Загрузить прогресс при входе
 function loadUserProgress() {
-  if (!currentUser) return;
-  const p = currentUser.progress || {};
+  if (!currentUser) {
+    state.solved = new Set();
+    state.correct = 0;
+    state.errors = 0;
+    state.hintsLeft = 10;
+    return;
+  }
+
+  const users = getAllUsers();
+  const user = users[currentUser.key];
+
+  if (!user) {
+    state.solved = new Set();
+    state.correct = 0;
+    state.errors = 0;
+    state.hintsLeft = 10;
+    return;
+  }
+
+  const p = user.progress || {};
+  // ПРИНУДИТЕЛЬНО перезаписываем состояние
   state.solved = new Set(p.solved || []);
   state.correct = p.correct || 0;
   state.errors = p.errors || 0;
   state.hintsLeft = p.hintsLeft || 10;
+
+  console.log("[Progress] Загружен для", user.firstName, "-", state.solved.size, "стран");
 }
 
 // ============================================================
@@ -3901,12 +3954,16 @@ document.getElementById("teacherForm").addEventListener("submit", e => {
   }
 });
 
-// Закрыть экран входа
 function closeAuth() {
   authScreen.classList.add("hide");
   setTimeout(() => { authScreen.style.display = "none"; }, 400);
-  // Обновляем приветствие
   if (currentUser) {
+    // Очищаем старый общий прогресс
+    localStorage.removeItem("geo_progress_final");
+    // Загружаем прогресс ИМЕННО этого пользователя
+    loadUserProgress();
+    // Перезапускаем игру с чистого листа для этого пользователя
+    setTimeout(() => startGame(), 300);
     console.log("[Auth] Добро пожаловать,", currentUser.firstName, currentUser.lastName);
     showToast(`👋 Привет, ${currentUser.firstName}!`, "ok");
   }
@@ -4229,17 +4286,20 @@ const ACHIEVEMENTS = [
   { id: "luxmax",       icon: "💎", name: "Луксмаксер",                     desc: "100% континента без подсказок и ошибок", rarity: "legendary", check: s => s.perfectContinent },
 ];
 
-const ACH_KEY = "geo_achievements";
+function getAchKey() {
+  if (!currentUser) return "geo_achievements_guest";
+  return "geo_achievements_" + currentUser.key;
+}
 
 /* ============================================================
    ХРАНИЛИЩЕ ДОСТИЖЕНИЙ
    ============================================================ */
-function getUnlockedAchievements() {
-  try { return new Set(JSON.parse(localStorage.getItem(ACH_KEY) || "[]")); }
+   function getUnlockedAchievements() {
+  try { return new Set(JSON.parse(localStorage.getItem(getAchKey()) || "[]")); }
   catch(e) { return new Set(); }
 }
 function saveUnlockedAchievements(set) {
-  try { localStorage.setItem(ACH_KEY, JSON.stringify([...set])); } catch(e) {}
+  try { localStorage.setItem(getAchKey(), JSON.stringify([...set])); } catch(e) {}
 }
 
 /* ============================================================
@@ -4287,7 +4347,7 @@ function collectStats() {
     daysSinceFirst: daysSince("geo_firstLogin"),
     daysSinceLastLogin: daysSince("geo_lastLogin"),
     streakDays: parseInt(localStorage.getItem("geo_day_streak") || "0", 10),
-    themeChanges: parseInt(localStorage.getItem("geo_theme_changes") || "0", 10),
+    themeChanges: parseInt(localStorage.getItem(getAchKey() + "_theme_changes") || "0", 10),
     speedRun20: localStorage.getItem("geo_speedrun20") === "yes",
     oceania: countRegion("Oceania"),
     maxErrorsOneCountry: parseInt(localStorage.getItem("geo_max_errors_one") || "0", 10),
@@ -4419,8 +4479,8 @@ localStorage.setItem("geo_lastLogin", new Date().toISOString());
 const _origApplyTheme = applyTheme;
 applyTheme = function(theme) {
   _origApplyTheme(theme);
-  const changes = parseInt(localStorage.getItem("geo_theme_changes") || "0", 10);
-  localStorage.setItem("geo_theme_changes", changes + 1);
+  const changes = parseInt(localStorage.getItem(getAchKey() + "_theme_changes") || "0", 10);
+  localStorage.setItem(getAchKey() + "_theme_changes", changes + 1);
 };
 
 // Подсказки — счётчик
@@ -4634,19 +4694,7 @@ function decodeProgress(code) {
   }
 }
 
-document.getElementById("saveProgressBtn").addEventListener("click", () => {
-  if (!currentUser) {
-    showToast("❌ Сначала войдите в аккаунт", "err");
-    return;
-  }
-  const code = encodeProgress();
-  if (!code) {
-    showToast("❌ Не удалось сохранить", "err");
-    return;
-  }
-  document.getElementById("codeBox").textContent = code;
-  document.getElementById("codeModal").classList.add("show");
-});
+
 
 document.getElementById("copyCodeBtn").addEventListener("click", () => {
   const code = document.getElementById("codeBox").textContent;
@@ -4722,6 +4770,65 @@ closeAuth = function() {
 
 // При загрузке
 setTimeout(updateTeacherButton, 500);
+/* ============================================================
+   СОХРАНЕНИЕ ПРОГРЕССА УЧЕНИКОМ — КОД
+   ============================================================ */
+   function encodeProgress() {
+  if (!currentUser) return null;
+  const data = {
+    f: currentUser.firstName,
+    l: currentUser.lastName,
+    c: currentUser.class,
+    s: [...state.solved],
+    e: state.errors,
+    cor: state.correct,
+    st: parseInt(localStorage.getItem("geo_day_streak") || "0", 10),
+    ach: [...getUnlockedAchievements()],
+    ts: Date.now(),
+  };
+  try {
+    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  } catch(e) {
+    return null;
+  }
+}
+
+document.getElementById("saveProgressBtn").addEventListener("click", () => {
+  if (!currentUser) {
+    showToast("❌ Сначала войдите в аккаунт", "err");
+    return;
+  }
+  const code = encodeProgress();
+  if (!code) {
+    showToast("❌ Не удалось сохранить", "err");
+    return;
+  }
+  document.getElementById("codeBox").textContent = code;
+  document.getElementById("codeModal").classList.add("show");
+});
+
+document.getElementById("copyCodeBtn").addEventListener("click", () => {
+  const code = document.getElementById("codeBox").textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast("📋 Код скопирован!", "ok");
+  }).catch(() => {
+    const range = document.createRange();
+    range.selectNode(document.getElementById("codeBox"));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand("copy");
+    showToast("📋 Код скопирован!", "ok");
+  });
+});
+
+document.getElementById("closeCodeBtn").addEventListener("click", () => {
+  document.getElementById("codeModal").classList.remove("show");
+});
+document.getElementById("codeModal").addEventListener("click", e => {
+  if (e.target.id === "codeModal") {
+    e.target.classList.remove("show");
+  }
+});
 loadTheme();
 updateColorSelection();
 </script>
