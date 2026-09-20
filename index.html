@@ -9,7 +9,373 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+
 <style>
+/* ============================================================
+   КНОПКА «УЧЕНИКИ» В ШАПКЕ
+   ============================================================ */
+   .teacher-panel-btn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(56,189,248,0.25), rgba(168,85,247,0.2));
+  border: 1px solid rgba(56,189,248,0.5);
+  border-radius: 10px;
+  color: #7dd3fc;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.teacher-panel-btn:hover {
+  background: linear-gradient(135deg, rgba(56,189,248,0.4), rgba(168,85,247,0.3));
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(56,189,248,0.4);
+}
+.teacher-panel-btn.hidden { display: none; }
+
+/* ============================================================
+   ПАНЕЛЬ УЧЕНИКОВ
+   ============================================================ */
+.students-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 5000;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.students-overlay.show { display: flex; }
+
+.students-card {
+  background: linear-gradient(180deg, rgba(30,41,59,0.98), rgba(15,23,42,0.98));
+  border: 1px solid rgba(56,189,248,0.3);
+  border-radius: 20px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  animation: authIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+.students-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(148,163,184,0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.students-header h2 {
+  font-size: 19px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #38bdf8, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.students-close {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.students-close:hover {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+  transform: rotate(90deg);
+}
+
+.students-stats {
+  padding: 16px 22px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid rgba(148,163,184,0.1);
+}
+.students-stat {
+  flex: 1;
+  min-width: 140px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(30,41,59,0.6);
+  border: 1px solid rgba(148,163,184,0.1);
+  text-align: center;
+}
+.students-stat-num {
+  font-size: 26px;
+  font-weight: 900;
+  color: #38bdf8;
+}
+.students-stat-lbl {
+  font-size: 11px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+.students-import {
+  padding: 14px 22px;
+  background: rgba(56,189,248,0.05);
+  border-bottom: 1px solid rgba(56,189,248,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.students-import label {
+  font-size: 12px;
+  color: #7dd3fc;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.students-import-row {
+  display: flex;
+  gap: 8px;
+}
+.students-import-row input {
+  flex: 1;
+  padding: 10px 14px;
+  background: var(--bg-1);
+  border: 1px solid rgba(56,189,248,0.3);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: 'Inter', monospace;
+}
+.students-import-row input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56,189,248,0.15);
+}
+.students-import-row button {
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: 0.2s;
+}
+.students-import-row button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(56,189,248,0.4);
+}
+.students-import-hint {
+  font-size: 11.5px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.students-toolbar {
+  padding: 14px 22px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid rgba(148,163,184,0.1);
+}
+.students-toolbar input,
+.students-toolbar select {
+  padding: 8px 12px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+}
+.students-toolbar input { flex: 1; min-width: 160px; }
+.students-toolbar input:focus,
+.students-toolbar select:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+.students-toolbar button {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.students-table-wrap {
+  flex: 1;
+  overflow: auto;
+  padding: 0 22px 22px;
+}
+.students-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: var(--text);
+}
+.students-table th {
+  padding: 10px;
+  text-align: left;
+  background: rgba(30,41,59,0.6);
+  color: #64748b;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: sticky;
+  top: 0;
+}
+.students-table td {
+  padding: 10px;
+  border-bottom: 1px solid rgba(148,163,184,0.08);
+}
+.students-table tr:hover td {
+  background: rgba(56,189,248,0.05);
+}
+.students-empty {
+  text-align: center;
+  color: #64748b;
+  padding: 40px 10px !important;
+}
+.students-progress {
+  display: inline-block;
+  min-width: 60px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* ============================================================
+   КНОПКА СОХРАНЕНИЯ ПРОГРЕССА
+   ============================================================ */
+.save-progress-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid #22c55e;
+  background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(22,163,74,0.1));
+  color: #86efac;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.save-progress-btn:hover {
+  background: linear-gradient(135deg, rgba(34,197,94,0.35), rgba(22,163,74,0.25));
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34,197,94,0.3);
+}
+
+/* ============================================================
+   МОДАЛКА С КОДОМ
+   ============================================================ */
+.code-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 7000;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.code-modal-overlay.show { display: flex; }
+
+.code-modal {
+  background: linear-gradient(180deg, rgba(30,41,59,0.98), rgba(15,23,42,0.98));
+  border: 2px solid rgba(34,197,94,0.4);
+  border-radius: 20px;
+  padding: 28px 24px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  animation: authIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.code-modal h3 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #22c55e;
+  margin-bottom: 8px;
+}
+.code-modal p {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.code-box {
+  padding: 16px;
+  background: rgba(15,23,42,0.9);
+  border: 2px dashed rgba(34,197,94,0.5);
+  border-radius: 12px;
+  font-family: 'Inter', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #86efac;
+  letter-spacing: 0.02em;
+  word-break: break-all;
+  margin-bottom: 16px;
+  user-select: all;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.code-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.code-actions button {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-copy {
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  color: #fff;
+}
+.btn-copy:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(56,189,248,0.4);
+}
+.btn-close-code {
+  background: rgba(30,41,59,0.8);
+  color: #cbd5e1;
+  border: 1px solid rgba(148,163,184,0.2);
+}
+.btn-close-code:hover {
+  background: rgba(51,65,85,0.9);
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .students-overlay { padding: 10px; }
+  .students-card { max-height: 95vh; }
+  .students-stats { padding: 12px 14px; }
+  .students-stat { min-width: 100px; padding: 10px; }
+  .students-stat-num { font-size: 20px; }
+  .students-import, .students-toolbar { padding: 12px 14px; }
+  .students-table-wrap { padding: 0 14px 14px; }
+  .teacher-panel-btn { padding: 6px 10px; font-size: 11px; }
+}
   :root {
     --bg-1: #0a0e1a;
     --bg-2: #111827;
@@ -1854,6 +2220,9 @@ body.fullscreen-mode .fs-keys-hint {
 <header>
   <h1>🌍 Политическая карта мира <span class="author">· создатель Иван Лукинский</span></h1>
   <div class="stats">
+  <button class="teacher-panel-btn hidden" id="teacherPanelBtn" title="Список учеников">
+  👥 Ученики
+</button>
     <div class="stat-chip"><span class="lbl">Осталось</span> <b id="left">0</b></div>
     <div class="stat-chip ok"><span class="lbl">Верно</span> <b id="ok">0</b></div>
     <div class="stat-chip err"><span class="lbl">Ошибок</span> <b id="err">0</b></div>
@@ -1897,6 +2266,7 @@ body.fullscreen-mode .fs-keys-hint {
 <div class="footer">
   <div>Режим: <b id="modeInfo">Найди страну</b> · <span id="countInfo"></span> <span id="highlightInfo"></span></div>
   <div class="author-foot">Создатель: <b>Иван Лукинский</b></div>
+  <button id="saveProgressBtn" class="save-progress-btn">💾 Сохранить прогресс</button>
   <button id="resetBtn">🔄 Сбросить прогресс</button>
 </div>
 <!-- Сертификат -->
@@ -1994,6 +2364,90 @@ body.fullscreen-mode .fs-keys-hint {
     <div class="ach-notif-title">ДОСТИЖЕНИЕ ПОЛУЧЕНО!</div>
     <div class="ach-notif-name" id="achNotifName">Название</div>
     <div class="ach-notif-desc" id="achNotifDesc">Описание</div>
+  </div>
+</div>
+</div>
+<!-- ============ ПАНЕЛЬ УЧИТЕЛЯ — СПИСОК УЧЕНИКОВ ============ -->
+<div class="students-overlay" id="studentsOverlay">
+<div class="students-card">
+  <div class="students-header">
+    <h2>👥 Список учеников</h2>
+    <button class="students-close" id="studentsCloseBtn">×</button>
+  </div>
+
+  <!-- Статистика -->
+  <div class="students-stats">
+    <div class="students-stat">
+      <div class="students-stat-num" id="statTotal">0</div>
+      <div class="students-stat-lbl">Всего учеников</div>
+    </div>
+    <div class="students-stat">
+      <div class="students-stat-num" id="statAvg">0</div>
+      <div class="students-stat-lbl">Средний прогресс</div>
+    </div>
+    <div class="students-stat">
+      <div class="students-stat-num" id="statBest">—</div>
+      <div class="students-stat-lbl">Лучший класс</div>
+    </div>
+  </div>
+
+  <!-- Импорт кода -->
+  <div class="students-import">
+    <label>📥 Импорт прогресса по коду ученика</label>
+    <div class="students-import-row">
+      <input type="text" id="importCodeInput" placeholder="Вставьте код от ученика…">
+      <button id="importCodeBtn">📥 Загрузить</button>
+    </div>
+    <div class="students-import-hint">
+      Ученик должен нажать «💾 Сохранить прогресс» и прислать вам код.
+    </div>
+  </div>
+
+  <!-- Фильтры -->
+  <div class="students-toolbar">
+    <input type="text" id="studentsSearch" placeholder="🔍 Поиск ученика…">
+    <select id="studentsClassFilter">
+      <option value="">Все классы</option>
+      <option value="5">5 класс</option>
+      <option value="6">6 класс</option>
+      <option value="7">7 класс</option>
+      <option value="8">8 класс</option>
+      <option value="9">9 класс</option>
+      <option value="10">10 класс</option>
+      <option value="11">11 класс</option>
+    </select>
+    <button id="studentsExportBtn">📥 CSV</button>
+  </div>
+
+  <!-- Таблица -->
+  <div class="students-table-wrap">
+    <table class="students-table">
+      <thead>
+        <tr>
+          <th>Ученик</th>
+          <th>Класс</th>
+          <th>Изучено</th>
+          <th>Ошибок</th>
+          <th>Стрик</th>
+          <th>Последний вход</th>
+        </tr>
+      </thead>
+      <tbody id="studentsTableBody">
+        <tr><td colspan="6" class="students-empty">Пока нет учеников</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+<!-- ============ МОДАЛКА С КОДОМ ============ -->
+<div class="code-modal-overlay" id="codeModal">
+<div class="code-modal">
+  <h3>✅ Прогресс сохранён!</h3>
+  <p>Отправьте этот код учителю, чтобы он увидел ваш прогресс:</p>
+  <div class="code-box" id="codeBox">—</div>
+  <div class="code-actions">
+    <button class="btn-copy" id="copyCodeBtn">📋 Скопировать</button>
+    <button class="btn-close-code" id="closeCodeBtn">Закрыть</button>
   </div>
 </div>
 </div>
@@ -3560,18 +4014,32 @@ document.getElementById("tutorialNext").addEventListener("click", () => {
   } else {
     localStorage.setItem(TUTORIAL_KEY, "yes");
     closeTutorial();
-    closeAuth();
+// Если пользователь уже зарегистрирован — закрываем экран входа
+if (currentUser) {
+  closeAuth();
+}
+// Иначе — остаёмся на экране регистрации
   }
 });
 
 document.getElementById("tutorialSkip").addEventListener("click", () => {
   localStorage.setItem(TUTORIAL_KEY, "yes");
   closeTutorial();
+// Если пользователь уже зарегистрирован — закрываем экран входа
+if (currentUser) {
   closeAuth();
+}
+// Иначе — остаёмся на экране регистрации
 });
 
 function closeTutorial() {
   tutorialScreen.classList.remove("show");
+}
+
+// Закрыть обучение и вернуться на экран входа
+function closeTutorialAndBackToAuth() {
+  tutorialScreen.classList.remove("show");
+  // Экран входа оставляем открытым
 }
 
 // Кнопка «Узнать о функциях» из формы
@@ -4019,6 +4487,241 @@ setTimeout(() => {
   checkAchievements();
   renderAchList();
 }, 2000);
+/* ============================================================
+   ПАНЕЛЬ УЧИТЕЛЯ — СПИСОК УЧЕНИКОВ
+   ============================================================ */
+
+// Показать/скрыть кнопку «Ученики»
+function updateTeacherButton() {
+  const btn = document.getElementById("teacherPanelBtn");
+  if (!btn) return;
+  // Кнопка видна, если это учитель (не ученик)
+  const isTeacher = !currentUser;
+  btn.classList.toggle("hidden", !isTeacher);
+}
+
+// Открыть панель учеников
+document.getElementById("teacherPanelBtn").addEventListener("click", () => {
+  document.getElementById("studentsOverlay").classList.add("show");
+  renderStudentsTable();
+});
+
+// Закрыть панель
+document.getElementById("studentsCloseBtn").addEventListener("click", () => {
+  document.getElementById("studentsOverlay").classList.remove("show");
+});
+document.getElementById("studentsOverlay").addEventListener("click", e => {
+  if (e.target.id === "studentsOverlay") {
+    e.target.classList.remove("show");
+  }
+});
+
+// Отрисовка таблицы
+function renderStudentsTable() {
+  const users = getAllUsers();
+  const filter = document.getElementById("studentsClassFilter").value;
+  const search = (document.getElementById("studentsSearch").value || "").toLowerCase();
+
+  const list = Object.entries(users)
+    .map(([key, u]) => ({ key, ...u }))
+    .filter(u => !filter || u.class === filter)
+    .filter(u => !search ||
+      (u.firstName || "").toLowerCase().includes(search) ||
+      (u.lastName || "").toLowerCase().includes(search));
+
+  list.sort((a, b) => (a.class || "").localeCompare(b.class || ""));
+
+  // Статистика
+  document.getElementById("statTotal").textContent = list.length;
+  const avgSolved = list.length > 0
+    ? Math.round(list.reduce((s, u) => s + (u.progress?.solved?.length || 0), 0) / list.length)
+    : 0;
+  document.getElementById("statAvg").textContent = avgSolved;
+
+  const byClass = {};
+  list.forEach(u => {
+    byClass[u.class] = (byClass[u.class] || 0) + (u.progress?.solved?.length || 0);
+  });
+  let bestClass = "—", bestScore = 0;
+  Object.entries(byClass).forEach(([cls, score]) => {
+    if (score > bestScore) { bestScore = score; bestClass = cls + " кл."; }
+  });
+  document.getElementById("statBest").textContent = bestClass;
+
+  // Таблица
+  const tbody = document.getElementById("studentsTableBody");
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="students-empty">Пока нет учеников</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = list.map(u => {
+    const solved = u.progress?.solved?.length || 0;
+    const errors = u.progress?.errors || 0;
+    const streak = u.progress?.streak || 0;
+    const lastLogin = u.lastLogin
+      ? new Date(u.lastLogin).toLocaleDateString("ru-RU")
+      : "—";
+    return `
+      <tr>
+        <td><b>${u.firstName || ""} ${u.lastName || ""}</b></td>
+        <td>${u.class} класс</td>
+        <td><span class="students-progress">${solved}</span></td>
+        <td>${errors}</td>
+        <td>${streak > 0 ? "🔥 " + streak : "—"}</td>
+        <td>${lastLogin}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+document.getElementById("studentsClassFilter").addEventListener("change", renderStudentsTable);
+document.getElementById("studentsSearch").addEventListener("input", renderStudentsTable);
+
+// Экспорт CSV
+document.getElementById("studentsExportBtn").addEventListener("click", () => {
+  const users = getAllUsers();
+  const rows = [["Имя", "Фамилия", "Класс", "Изучено", "Ошибок", "Стрик", "Последний вход"]];
+  Object.values(users).forEach(u => {
+    rows.push([
+      u.firstName, u.lastName, u.class,
+      u.progress?.solved?.length || 0,
+      u.progress?.errors || 0,
+      u.progress?.streak || 0,
+      u.lastLogin || ""
+    ]);
+  });
+  const csv = rows.map(r => r.map(c => `"${c}"`).join(",")).join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "students_" + new Date().toISOString().slice(0,10) + ".csv";
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("📥 CSV сохранён", "ok");
+});
+
+/* ============================================================
+   СОХРАНЕНИЕ ПРОГРЕССА УЧЕНИКОМ (КОД)
+   ============================================================ */
+function encodeProgress() {
+  if (!currentUser) return null;
+  const data = {
+    f: currentUser.firstName,
+    l: currentUser.lastName,
+    c: currentUser.class,
+    s: [...state.solved],
+    e: state.errors,
+    cor: state.correct,
+    st: parseInt(localStorage.getItem("geo_day_streak") || "0", 10),
+    ach: [...getUnlockedAchievements()],
+    ts: Date.now(),
+  };
+  try {
+    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  } catch(e) {
+    return null;
+  }
+}
+
+function decodeProgress(code) {
+  try {
+    const json = decodeURIComponent(escape(atob(code.trim())));
+    return JSON.parse(json);
+  } catch(e) {
+    return null;
+  }
+}
+
+document.getElementById("saveProgressBtn").addEventListener("click", () => {
+  if (!currentUser) {
+    showToast("❌ Сначала войдите в аккаунт", "err");
+    return;
+  }
+  const code = encodeProgress();
+  if (!code) {
+    showToast("❌ Не удалось сохранить", "err");
+    return;
+  }
+  document.getElementById("codeBox").textContent = code;
+  document.getElementById("codeModal").classList.add("show");
+});
+
+document.getElementById("copyCodeBtn").addEventListener("click", () => {
+  const code = document.getElementById("codeBox").textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast("📋 Код скопирован!", "ok");
+  }).catch(() => {
+    const range = document.createRange();
+    range.selectNode(document.getElementById("codeBox"));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand("copy");
+    showToast("📋 Код скопирован!", "ok");
+  });
+});
+
+document.getElementById("closeCodeBtn").addEventListener("click", () => {
+  document.getElementById("codeModal").classList.remove("show");
+});
+document.getElementById("codeModal").addEventListener("click", e => {
+  if (e.target.id === "codeModal") {
+    e.target.classList.remove("show");
+  }
+});
+
+/* ============================================================
+   ИМПОРТ КОДА УЧИТЕЛЕМ
+   ============================================================ */
+document.getElementById("importCodeBtn").addEventListener("click", () => {
+  const code = document.getElementById("importCodeInput").value.trim();
+  if (!code) {
+    showToast("❌ Введите код ученика", "err");
+    return;
+  }
+
+  const data = decodeProgress(code);
+  if (!data) {
+    showToast("❌ Неверный код", "err");
+    return;
+  }
+
+  const key = (data.f + "_" + data.l + "_" + data.c).toLowerCase();
+  const users = getAllUsers();
+  users[key] = {
+    firstName: data.f,
+    lastName: data.l,
+    class: data.c,
+    password: "imported",
+    createdAt: new Date(data.ts).toISOString(),
+    lastLogin: new Date(data.ts).toISOString(),
+    progress: {
+      solved: data.s || [],
+      correct: data.cor || 0,
+      errors: data.e || 0,
+      hintsLeft: 10,
+      streak: data.st || 0,
+      achievements: data.ach || [],
+    }
+  };
+  saveAllUsers(users);
+  renderStudentsTable();
+  showToast(`✅ Загружен: ${data.f} ${data.l} (${data.c} класс)`, "ok");
+  document.getElementById("importCodeInput").value = "";
+});
+
+/* ============================================================
+   ОБНОВЛЯЕМ КНОПКУ УЧИТЕЛЯ ПРИ ВХОДЕ
+   ============================================================ */
+const _origCloseAuth = closeAuth;
+closeAuth = function() {
+  _origCloseAuth();
+  setTimeout(updateTeacherButton, 100);
+};
+
+// При загрузке
+setTimeout(updateTeacherButton, 500);
 loadTheme();
 updateColorSelection();
 </script>
