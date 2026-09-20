@@ -1504,13 +1504,18 @@ body.fullscreen-mode .fs-keys-hint {
   position: fixed; inset: 0;
   background: radial-gradient(circle at center, #0a1628 0%, #050a15 100%);
   z-index: 10000;
-  display: flex; align-items: center; justify-content: center;
+  display: none; align-items: center; justify-content: center;
   padding: 20px;
   overflow-y: auto;
   transition: opacity 0.4s ease;
 }
-.auth-screen.hide { opacity: 0; pointer-events: none; }
-
+.auth-screen.show {
+  display: flex;
+}
+.auth-screen.hide {
+  opacity: 0;
+  pointer-events: none;
+}
 .auth-card {
   background: linear-gradient(180deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95));
   backdrop-filter: blur(24px);
@@ -1787,7 +1792,7 @@ body.fullscreen-mode .fs-keys-hint {
 .achievements-btn {
   position: fixed;
   top: 14px;
-  right: 14px;
+  right: 130px;
   z-index: 1500;
   display: inline-flex;
   align-items: center;
@@ -2093,6 +2098,25 @@ body.fullscreen-mode .fs-keys-hint {
     max-width: none;
   }
 }
+/* Кнопка «Выйти» */
+.logout-btn {
+  padding: 9px 19px;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(239,68,68,0.5);
+  background: rgba(239,68,68,0.15);
+  color: #fca5a5;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.logout-btn:hover {
+  background: rgba(239,68,68,0.3);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239,68,68,0.3);
+}
 </style>
 </head>
 <body>
@@ -2268,6 +2292,9 @@ body.fullscreen-mode .fs-keys-hint {
     <div class="stat-chip ok"><span class="lbl">Верно</span> <b id="ok">0</b></div>
     <div class="stat-chip err"><span class="lbl">Ошибок</span> <b id="err">0</b></div>
   </div>
+  <button class="logout-btn" id="logoutBtn" title="Выйти из аккаунта">
+  🚪 Выйти
+</button>
 </header>
 
 <div class="controls">
@@ -3446,6 +3473,12 @@ window.addEventListener("beforeunload", () => { saveProgress(); saveSettings(); 
     splash.classList.add("hide");
     setTimeout(() => {
       splash.style.display = "none";
+      // Показать экран входа ПОСЛЕ заставки
+      const authScreen = document.getElementById("authScreen");
+      if (authScreen) {
+        authScreen.classList.add("show");
+        authScreen.style.display = "flex";
+      }
       // Пересчитываем размер карты, чтобы всё правильно отрисовалось
       setTimeout(() => map.invalidateSize(), 300);
     }, 800);
@@ -3465,6 +3498,12 @@ window.addEventListener("beforeunload", () => { saveProgress(); saveSettings(); 
     clearTimeout(autoHide);
     splash.style.display = "none";
     hidden = true;
+     // Показать authScreen сразу (заставка уже показывалась)
+     const authScreen = document.getElementById("authScreen");
+    if (authScreen) {
+      authScreen.classList.add("show");
+      authScreen.style.display = "flex";
+    }
   } else {
     sessionStorage.setItem("splashShown", "yes");
   }
@@ -3933,6 +3972,10 @@ document.getElementById("studentForm").addEventListener("submit", e => {
   document.getElementById("authError").textContent = "";
   saveUserProgress();
   loadUserProgress();
+    // Запоминаем активность (сессия на 10 минут)
+    updateActivity();
+  // Убираем учительскую сессию
+  localStorage.removeItem("geo_teacher_session");
 
   // Если новый — показываем обучение
   if (result.isNew && !localStorage.getItem(TUTORIAL_KEY)) {
@@ -3947,14 +3990,28 @@ document.getElementById("teacherForm").addEventListener("submit", e => {
   e.preventDefault();
   const code = document.getElementById("teacherCode").value;
   if (code === ADMIN_CODE) {
+    // Запоминаем учительскую сессию
+    localStorage.setItem("geo_teacher_session", "yes");
+    updateActivity();
+    // Убираем ученическую сессию
+    localStorage.removeItem(USER_KEY);
+    currentUser = null;
+
     closeAuth();
-    setTimeout(openTeacherPanel, 400);
+    // Показываем кнопку «Ученики»
+    setTimeout(() => {
+      document.getElementById("teacherPanelBtn").classList.remove("hidden");
+      openTeacherPanel();
+    }, 400);
   } else {
     document.getElementById("teacherError").textContent = "❌ Неверный код учителя";
   }
 });
 
 function closeAuth() {
+   // Обновляем время активности (для сессии на 10 минут)
+   updateActivity();
+
   authScreen.classList.add("hide");
   setTimeout(() => { authScreen.style.display = "none"; }, 400);
   if (currentUser) {
@@ -4216,18 +4273,59 @@ saveProgress = function() {
 // ============================================================
 // ПРИ ЗАГРУЗКЕ — ПРОВЕРЯЕМ ПОЛЬЗОВАТЕЛЯ
 // ============================================================
+/* ============================================================
+   ПРОВЕРКА СЕССИИ (10 МИНУТ)
+   ============================================================ */
+   const SESSION_TIMEOUT = 10 * 60 * 1000; // 10 минут в миллисекундах
+
+function isSessionValid() {
+  const lastActivity = localStorage.getItem("geo_last_activity");
+  if (!lastActivity) return false;
+  const elapsed = Date.now() - parseInt(lastActivity, 10);
+  return elapsed < SESSION_TIMEOUT;
+}
+
+function updateActivity() {
+  localStorage.setItem("geo_last_activity", Date.now().toString());
+}
+
+// Обновляем активность при любом действии
+["click", "keydown", "mousemove", "touchstart"].forEach(evt => {
+  document.addEventListener(evt, updateActivity, { passive: true });
+});
+
+// Проверка при загрузке
 (function checkUser() {
   try {
+    // Проверяем сессию учителя
+    const teacherSession = localStorage.getItem("geo_teacher_session");
+    if (teacherSession === "yes" && isSessionValid()) {
+      // Учитель в сессии — открываем панель учеников
+      updateActivity();
+      setTimeout(() => {
+        authScreen.style.display = "none";
+        document.getElementById("teacherPanelBtn").classList.remove("hidden");
+        showToast("👨‍🏫 Учитель в сессии", "ok");
+        setTimeout(openTeacherPanel, 600);
+      }, 500);
+      return;
+    }
+
+    // Проверяем сессию ученика
     const saved = localStorage.getItem(USER_KEY);
-    if (saved) {
+    if (saved && isSessionValid()) {
       const u = JSON.parse(saved);
       currentUser = u;
       loadUserProgress();
-      // Сразу входим
+      updateActivity();
       setTimeout(() => {
         authScreen.style.display = "none";
         showToast(`👋 С возвращением, ${u.firstName}!`, "ok");
       }, 500);
+    } else {
+      // Сессия истекла — очищаем
+      localStorage.removeItem(USER_KEY);
+      localStorage.removeItem("geo_teacher_session");
     }
   } catch(e) {}
 })();
@@ -4827,6 +4925,21 @@ document.getElementById("closeCodeBtn").addEventListener("click", () => {
 document.getElementById("codeModal").addEventListener("click", e => {
   if (e.target.id === "codeModal") {
     e.target.classList.remove("show");
+  }
+});
+/* ============================================================
+   КНОПКА «ВЫЙТИ ИЗ АККАУНТА»
+   ============================================================ */
+   document.getElementById("logoutBtn").addEventListener("click", () => {
+  if (confirm("Выйти из аккаунта?")) {
+    // Очищаем сессию
+    localStorage.removeItem("geo_last_activity");
+    localStorage.removeItem("geo_current_user");
+    localStorage.removeItem("geo_teacher_session");
+    currentUser = null;
+
+    // Обновляем страницу
+    location.reload();
   }
 });
 loadTheme();
