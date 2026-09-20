@@ -8,15 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" sizes="192x192" href="icon.png">
-<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
-<meta name="theme-color" content="#38bdf8">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="География">
-<meta name="msapplication-TileImage" content="icon.png">
 
 <style>
   :root {
@@ -1099,23 +1090,767 @@ body.fullscreen-mode .fs-keys-hint {
   font-weight: 700;
   color: #38bdf8;
 }
+/* ============================================================
+   ЭКРАН ВХОДА / РЕГИСТРАЦИИ
+   ============================================================ */
+   .auth-screen {
+  position: fixed; inset: 0;
+  background: radial-gradient(circle at center, #0a1628 0%, #050a15 100%);
+  z-index: 10000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+  transition: opacity 0.4s ease;
+}
+.auth-screen.hide { opacity: 0; pointer-events: none; }
 
+.auth-card {
+  background: linear-gradient(180deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95));
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(56,189,248,0.2);
+  border-radius: 24px;
+  padding: 32px 28px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  animation: authIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes authIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.auth-logo { text-align: center; margin-bottom: 24px; }
+.auth-globe {
+  font-size: 56px; line-height: 1;
+  animation: globeSpin 8s linear infinite;
+  display: inline-block;
+}
+@keyframes globeSpin {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+.auth-title {
+  font-size: 24px; font-weight: 900; margin-top: 8px;
+  background: linear-gradient(135deg, #38bdf8, #a855f7);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.auth-subtitle { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+
+.auth-tabs {
+  display: flex; gap: 6px; margin-bottom: 20px;
+  background: rgba(15,23,42,0.6);
+  border-radius: 12px; padding: 4px;
+}
+.auth-tab {
+  flex: 1; padding: 10px 14px;
+  background: transparent; border: none;
+  color: #94a3b8; font-size: 13px; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+  border-radius: 8px; transition: 0.2s;
+}
+.auth-tab.active {
+  background: linear-gradient(135deg, rgba(56,189,248,0.25), rgba(168,85,247,0.25));
+  color: #fff;
+}
+
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+.auth-form.hidden { display: none; }
+
+.auth-field { display: flex; flex-direction: column; gap: 6px; }
+.auth-field label {
+  font-size: 11px; color: #94a3b8; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.auth-field input,
+.auth-field select {
+  padding: 12px 14px;
+  background: rgba(15,23,42,0.8);
+  border: 1px solid rgba(148,163,184,0.2);
+  border-radius: 10px;
+  color: #f1f5f9; font-size: 14px; font-family: inherit;
+  outline: none; transition: 0.2s;
+}
+.auth-field input:focus,
+.auth-field select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56,189,248,0.15);
+}
+.auth-field input::placeholder { color: #475569; }
+
+.auth-btn {
+  padding: 12px 20px; border-radius: 10px;
+  border: none; font-size: 14px; font-weight: 700;
+  font-family: inherit; cursor: pointer;
+  transition: 0.2s;
+}
+.auth-btn-primary {
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(56,189,248,0.3);
+}
+.auth-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(56,189,248,0.5);
+}
+.auth-btn-secondary {
+  background: rgba(30,41,59,0.8);
+  color: #cbd5e1;
+  border: 1px solid rgba(148,163,184,0.2);
+}
+.auth-btn-secondary:hover { background: rgba(51,65,85,0.8); color: #fff; }
+
+.auth-error {
+  color: #ef4444; font-size: 13px;
+  text-align: center; min-height: 18px;
+  font-weight: 600;
+}
+
+.auth-footer {
+  text-align: center; margin-top: 16px;
+  font-size: 12px; color: #64748b;
+}
+
+/* ============================================================
+   ЭКРАН ОБУЧЕНИЯ
+   ============================================================ */
+.tutorial-screen {
+  position: fixed; inset: 0;
+  background: rgba(5, 10, 21, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 10001;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+.tutorial-screen.show { display: flex; }
+
+.tutorial-card {
+  background: linear-gradient(180deg, rgba(30,41,59,0.98), rgba(15,23,42,0.98));
+  border: 1px solid rgba(56,189,248,0.2);
+  border-radius: 24px;
+  padding: 32px 28px 24px;
+  max-width: 520px; width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  animation: authIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tutorial-progress {
+  height: 4px; background: rgba(30,41,59,0.8);
+  border-radius: 4px; overflow: hidden;
+  margin-bottom: 24px;
+}
+.tutorial-progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #38bdf8, #a855f7);
+  transition: width 0.4s ease;
+}
+
+.tutorial-content { min-height: 240px; }
+.tutorial-slide { display: none; text-align: center; }
+.tutorial-slide.active { display: block; animation: fadeIn 0.4s ease; }
+
+.tutorial-icon { font-size: 64px; margin-bottom: 16px; }
+.tutorial-slide h3 {
+  font-size: 22px; font-weight: 800; color: #f1f5f9;
+  margin-bottom: 12px;
+}
+.tutorial-slide p {
+  font-size: 14px; color: #94a3b8; line-height: 1.6;
+  margin-bottom: 16px;
+}
+.tutorial-slide ul {
+  text-align: left; list-style: none; padding: 0;
+  font-size: 14px; color: #cbd5e1; line-height: 2;
+}
+.tutorial-slide li::before { content: "✓ "; color: #22c55e; font-weight: 800; }
+
+.tutorial-controls {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-top: 24px;
+}
+.tutorial-dots { display: flex; gap: 6px; }
+.tutorial-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(148,163,184,0.3);
+  transition: 0.3s;
+}
+.tutorial-dot.active { background: #38bdf8; width: 24px; border-radius: 4px; }
+
+/* ============================================================
+   ПАНЕЛЬ УЧИТЕЛЯ
+   ============================================================ */
+.teacher-screen {
+  position: fixed; inset: 0;
+  background: rgba(5,10,21,0.95);
+  backdrop-filter: blur(10px);
+  z-index: 10002;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.teacher-screen.show { display: flex; }
+
+.teacher-card {
+  background: var(--panel-solid);
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  max-width: 900px; width: 100%;
+  max-height: 90vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  animation: authIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.teacher-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.teacher-header h2 { font-size: 18px; color: var(--text); }
+.teacher-body {
+  padding: 20px 22px; overflow-y: auto; flex: 1;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.teacher-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+.teacher-stat {
+  flex: 1; min-width: 140px;
+  padding: 16px; border-radius: 12px;
+  background: var(--bg-3); border: 1px solid var(--border);
+  text-align: center;
+}
+.teacher-stat-num {
+  font-size: 28px; font-weight: 900; color: var(--accent);
+}
+.teacher-stat-lbl {
+  font-size: 11px; color: var(--text-mute);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+.teacher-toolbar {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.teacher-toolbar input,
+.teacher-toolbar select {
+  padding: 8px 12px; background: var(--bg-3);
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); font-size: 13px; font-family: inherit;
+}
+.teacher-toolbar input { flex: 1; min-width: 180px; }
+.teacher-toolbar button {
+  padding: 8px 16px; background: var(--accent); color: #fff;
+  border: none; border-radius: 8px; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+}
+.teacher-table-wrap { overflow-x: auto; }
+.teacher-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px; color: var(--text);
+}
+.teacher-table th {
+  padding: 10px; text-align: left;
+  background: var(--bg-3); color: var(--text-mute);
+  font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.teacher-table td {
+  padding: 10px; border-bottom: 1px solid var(--border);
+}
+.teacher-table tr:hover td { background: var(--bg-3); }
+.teacher-progress {
+  display: inline-block; min-width: 60px;
+  padding: 3px 8px; border-radius: 6px;
+  background: rgba(34,197,94,0.2);
+  color: #22c55e; font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .auth-card { padding: 24px 20px; }
+  .auth-title { font-size: 20px; }
+  .auth-globe { font-size: 44px; }
+  .teacher-stat { min-width: 100px; padding: 12px; }
+  .teacher-stat-num { font-size: 22px; }
+}
+
+
+/* ============================================================
+   СИСТЕМА ДОСТИЖЕНИЙ — Brawl Stars Style
+   ============================================================ */
+
+/* Кнопка достижений */
+.achievements-btn {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 1500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.25), rgba(184,134,11,0.15));
+  border: 1px solid rgba(212,175,55,0.5);
+  border-radius: 12px;
+  color: #fde047;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.25s;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 4px 20px rgba(212,175,55,0.25);
+}
+.achievements-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, rgba(212,175,55,0.4), rgba(184,134,11,0.3));
+  box-shadow: 0 6px 24px rgba(212,175,55,0.5);
+}
+.ach-badge {
+  font-size: 11px;
+  background: rgba(0,0,0,0.4);
+  padding: 2px 7px;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+/* Панель достижений (выдвижная справа) */
+.ach-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  max-width: 92vw;
+  height: 100vh;
+  background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(10,14,26,0.98));
+  backdrop-filter: blur(24px);
+  border-left: 1px solid rgba(56,189,248,0.2);
+  z-index: 1600;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+}
+.ach-panel.show { transform: translateX(0); }
+
+.ach-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(148,163,184,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ach-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #d4af37, #fde047);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ach-progress-bar {
+  height: 6px;
+  background: rgba(30,41,59,0.8);
+  margin: 14px 22px 0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ach-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #22c55e, #38bdf8, #a855f7, #fbbf24);
+  background-size: 200% 100%;
+  animation: gradientMove 3s linear infinite;
+  transition: width 0.6s ease;
+}
+@keyframes gradientMove {
+  0% { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
+}
+.ach-count {
+  padding: 8px 22px 14px;
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Счётчики по редкости */
+.ach-rarities {
+  padding: 0 22px 14px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid rgba(148,163,184,0.08);
+  padding-bottom: 14px;
+}
+.ach-rarity-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(30,41,59,0.6);
+  border: 1px solid rgba(148,163,184,0.15);
+}
+.ach-rarity-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ach-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Карточка достижения */
+.ach-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  align-items: flex-start;
+  min-height: fit-content;
+  background: rgba(30,41,59,0.4);
+  border: 1px solid rgba(148,163,184,0.1);
+  border-radius: 12px;
+  transition: 0.25s;
+  opacity: 0.6;
+  filter: grayscale(0.7);
+  position: relative;
+  overflow: hidden;
+}
+.ach-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--rarity-color);
+}
+.ach-item.unlocked {
+  opacity: 1;
+  filter: none;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--rarity-color) 15%, transparent),
+    rgba(30,41,59,0.4));
+  border-color: color-mix(in srgb, var(--rarity-color) 40%, transparent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--rarity-color) 20%, transparent);
+}
+.ach-item:hover { transform: translateX(-4px); }
+
+.ach-item-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  background: rgba(15,23,42,0.7);
+  border-radius: 12px;
+  flex-shrink: 0;
+  border: 2px solid var(--rarity-color);
+  box-shadow: inset 0 0 12px color-mix(in srgb, var(--rarity-color) 30%, transparent);
+}
+.ach-item.unlocked .ach-item-icon {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--rarity-color) 30%, transparent),
+    rgba(15,23,42,0.6));
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--rarity-color) 40%, transparent),
+    inset 0 0 12px color-mix(in srgb, var(--rarity-color) 40%, transparent);
+}
+
+.ach-item-body {
+  flex: 1;
+  min-width: 0;
+  overflow: visible;
+}
+.ach-item-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 3px;
+  line-height: 1.3;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.ach-item-desc {
+  font-size: 11.5px;
+  color: #64748b;
+  margin-bottom: 6px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+.ach-item.unlocked .ach-item-desc { color: #94a3b8; }
+
+.ach-item-rarity {
+  display: inline-block;
+  font-size: 9.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--rarity-color) 25%, transparent);
+  color: var(--rarity-color);
+  border: 1px solid color-mix(in srgb, var(--rarity-color) 50%, transparent);
+}
+
+/* Всплывающее уведомление */
+.ach-notification {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 1700;
+  min-width: 320px;
+  max-width: 400px;
+  background: linear-gradient(135deg, rgba(15,23,42,0.98), rgba(10,14,26,0.98));
+  border: 2px solid var(--notif-color, #d4af37);
+  border-radius: 16px;
+  font-family: inherit;
+  box-shadow:
+    0 12px 40px color-mix(in srgb, var(--notif-color, #d4af37) 40%, transparent),
+    0 0 60px color-mix(in srgb, var(--notif-color, #d4af37) 20%, transparent);
+  transform: translateX(calc(100% + 40px));
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+.ach-notification.show { transform: translateX(0); }
+
+.ach-notif-rarity {
+  padding: 4px 14px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-align: center;
+  background: var(--notif-color, #d4af37);
+  color: #0a1628;
+}
+.ach-notif-body {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ach-notif-icon {
+  font-size: 40px;
+  flex-shrink: 0;
+  animation: achIconBounce 0.6s ease infinite alternate;
+  filter: drop-shadow(0 0 12px var(--notif-color, #d4af37));
+}
+@keyframes achIconBounce {
+  from { transform: scale(1); }
+  to { transform: scale(1.15); }
+}
+.ach-notif-text { flex: 1; min-width: 0; }
+.ach-notif-title {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  color: #94a3b8;
+  margin-bottom: 3px;
+}
+.ach-notif-name {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--notif-color, #d4af37);
+  margin-bottom: 2px;
+}
+.ach-notif-desc {
+  font-size: 12px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+/* Адаптив */
+@media (max-width: 640px) {
+  .ach-panel { width: 100vw; }
+  .achievements-btn {
+    top: 10px; right: 10px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .ach-notification {
+    top: 70px;
+    right: 10px;
+    left: 10px;
+    min-width: 0;
+    max-width: none;
+  }
+}
 </style>
 </head>
 <body>
 
 <div class="splash-screen" id="splashScreen">
-  <div class="splash-glow"></div>
-  <div class="splash-content">
-    <div class="splash-photo-wrap">
-      <img src="creator.jpg" alt="Создатель игры" class="splash-photo" 
-           onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'font-size:80px; text-align:center;\'>👑</div>';">
-    </div>
-    <div class="splash-role">Создатель игры</div>
-    <div class="splash-name">Лукинский Иван</div>
+<div class="splash-glow"></div>
+<div class="splash-content">
+  <div class="splash-photo-wrap">
+    <img src="creator.jpg" alt="Создатель игры" class="splash-photo" 
+         onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'font-size:80px; text-align:center;\'>👑</div>';">
   </div>
-  <button class="splash-skip" id="skipSplash">Пропустить →</button>
+  <div class="splash-role">Создатель игры</div>
+  <div class="splash-name">Лукинский Иван</div>
 </div>
+<button class="splash-skip" id="skipSplash">Пропустить →</button>
+</div>
+</div>
+
+<!-- ============ ЭКРАН РЕГИСТРАЦИИ / ВХОДА ============ -->
+<div class="auth-screen" id="authScreen">
+<div class="auth-card">
+  <div class="auth-logo">
+    <div class="auth-globe">🌍</div>
+    <h1 class="auth-title">География мира</h1>
+    <p class="auth-subtitle">Войдите, чтобы начать путешествие</p>
+  </div>
+  
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="student">👤 Ученик</button>
+        <button class="auth-tab" data-tab="teacher">👨‍🏫 Учитель</button>
+      </div>
+  
+      <form class="auth-form" id="studentForm">
+        <div class="auth-field">
+          <label>Имя</label>
+          <input type="text" id="regFirstName" placeholder="Иван" required maxlength="30">
+        </div>
+        <div class="auth-field">
+          <label>Фамилия</label>
+          <input type="text" id="regLastName" placeholder="Лукинский" required maxlength="30">
+        </div>
+        <div class="auth-field">
+          <label>Класс</label>
+          <select id="regClass" required>
+            <option value="">Выберите класс</option>
+            <option value="5">5 класс</option>
+            <option value="6">6 класс</option>
+            <option value="7">7 класс</option>
+            <option value="8">8 класс</option>
+            <option value="9">9 класс</option>
+            <option value="10">10 класс</option>
+            <option value="11">11 класс</option>
+          </select>
+        </div>
+        <div class="auth-field">
+          <label>Пароль</label>
+          <input type="password" id="regPassword" placeholder="Минимум 4 символа" required minlength="4" maxlength="30">
+        </div>
+  
+        <button type="submit" class="auth-btn auth-btn-primary">
+          🚀 Войти / Зарегистрироваться
+        </button>
+  
+        <button type="button" class="auth-btn auth-btn-secondary" id="showTutorialBtn">
+          📖 Узнать о функциях игры
+        </button>
+  
+        <div class="auth-error" id="authError"></div>
+      </form>
+  
+      <form class="auth-form hidden" id="teacherForm">
+        <div class="auth-field">
+          <label>Код учителя</label>
+          <input type="password" id="teacherCode" placeholder="Введите код" required>
+        </div>
+  
+        <button type="submit" class="auth-btn auth-btn-primary">
+          👨‍🏫 Войти как учитель
+        </button>
+  
+        <div class="auth-error" id="teacherError"></div>
+      </form>
+  
+      <div class="auth-footer">
+        <span id="authFooterText"></span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ============ ЭКРАН ОБУЧЕНИЯ ============ -->
+  <div class="tutorial-screen" id="tutorialScreen">
+    <div class="tutorial-card">
+      <div class="tutorial-progress">
+        <div class="tutorial-progress-fill" id="tutorialProgress"></div>
+      </div>
+  
+      <div class="tutorial-content" id="tutorialContent"></div>
+  
+      <div class="tutorial-controls">
+        <button class="auth-btn auth-btn-secondary" id="tutorialSkip">Пропустить</button>
+        <div class="tutorial-dots" id="tutorialDots"></div>
+        <button class="auth-btn auth-btn-primary" id="tutorialNext">Далее →</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ============ ПАНЕЛЬ УЧИТЕЛЯ ============ -->
+  <div class="teacher-screen" id="teacherScreen">
+    <div class="teacher-card">
+      <div class="teacher-header">
+        <h2>👨‍🏫 Панель учителя</h2>
+        <button class="panel-close" id="teacherCloseBtn">×</button>
+      </div>
+  
+      <div class="teacher-body">
+        <div class="teacher-stats">
+          <div class="teacher-stat">
+            <div class="teacher-stat-num" id="teacherTotalStudents">0</div>
+            <div class="teacher-stat-lbl">Учеников</div>
+          </div>
+          <div class="teacher-stat">
+            <div class="teacher-stat-num" id="teacherAvgProgress">0%</div>
+            <div class="teacher-stat-lbl">Средний прогресс</div>
+          </div>
+          <div class="teacher-stat">
+            <div class="teacher-stat-num" id="teacherBestClass">—</div>
+            <div class="teacher-stat-lbl">Лучший класс</div>
+          </div>
+        </div>
+  
+        <div class="teacher-toolbar">
+          <input type="text" id="teacherSearch" placeholder="🔍 Поиск ученика…">
+          <select id="teacherClassFilter">
+            <option value="">Все классы</option>
+            <option value="5">5 класс</option>
+            <option value="6">6 класс</option>
+            <option value="7">7 класс</option>
+            <option value="8">8 класс</option>
+            <option value="9">9 класс</option>
+            <option value="10">10 класс</option>
+            <option value="11">11 класс</option>
+          </select>
+          <button id="teacherExportBtn">📥 Экспорт CSV</button>
+        </div>
+  
+        <div class="teacher-table-wrap">
+          <table class="teacher-table">
+            <thead>
+              <tr>
+                <th>Ученик</th>
+                <th>Класс</th>
+                <th>Изучено</th>
+                <th>Ошибок</th>
+                <th>Стрик</th>
+                <th>Последний вход</th>
+              </tr>
+            </thead>
+            <tbody id="teacherTableBody">
+              <tr><td colspan="6" style="text-align:center; color:#64748b;">Пока нет учеников</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 <header>
   <h1>🌍 Политическая карта мира <span class="author">· создатель Иван Лукинский</span></h1>
   <div class="stats">
@@ -1225,6 +1960,43 @@ body.fullscreen-mode .fs-keys-hint {
 <kbd>H</kbd> подсказка · <kbd>S</kbd> пропустить · <kbd>Esc</kbd> выйти
 </div>
 
+<!-- ============ КНОПКА ДОСТИЖЕНИЙ ============ -->
+<button class="achievements-btn" id="achBtn" title="Достижения">
+🏆 <span class="ach-badge" id="achBadge">0/26</span>
+</button>
+
+<!-- ============ ПАНЕЛЬ ДОСТИЖЕНИЙ ============ -->
+<aside class="ach-panel" id="achPanel">
+<div class="ach-header">
+  <h2>🏆 Достижения</h2>
+  <button class="panel-close" id="achCloseBtn">×</button>
+</div>
+
+<div class="ach-progress-bar">
+  <div class="ach-progress-fill" id="achProgressFill"></div>
+</div>
+
+<div class="ach-count" id="achCount">Получено 0 из 26</div>
+
+<div class="ach-rarities" id="achRarities">
+  <!-- Заполняется через JS -->
+</div>
+
+<div class="ach-list" id="achList"></div>
+</aside>
+
+<!-- ============ ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ ============ -->
+<div class="ach-notification" id="achNotification">
+<div class="ach-notif-rarity" id="achNotifRarity">ОБЫЧНОЕ</div>
+<div class="ach-notif-body">
+  <div class="ach-notif-icon" id="achNotifIcon">🏆</div>
+  <div class="ach-notif-text">
+    <div class="ach-notif-title">ДОСТИЖЕНИЕ ПОЛУЧЕНО!</div>
+    <div class="ach-notif-name" id="achNotifName">Название</div>
+    <div class="ach-notif-desc" id="achNotifDesc">Описание</div>
+  </div>
+</div>
+</div>
 <div class="toast" id="toast"></div>
 
 <div class="panel-overlay" id="panelOverlay">
@@ -1276,6 +2048,7 @@ body.fullscreen-mode .fs-keys-hint {
   </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
 /* ============================================================
    КОНФИГ
@@ -2516,20 +3289,738 @@ updateHintUI = function() {
   _origUpdateHintUI2();
   updateFsCounters();
 };
+/* ============================================================
+   СИСТЕМА ПОЛЬЗОВАТЕЛЕЙ
+   ============================================================ */
+   const ADMIN_CODE = "teacher2025";  // ← ПАРОЛЬ УЧИТЕЛЯ (смените!)
+
+const USER_KEY = "geo_current_user";
+const USERS_KEY = "geo_all_users";
+const TUTORIAL_KEY = "geo_tutorial_done";
+
+// Текущий пользователь
+let currentUser = null;
+
+// Получить всех пользователей
+function getAllUsers() {
+  try { return JSON.parse(localStorage.getItem(USERS_KEY) || "{}"); }
+  catch(e) { return {}; }
+}
+
+// Сохранить всех пользователей
+function saveAllUsers(users) {
+  try { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+  catch(e) {}
+}
+
+// Ключ пользователя = имя_фамилия_класс
+function getUserKey(first, last, cls) {
+  return (first + "_" + last + "_" + cls).toLowerCase();
+}
+
+// Регистрация / Вход
+function registerOrLogin(first, last, cls, password) {
+  const key = getUserKey(first, last, cls);
+  const users = getAllUsers();
+
+  if (users[key]) {
+    // Пользователь есть — проверяем пароль
+    if (users[key].password === password) {
+      currentUser = { key, ...users[key] };
+      return { ok: true, isNew: false };
+    } else {
+      return { ok: false, error: "❌ Неверный пароль. Попробуйте ещё раз." };
+    }
+  } else {
+    // Новый пользователь
+    const newUser = {
+      firstName: first,
+      lastName: last,
+      class: cls,
+      password: password,
+      createdAt: new Date().toISOString(),
+      lastLogin: new Date().toISOString(),
+      progress: {
+        solved: [],
+        correct: 0,
+        errors: 0,
+        hintsLeft: 10,
+        streak: 0,
+        achievements: []
+      }
+    };
+    users[key] = newUser;
+    saveAllUsers(users);
+    currentUser = { key, ...newUser };
+    return { ok: true, isNew: true };
+  }
+}
+
+// Сохранить прогресс текущего пользователя
+function saveUserProgress() {
+  if (!currentUser) return;
+  const users = getAllUsers();
+  if (users[currentUser.key]) {
+    users[currentUser.key].lastLogin = new Date().toISOString();
+    users[currentUser.key].progress = {
+      solved: [...state.solved],
+      correct: state.correct,
+      errors: state.errors,
+      hintsLeft: state.hintsLeft,
+      streak: users[currentUser.key].progress.streak || 0,
+      achievements: users[currentUser.key].progress.achievements || []
+    };
+    // Обновляем lastLogin для учителя
+    saveAllUsers(users);
+    localStorage.setItem(USER_KEY, JSON.stringify(currentUser));
+  }
+}
+
+// Загрузить прогресс при входе
+function loadUserProgress() {
+  if (!currentUser) return;
+  const p = currentUser.progress || {};
+  state.solved = new Set(p.solved || []);
+  state.correct = p.correct || 0;
+  state.errors = p.errors || 0;
+  state.hintsLeft = p.hintsLeft || 10;
+}
+
+// ============================================================
+// ЭКРАН ВХОДА
+// ============================================================
+const authScreen = document.getElementById("authScreen");
+const tutorialScreen = document.getElementById("tutorialScreen");
+const teacherScreen = document.getElementById("teacherScreen");
+
+// Переключение вкладок
+document.querySelectorAll(".auth-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById("studentForm").classList.toggle("hidden", tab.dataset.tab !== "student");
+    document.getElementById("teacherForm").classList.toggle("hidden", tab.dataset.tab !== "teacher");
+  });
+});
+
+// Форма ученика
+document.getElementById("studentForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const first = document.getElementById("regFirstName").value.trim();
+  const last = document.getElementById("regLastName").value.trim();
+  const cls = document.getElementById("regClass").value;
+  const pass = document.getElementById("regPassword").value;
+
+  if (!first || !last || !cls || !pass) {
+    document.getElementById("authError").textContent = "❌ Заполните все поля";
+    return;
+  }
+
+  const result = registerOrLogin(first, last, cls, pass);
+  if (!result.ok) {
+    document.getElementById("authError").textContent = result.error;
+    return;
+  }
+
+  // Успех
+  document.getElementById("authError").textContent = "";
+  saveUserProgress();
+  loadUserProgress();
+
+  // Если новый — показываем обучение
+  if (result.isNew && !localStorage.getItem(TUTORIAL_KEY)) {
+    showTutorial();
+  } else {
+    closeAuth();
+  }
+});
+
+// Форма учителя
+document.getElementById("teacherForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const code = document.getElementById("teacherCode").value;
+  if (code === ADMIN_CODE) {
+    closeAuth();
+    setTimeout(openTeacherPanel, 400);
+  } else {
+    document.getElementById("teacherError").textContent = "❌ Неверный код учителя";
+  }
+});
+
+// Закрыть экран входа
+function closeAuth() {
+  authScreen.classList.add("hide");
+  setTimeout(() => { authScreen.style.display = "none"; }, 400);
+  // Обновляем приветствие
+  if (currentUser) {
+    console.log("[Auth] Добро пожаловать,", currentUser.firstName, currentUser.lastName);
+    showToast(`👋 Привет, ${currentUser.firstName}!`, "ok");
+  }
+}
+
+// ============================================================
+// ОБУЧЕНИЕ
+// ============================================================
+const TUTORIAL_SLIDES = [
+  {
+    icon: "🌍",
+    title: "Добро пожаловать в Географию мира!",
+    text: "Это игра-путешествие, где вы выучите страны, столицы и флаги всего мира.",
+    list: []
+  },
+  {
+    icon: "🔍",
+    title: "Режим «Найди страну»",
+    text: "Кликните по стране, которую назовёт игра. Так вы запомните её расположение.",
+    list: []
+  },
+  {
+    icon: "🏛",
+    title: "Найди столицу",
+    text: "Игра называет столицу, а вы ищете страну, к которой она относится.",
+    list: []
+  },
+  {
+    icon: "🎯",
+    title: "5 режимов игры",
+    text: "",
+    list: [
+      "🔍 Найди страну — по названию",
+      "🏛 Найди столицу — по городу",
+      "🎨 Свободная закраска — изучение",
+      "🔁 Повтор ошибок — сложные страны",
+      "⏱ На время — с таймером"
+    ]
+  },
+  {
+    icon: "✏️",
+    title: "Свой список",
+    text: "Создайте свой список стран — например, только для контрольной. Игра будет спрашивать только их.",
+    list: []
+  },
+  {
+    icon: "🏆",
+    title: "Достижения и сертификаты",
+    text: "Изучите континент на 100% — получите сертификат! Скачайте PNG и покажите друзьям.",
+    list: []
+  },
+  {
+    icon: "📊",
+    title: "Прогресс сохраняется",
+    text: "Войдите с того же имени и фамилии на любом устройстве — прогресс подтянется.",
+    list: []
+  },
+  {
+    icon: "🚀",
+    title: "Готовы начать?",
+    text: "Нажмите «Начать игру» и отправляйтесь в путешествие по миру!",
+    list: []
+  }
+];
+
+let tutorialSlide = 0;
+
+function showTutorial() {
+  tutorialScreen.classList.add("show");
+  tutorialSlide = 0;
+  renderTutorial();
+}
+
+function renderTutorial() {
+  const slide = TUTORIAL_SLIDES[tutorialSlide];
+  const content = document.getElementById("tutorialContent");
+  content.innerHTML = `
+    <div class="tutorial-slide active">
+      <div class="tutorial-icon">${slide.icon}</div>
+      <h3>${slide.title}</h3>
+      ${slide.text ? `<p>${slide.text}</p>` : ""}
+      ${slide.list.length ? `<ul>${slide.list.map(l => `<li>${l}</li>`).join("")}</ul>` : ""}
+    </div>
+  `;
+
+  // Прогресс
+  const pct = ((tutorialSlide + 1) / TUTORIAL_SLIDES.length) * 100;
+  document.getElementById("tutorialProgress").style.width = pct + "%";
+
+  // Точки
+  const dots = document.getElementById("tutorialDots");
+  dots.innerHTML = TUTORIAL_SLIDES.map((_, i) =>
+    `<div class="tutorial-dot ${i === tutorialSlide ? 'active' : ''}"></div>`
+  ).join("");
+
+  // Кнопка
+  const nextBtn = document.getElementById("tutorialNext");
+  nextBtn.textContent = tutorialSlide === TUTORIAL_SLIDES.length - 1 ? "🎮 Начать игру" : "Далее →";
+}
+
+document.getElementById("tutorialNext").addEventListener("click", () => {
+  if (tutorialSlide < TUTORIAL_SLIDES.length - 1) {
+    tutorialSlide++;
+    renderTutorial();
+  } else {
+    localStorage.setItem(TUTORIAL_KEY, "yes");
+    closeTutorial();
+    closeAuth();
+  }
+});
+
+document.getElementById("tutorialSkip").addEventListener("click", () => {
+  localStorage.setItem(TUTORIAL_KEY, "yes");
+  closeTutorial();
+  closeAuth();
+});
+
+function closeTutorial() {
+  tutorialScreen.classList.remove("show");
+}
+
+// Кнопка «Узнать о функциях» из формы
+document.getElementById("showTutorialBtn").addEventListener("click", () => {
+  showTutorial();
+});
+
+// ============================================================
+// ПАНЕЛЬ УЧИТЕЛЯ
+// ============================================================
+function openTeacherPanel() {
+  teacherScreen.classList.add("show");
+  renderTeacherTable();
+}
+
+document.getElementById("teacherCloseBtn").addEventListener("click", () => {
+  teacherScreen.classList.remove("show");
+});
+
+function renderTeacherTable() {
+  const users = getAllUsers();
+  const filter = document.getElementById("teacherClassFilter").value;
+  const search = (document.getElementById("teacherSearch").value || "").toLowerCase();
+
+  const list = Object.entries(users)
+    .map(([key, u]) => ({ key, ...u }))
+    .filter(u => !filter || u.class === filter)
+    .filter(u => !search ||
+      (u.firstName || "").toLowerCase().includes(search) ||
+      (u.lastName || "").toLowerCase().includes(search));
+
+  // Сортировка по классу
+  list.sort((a, b) => (a.class || "").localeCompare(b.class || ""));
+
+  // Статистика
+  const total = list.length;
+  const avgProgress = total > 0
+    ? Math.round(list.reduce((s, u) => s + (u.progress?.solved?.length || 0), 0) / total)
+    : 0;
+  document.getElementById("teacherTotalStudents").textContent = total;
+  document.getElementById("teacherAvgProgress").textContent = avgProgress;
+
+  // Лучший класс
+  const byClass = {};
+  list.forEach(u => {
+    byClass[u.class] = (byClass[u.class] || 0) + (u.progress?.solved?.length || 0);
+  });
+  let bestClass = "—", bestScore = 0;
+  Object.entries(byClass).forEach(([cls, score]) => {
+    if (score > bestScore) { bestScore = score; bestClass = cls + " кл."; }
+  });
+  document.getElementById("teacherBestClass").textContent = bestClass;
+
+  // Таблица
+  const tbody = document.getElementById("teacherTableBody");
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">Пока нет учеников</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = list.map(u => {
+    const solved = u.progress?.solved?.length || 0;
+    const errors = u.progress?.errors || 0;
+    const streak = u.progress?.streak || 0;
+    const lastLogin = u.lastLogin ? new Date(u.lastLogin).toLocaleDateString("ru-RU") : "—";
+    return `
+      <tr>
+        <td><b>${u.firstName || ""} ${u.lastName || ""}</b></td>
+        <td>${u.class} класс</td>
+        <td><span class="teacher-progress">${solved}</span></td>
+        <td>${errors}</td>
+        <td>${streak > 0 ? "🔥 " + streak : "—"}</td>
+        <td>${lastLogin}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+document.getElementById("teacherClassFilter").addEventListener("change", renderTeacherTable);
+document.getElementById("teacherSearch").addEventListener("input", renderTeacherTable);
+
+// Экспорт CSV
+document.getElementById("teacherExportBtn").addEventListener("click", () => {
+  const users = getAllUsers();
+  const rows = [
+    ["Имя", "Фамилия", "Класс", "Изучено", "Ошибок", "Стрик", "Последний вход"]
+  ];
+  Object.values(users).forEach(u => {
+    rows.push([
+      u.firstName, u.lastName, u.class,
+      u.progress?.solved?.length || 0,
+      u.progress?.errors || 0,
+      u.progress?.streak || 0,
+      u.lastLogin || ""
+    ]);
+  });
+  const csv = rows.map(r => r.map(c => `"${c}"`).join(",")).join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "progress_" + new Date().toISOString().slice(0,10) + ".csv";
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("📥 CSV сохранён", "ok");
+});
+
+// ============================================================
+// АВТОСОХРАНЕНИЕ ПРИ ИЗМЕНЕНИИ ПРОГРЕССА
+// ============================================================
+const _origSaveProgress = saveProgress;
+saveProgress = function() {
+  _origSaveProgress();
+  saveUserProgress();
+};
+
+// ============================================================
+// ПРИ ЗАГРУЗКЕ — ПРОВЕРЯЕМ ПОЛЬЗОВАТЕЛЯ
+// ============================================================
+(function checkUser() {
+  try {
+    const saved = localStorage.getItem(USER_KEY);
+    if (saved) {
+      const u = JSON.parse(saved);
+      currentUser = u;
+      loadUserProgress();
+      // Сразу входим
+      setTimeout(() => {
+        authScreen.style.display = "none";
+        showToast(`👋 С возвращением, ${u.firstName}!`, "ok");
+      }, 500);
+    }
+  } catch(e) {}
+})();
+/* ============================================================
+   СИСТЕМА ДОСТИЖЕНИЙ — 26 штук, Brawl Stars Style
+   ============================================================ */
+
+// Редкости
+const RARITIES = {
+  common:     { name: "Обычное",      color: "#9ca3af" },
+  rare:       { name: "Редкое",       color: "#22c55e" },
+  superrare:  { name: "Сверхредкое",  color: "#3b82f6" },
+  epic:       { name: "Эпическое",    color: "#a855f7" },
+  mythic:     { name: "Мифическое",   color: "#ef4444" },
+  legendary:  { name: "Легендарное",  color: "#fbbf24" },
+};
+
+// 26 достижений
+const ACHIEVEMENTS = [
+  // ⚪ ОБЫЧНЫЕ (4)
+  { id: "base",         icon: "🌍", name: "Ну, это база",                   desc: "Угадать 1 страну",                       rarity: "common",    check: s => s.solved.size >= 1 },
+  { id: "50_0",         icon: "🥈", name: "Пять-ноль, погнали",             desc: "Угадать 50 стран",                       rarity: "common",    check: s => s.solved.size >= 50 },
+  { id: "phone",        icon: "📞", name: "Возьми телефон, детка",          desc: "10 вопросов подряд",                     rarity: "common",    check: s => s.streakCorrect >= 10 },
+  { id: "myhour",       icon: "🌙", name: "Мой час настал",                 desc: "Играть в 00:00–03:00",                   rarity: "common",    check: s => { const h = new Date().getHours(); return h >= 0 && h < 3; } },
+
+  // 🟢 РЕДКИЕ (5)
+  { id: "mog",          icon: "💯", name: "Я тебя могну",                   desc: "Угадать 100 стран",                      rarity: "rare",      check: s => s.solved.size >= 100 },
+  { id: "strawberry",   icon: "🍓", name: "Ты клубника, я клубника",        desc: "Угадать 80 стран",                       rarity: "rare",      check: s => s.solved.size >= 80 },
+  { id: "earlybird",    icon: "☀️", name: "Ранняя пташка",                  desc: "Играть в 05:00–07:00",                   rarity: "rare",      check: s => { const h = new Date().getHours(); return h >= 5 && h < 7; } },
+  { id: "penguin",      icon: "🐧", name: "Как пингвин, пошёл в гору",      desc: "25 стран подряд",                        rarity: "rare",      check: s => s.streakCorrect >= 25 },
+  { id: "nutaqoe",      icon: "🎭", name: "Ну, такое",                      desc: "Сменить тему 10 раз",                    rarity: "rare",      check: s => s.themeChanges >= 10 },
+
+  // 🔵 СВЕРХРЕДКИЕ (5)
+  { id: "67",           icon: "📱", name: "Сикс-севен",                     desc: "Набрать 67 стран",                       rarity: "superrare", check: s => s.solved.size >= 67 },
+  { id: "isee",         icon: "👀", name: "Я всё вижу",                     desc: "100 стран без подсказок",                rarity: "superrare", check: s => s.solved.size >= 100 && s.hintsUsedTotal === 0 },
+  { id: "burmalda",     icon: "🐿️", name: "Бурмалда",                       desc: "Сделать 30 ошибок",                      rarity: "superrare", check: s => s.errors >= 30 },
+  { id: "squirrel",     icon: "🌪️", name: "Белку сдуло",                    desc: "5 проигрышей подряд",                    rarity: "superrare", check: s => s.streakWrong >= 5 },
+  { id: "supersonic",   icon: "⚡", name: "Сверхзвук",                      desc: "20 стран за 60 сек",                     rarity: "superrare", check: s => s.speedRun20 },
+
+  // 🟣 ЭПИЧЕСКИЕ (6)
+  { id: "planet",       icon: "🌎", name: "Я всю планету знаю, чё",         desc: "Угадать 180 стран",                      rarity: "epic",      check: s => s.solved.size >= 180 },
+  { id: "cheremsha",    icon: "👹", name: "Черемша",                        desc: "Сделать 50 ошибок",                      rarity: "epic",      check: s => s.errors >= 50 },
+  { id: "kotost",       icon: "🐱", name: "Котость",                        desc: "Играть 30 дней подряд",                  rarity: "epic",      check: s => s.streakDays >= 30 },
+  { id: "grade5",       icon: "📚", name: "Где моя 5 в году по географии?", desc: "3000 верных ответов",                    rarity: "epic",      check: s => s.totalCorrect >= 3000 },
+  { id: "niche",        icon: "🧠", name: "Нишево",                         desc: "Изучить всю Океанию (14 стран)",         rarity: "epic",      check: s => s.oceania >= 14 },
+  { id: "shuesh",       icon: "🤨", name: "Да ты шуешь?",                   desc: "Ошибиться в одной стране 10 раз",        rarity: "epic",      check: s => s.maxErrorsOneCountry >= 10 },
+
+  // 🔴 МИФИЧЕСКИЕ (3)
+  { id: "pacanoid",     icon: "🐧", name: "Пацаноид пропал",                desc: "Забросить игру на 30 дней",              rarity: "mythic",    check: s => s.daysSinceLastLogin >= 30 },
+  { id: "squirrelwhere",icon: "🌪️", name: "Белка, ты где?",                 desc: "Сделать 100 ошибок",                     rarity: "mythic",    check: s => s.errors >= 100 },
+  { id: "bekrums",      icon: "🌀", name: "Бекрумс",                        desc: "Создать 10 списков по 20+ стран",        rarity: "mythic",    check: s => s.bigLists >= 10 },
+
+  // 🟡 ЛЕГЕНДАРНЫЕ (3)
+  { id: "kolbasenko",   icon: "🎤", name: "Данил Колбасенко",               desc: "Зайти в игру через год",                 rarity: "legendary", check: s => s.daysSinceFirst >= 365 },
+  { id: "mellstroy",    icon: "👑", name: "Меллстройность",                 desc: "Весь мир без единой ошибки",             rarity: "legendary", check: s => s.solved.size >= 195 && s.errors === 0 },
+  { id: "luxmax",       icon: "💎", name: "Луксмаксер",                     desc: "100% континента без подсказок и ошибок", rarity: "legendary", check: s => s.perfectContinent },
+];
+
+const ACH_KEY = "geo_achievements";
+
+/* ============================================================
+   ХРАНИЛИЩЕ ДОСТИЖЕНИЙ
+   ============================================================ */
+function getUnlockedAchievements() {
+  try { return new Set(JSON.parse(localStorage.getItem(ACH_KEY) || "[]")); }
+  catch(e) { return new Set(); }
+}
+function saveUnlockedAchievements(set) {
+  try { localStorage.setItem(ACH_KEY, JSON.stringify([...set])); } catch(e) {}
+}
+
+/* ============================================================
+   ПРОВЕРКА ДОСТИЖЕНИЙ
+   ============================================================ */
+function checkAchievements() {
+  const unlocked = getUnlockedAchievements();
+  const stats = collectStats();
+  const newlyUnlocked = [];
+
+  ACHIEVEMENTS.forEach(ach => {
+    if (unlocked.has(ach.id)) return;
+    try {
+      if (ach.check(stats)) {
+        unlocked.add(ach.id);
+        newlyUnlocked.push(ach);
+      }
+    } catch(e) {}
+  });
+
+  if (newlyUnlocked.length) {
+    saveUnlockedAchievements(unlocked);
+    renderAchList();
+    // Показываем уведомления по очереди
+    newlyUnlocked.forEach((ach, i) => {
+      setTimeout(() => showAchNotification(ach), i * 1600);
+    });
+  }
+}
+
+/* ============================================================
+   СБОР СТАТИСТИКИ
+   ============================================================ */
+function collectStats() {
+  const progress = loadProgress();
+  const totalCorrect = progress?.correct || 0;
+
+  return {
+    correct: totalCorrect,
+    solved: state.solved,
+    errors: state.errors,
+    streakCorrect: parseInt(localStorage.getItem("geo_streak_correct") || "0", 10),
+    streakWrong: parseInt(localStorage.getItem("geo_streak_wrong") || "0", 10),
+    hintsUsedTotal: parseInt(localStorage.getItem("geo_hints_total") || "0", 10),
+    daysSinceFirst: daysSince("geo_firstLogin"),
+    daysSinceLastLogin: daysSince("geo_lastLogin"),
+    streakDays: parseInt(localStorage.getItem("geo_day_streak") || "0", 10),
+    themeChanges: parseInt(localStorage.getItem("geo_theme_changes") || "0", 10),
+    speedRun20: localStorage.getItem("geo_speedrun20") === "yes",
+    oceania: countRegion("Oceania"),
+    maxErrorsOneCountry: parseInt(localStorage.getItem("geo_max_errors_one") || "0", 10),
+    bigLists: countBigLists(),
+    perfectContinent: localStorage.getItem("geo_perfect_continent") === "yes",
+    totalCorrect: totalCorrect,
+  };
+}
+
+function daysSince(key) {
+  const saved = localStorage.getItem(key);
+  if (!saved) return 0;
+  return Math.floor((Date.now() - new Date(saved).getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function countRegion(region) {
+  let count = 0;
+  state.solved.forEach(id => {
+    if (state.layerData[id]?.region === region) count++;
+  });
+  return count;
+}
+
+function countBigLists() {
+  try {
+    const lists = JSON.parse(localStorage.getItem("geo_settings_final") || "{}").savedLists || [];
+    return lists.filter(l => (l.ids?.length || 0) >= 20).length;
+  } catch(e) { return 0; }
+}
+
+/* ============================================================
+   УВЕДОМЛЕНИЕ
+   ============================================================ */
+function showAchNotification(ach) {
+  const notif = document.getElementById("achNotification");
+  const rarity = RARITIES[ach.rarity];
+
+  notif.style.setProperty("--notif-color", rarity.color);
+  document.getElementById("achNotifRarity").textContent = rarity.name.toUpperCase();
+  document.getElementById("achNotifIcon").textContent = ach.icon;
+  document.getElementById("achNotifName").textContent = ach.name;
+  document.getElementById("achNotifDesc").textContent = ach.desc;
+
+  notif.classList.add("show");
+  clearTimeout(notif._timer);
+  notif._timer = setTimeout(() => notif.classList.remove("show"), 4500);
+}
+
+/* ============================================================
+   ОТРИСОВКА СПИСКА
+   ============================================================ */
+function renderAchList() {
+  const unlocked = getUnlockedAchievements();
+  const list = document.getElementById("achList");
+
+  // Сначала полученные, потом остальные
+const sorted = [...ACHIEVEMENTS].sort((a, b) => {
+  const aUnlocked = unlocked.has(a.id) ? 0 : 1;
+  const bUnlocked = unlocked.has(b.id) ? 0 : 1;
+  return aUnlocked - bUnlocked;
+});
+
+list.innerHTML = sorted.map(ach => {
+    const isUnlocked = unlocked.has(ach.id);
+    const rarity = RARITIES[ach.rarity];
+    return `
+      <div class="ach-item ${isUnlocked ? 'unlocked' : ''}" style="--rarity-color: ${rarity.color};">
+        <div class="ach-item-icon">${ach.icon}</div>
+        <div class="ach-item-body">
+          <div class="ach-item-name">${ach.name}</div>
+          <div class="ach-item-desc">${isUnlocked ? '✅ ' + ach.desc : ach.desc}</div>
+          <div class="ach-item-rarity">${rarity.name}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  // Прогресс
+  const total = ACHIEVEMENTS.length;
+  const got = unlocked.size;
+  document.getElementById("achCount").textContent = `Получено ${got} из ${total}`;
+  document.getElementById("achProgressFill").style.width = (got / total * 100) + "%";
+  document.getElementById("achBadge").textContent = `${got}/${total}`;
+
+  // Счётчики по редкости
+  renderRarityChips(unlocked);
+}
+
+function renderRarityChips(unlocked) {
+  const wrap = document.getElementById("achRarities");
+  const counts = {};
+  Object.keys(RARITIES).forEach(r => counts[r] = { got: 0, total: 0 });
+
+  ACHIEVEMENTS.forEach(a => {
+    counts[a.rarity].total++;
+    if (unlocked.has(a.id)) counts[a.rarity].got++;
+  });
+
+  wrap.innerHTML = Object.entries(RARITIES).map(([key, r]) => `
+    <div class="ach-rarity-chip" style="color: ${r.color};">
+      <span class="ach-rarity-dot" style="background: ${r.color};"></span>
+      ${counts[key].got}/${counts[key].total}
+    </div>
+  `).join("");
+}
+
+/* ============================================================
+   ОТКРЫТЬ / ЗАКРЫТЬ ПАНЕЛЬ
+   ============================================================ */
+document.getElementById("achBtn").addEventListener("click", () => {
+  document.getElementById("achPanel").classList.toggle("show");
+  renderAchList();
+});
+document.getElementById("achCloseBtn").addEventListener("click", () => {
+  document.getElementById("achPanel").classList.remove("show");
+});
+
+/* ============================================================
+   ОТСЛЕЖИВАНИЕ СТАТИСТИКИ
+   ============================================================ */
+
+// Первый вход
+if (!localStorage.getItem("geo_firstLogin")) {
+  localStorage.setItem("geo_firstLogin", new Date().toISOString());
+}
+localStorage.setItem("geo_lastLogin", new Date().toISOString());
+
+// Смена темы — счётчик
+const _origApplyTheme = applyTheme;
+applyTheme = function(theme) {
+  _origApplyTheme(theme);
+  const changes = parseInt(localStorage.getItem("geo_theme_changes") || "0", 10);
+  localStorage.setItem("geo_theme_changes", changes + 1);
+};
+
+// Подсказки — счётчик
+const _origUpdateHintUI = updateHintUI;
+updateHintUI = function() {
+  _origUpdateHintUI();
+  const used = 10 - state.hintsLeft;
+  if (used > 0) {
+    const total = parseInt(localStorage.getItem("geo_hints_total") || "0", 10);
+    localStorage.setItem("geo_hints_total", Math.max(total, used));
+  }
+};
+
+// Проверка достижений после каждого ответа
+const _origOnCountryClickAch = onCountryClick;
+onCountryClick = function(id) {
+  _origOnCountryClickAch(id);
+  setTimeout(() => {
+    updateStreaks(id);
+    checkAchievements();
+  }, 500);
+};
+
+function updateStreaks(lastId) {
+  // Стрик правильных ответов
+  const prevCorrect = state.solved.has(lastId);
+  let streakC = parseInt(localStorage.getItem("geo_streak_correct") || "0", 10);
+  let streakW = parseInt(localStorage.getItem("geo_streak_wrong") || "0", 10);
+
+  if (prevCorrect) {
+    streakC++;
+    streakW = 0;
+  } else {
+    streakW++;
+    // Считаем ошибки по одной стране
+    const errs = JSON.parse(localStorage.getItem("geo_errors_by_country") || "{}");
+    const targetId = state.current?.id || lastId;
+    errs[targetId] = (errs[targetId] || 0) + 1;
+    localStorage.setItem("geo_errors_by_country", JSON.stringify(errs));
+
+    const maxErr = Math.max(...Object.values(errs));
+    localStorage.setItem("geo_max_errors_one", maxErr);
+  }
+
+  localStorage.setItem("geo_streak_correct", streakC);
+  localStorage.setItem("geo_streak_wrong", streakW);
+}
+
+// Дневной стрик
+(function updateDayStreak() {
+  const lastDay = localStorage.getItem("geo_lastDay");
+  const today = new Date().toDateString();
+  if (lastDay !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    let streak = parseInt(localStorage.getItem("geo_day_streak") || "0", 10);
+    streak = (lastDay === yesterday) ? streak + 1 : 1;
+    localStorage.setItem("geo_day_streak", streak);
+    localStorage.setItem("geo_lastDay", today);
+  }
+})();
+
+// Проверка при загрузке
+setTimeout(() => {
+  checkAchievements();
+  renderAchList();
+}, 2000);
 loadTheme();
 updateColorSelection();
-/* ============ PWA — РЕГИСТРАЦИЯ SERVICE WORKER ============ */
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js")
-      .then(reg => {
-        console.log("[PWA] Service Worker зарегистрирован:", reg.scope);
-      })
-      .catch(err => {
-        console.warn("[PWA] Ошибка регистрации Service Worker:", err);
-      });
-  });
-}
 </script>
 </body>
 </html>
