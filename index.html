@@ -9,414 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-
 <style>
-/* ============================================================
-   КНОПКА «УЧЕНИКИ» В ШАПКЕ
-   ============================================================ */
-   .teacher-panel-btn {
-  padding: 8px 16px;
-  background: linear-gradient(135deg, rgba(56,189,248,0.25), rgba(168,85,247,0.2));
-  border: 1px solid rgba(56,189,248,0.5);
-  border-radius: 10px;
-  color: #7dd3fc;
-  font-size: 13px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  transition: 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.teacher-panel-btn:hover {
-  background: linear-gradient(135deg, rgba(56,189,248,0.4), rgba(168,85,247,0.3));
-  color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(56,189,248,0.4);
-}
-.teacher-panel-btn.hidden { display: none; }
-
-/* ============================================================
-   ПАНЕЛЬ УЧЕНИКОВ
-   ============================================================ */
-.students-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(8px);
-  z-index: 5000;
-  display: none; align-items: center; justify-content: center;
-  padding: 20px;
-}
-.students-overlay.show { display: flex; }
-
-.students-card {
-  background: linear-gradient(180deg, rgba(30,41,59,0.98), rgba(15,23,42,0.98));
-  border: 1px solid rgba(56,189,248,0.3);
-  border-radius: 20px;
-  max-width: 900px;
-  width: 100%;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-  animation: authIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  overflow: hidden;
-}
-.students-header {
-  padding: 18px 22px;
-  border-bottom: 1px solid rgba(148,163,184,0.15);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.students-header h2 {
-  font-size: 19px;
-  font-weight: 800;
-  background: linear-gradient(135deg, #38bdf8, #a855f7);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.students-close {
-  background: var(--bg-3);
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  width: 34px; height: 34px;
-  border-radius: 10px;
-  font-size: 20px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.students-close:hover {
-  background: var(--danger);
-  color: #fff;
-  border-color: var(--danger);
-  transform: rotate(90deg);
-}
-
-.students-stats {
-  padding: 16px 22px;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  border-bottom: 1px solid rgba(148,163,184,0.1);
-}
-.students-stat {
-  flex: 1;
-  min-width: 140px;
-  padding: 14px;
-  border-radius: 12px;
-  background: rgba(30,41,59,0.6);
-  border: 1px solid rgba(148,163,184,0.1);
-  text-align: center;
-}
-.students-stat-num {
-  font-size: 26px;
-  font-weight: 900;
-  color: #38bdf8;
-}
-.students-stat-lbl {
-  font-size: 11px;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 4px;
-}
-
-.students-import {
-  padding: 14px 22px;
-  background: rgba(56,189,248,0.05);
-  border-bottom: 1px solid rgba(56,189,248,0.15);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.students-import label {
-  font-size: 12px;
-  color: #7dd3fc;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.students-import-row {
-  display: flex;
-  gap: 8px;
-}
-.students-import-row input {
-  flex: 1;
-  padding: 10px 14px;
-  background: var(--bg-1);
-  border: 1px solid rgba(56,189,248,0.3);
-  border-radius: 8px;
-  color: var(--text);
-  font-size: 13px;
-  font-family: 'Inter', monospace;
-}
-.students-import-row input:focus {
-  outline: none;
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 3px rgba(56,189,248,0.15);
-}
-.students-import-row button {
-  padding: 10px 18px;
-  background: linear-gradient(135deg, #38bdf8, #0284c7);
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-  transition: 0.2s;
-}
-.students-import-row button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(56,189,248,0.4);
-}
-.students-import-hint {
-  font-size: 11.5px;
-  color: #64748b;
-  line-height: 1.4;
-}
-
-.students-toolbar {
-  padding: 14px 22px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  border-bottom: 1px solid rgba(148,163,184,0.1);
-}
-.students-toolbar input,
-.students-toolbar select {
-  padding: 8px 12px;
-  background: var(--bg-3);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-size: 13px;
-  font-family: inherit;
-}
-.students-toolbar input { flex: 1; min-width: 160px; }
-.students-toolbar input:focus,
-.students-toolbar select:focus {
-  outline: none;
-  border-color: #38bdf8;
-}
-.students-toolbar button {
-  padding: 8px 16px;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.students-table-wrap {
-  flex: 1;
-  overflow: auto;
-  padding: 0 22px 22px;
-}
-.students-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  color: var(--text);
-}
-.students-table th {
-  padding: 10px;
-  text-align: left;
-  background: rgba(30,41,59,0.6);
-  color: #64748b;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  position: sticky;
-  top: 0;
-}
-.students-table td {
-  padding: 10px;
-  border-bottom: 1px solid rgba(148,163,184,0.08);
-}
-.students-table tr:hover td {
-  background: rgba(56,189,248,0.05);
-}
-.students-empty {
-  text-align: center;
-  color: #64748b;
-  padding: 40px 10px !important;
-}
-.students-progress {
-  display: inline-block;
-  min-width: 60px;
-  padding: 3px 10px;
-  border-radius: 6px;
-  background: rgba(34,197,94,0.15);
-  color: #22c55e;
-  font-weight: 800;
-  text-align: center;
-}
-
-/* ============================================================
-   КНОПКИ В ФУТЕРЕ — РЯДОМ
-   ============================================================ */
-   .footer-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.footer-btn {
-  padding: 10px 18px;
-  font-size: 13px;
-  font-weight: 700;
-  font-family: inherit;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: 0.2s;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.footer-btn.save-btn {
-  background: linear-gradient(135deg, rgba(34,197,94,0.25), rgba(22,163,74,0.15));
-  border-color: #22c55e;
-  color: #86efac;
-}
-.footer-btn.save-btn:hover {
-  background: linear-gradient(135deg, rgba(34,197,94,0.45), rgba(22,163,74,0.3));
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(34,197,94,0.4);
-}
-
-.footer-btn.reset-btn {
-  background: rgba(30,41,59,0.8);
-  border-color: rgba(148,163,184,0.3);
-  color: #cbd5e1;
-}
-.footer-btn.reset-btn:hover {
-  background: rgba(239,68,68,0.2);
-  border-color: #ef4444;
-  color: #fca5a5;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(239,68,68,0.3);
-}
-
-@media (max-width: 768px) {
-  .footer-actions {
-    width: 100%;
-    justify-content: center;
-  }
-  .footer-btn {
-    padding: 8px 14px;
-    font-size: 12px;
-    flex: 1;
-    justify-content: center;
-  }
-}
-
-/* ============================================================
-   МОДАЛКА С КОДОМ
-   ============================================================ */
-.code-modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(8px);
-  z-index: 7000;
-  display: none; align-items: center; justify-content: center;
-  padding: 20px;
-}
-.code-modal-overlay.show { display: flex; }
-
-.code-modal {
-  background: linear-gradient(180deg, rgba(30,41,59,0.98), rgba(15,23,42,0.98));
-  border: 2px solid rgba(34,197,94,0.4);
-  border-radius: 20px;
-  padding: 28px 24px;
-  max-width: 500px;
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-  animation: authIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.code-modal h3 {
-  font-size: 20px;
-  font-weight: 800;
-  color: #22c55e;
-  margin-bottom: 8px;
-}
-.code-modal p {
-  font-size: 13px;
-  color: #94a3b8;
-  line-height: 1.6;
-  margin-bottom: 16px;
-}
-.code-box {
-  padding: 16px;
-  background: rgba(15,23,42,0.9);
-  border: 2px dashed rgba(34,197,94,0.5);
-  border-radius: 12px;
-  font-family: 'Inter', monospace;
-  font-size: 12px;
-  font-weight: 600;
-  color: #86efac;
-  letter-spacing: 0.02em;
-  word-break: break-all;
-  margin-bottom: 16px;
-  user-select: all;
-  max-height: 120px;
-  overflow-y: auto;
-}
-.code-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.code-actions button {
-  padding: 10px 18px;
-  border-radius: 10px;
-  border: none;
-  font-size: 13px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.btn-copy {
-  background: linear-gradient(135deg, #38bdf8, #0284c7);
-  color: #fff;
-}
-.btn-copy:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(56,189,248,0.4);
-}
-.btn-close-code {
-  background: rgba(30,41,59,0.8);
-  color: #cbd5e1;
-  border: 1px solid rgba(148,163,184,0.2);
-}
-.btn-close-code:hover {
-  background: rgba(51,65,85,0.9);
-  color: #fff;
-}
-
-@media (max-width: 640px) {
-  .students-overlay { padding: 10px; }
-  .students-card { max-height: 95vh; }
-  .students-stats { padding: 12px 14px; }
-  .students-stat { min-width: 100px; padding: 10px; }
-  .students-stat-num { font-size: 20px; }
-  .students-import, .students-toolbar { padding: 12px 14px; }
-  .students-table-wrap { padding: 0 14px 14px; }
-  .teacher-panel-btn { padding: 6px 10px; font-size: 11px; }
-}
   :root {
     --bg-1: #0a0e1a;
     --bg-2: #111827;
@@ -1408,94 +1001,448 @@ body.light .country-disabled {
     transition: 0.2s;
   }
 
-  /* ============ КОМПАКТНОЕ МЕНЮ НА ТЕЛЕФОНЕ ============ */
-  @media (max-width: 768px) {
-    header { padding: 8px 12px; gap: 6px; }
-    h1 { font-size: 14px; gap: 5px; }
-    h1 .author { display: none; }
+ /* ============================================================
+   МОБИЛЬНАЯ ВЕРСИЯ — СТИЛЬ STUDYGE
+   ============================================================ */
+@media (max-width: 768px) {
 
-    .stats { gap: 5px; }
-    .stat-chip { padding: 3px 8px; font-size: 10px; border-radius: 14px; gap: 4px; }
-    .stat-chip .lbl { font-size: 10px; }
-    .stat-chip b { font-size: 11px; }
+/* === ОСНОВА === */
+body {
+  background: #0f1115;
+  overflow: hidden;
+}
 
-    .controls { padding: 6px 10px; gap: 5px; }
-    .controls button, .controls select {
-      padding: 5px 9px;
-      font-size: 11px;
-      border-radius: 8px;
-      gap: 3px;
-    }
-    .controls button.theme-btn { padding: 5px 8px; font-size: 13px; }
-    .hint-count { font-size: 10px; padding: 3px 6px; margin-left: -3px; }
-
-    .question { padding: 8px 12px; font-size: 14px; min-height: 46px; gap: 2px; }
-    .question .target { font-size: 16px; }
-    .question .hint { font-size: 11px; }
-
-    .footer { padding: 6px 12px; font-size: 10.5px; gap: 5px; }
-    .footer button { padding: 4px 9px; font-size: 11px; }
-
-    .toast { top: 100px; padding: 9px 16px; font-size: 13px; border-radius: 12px; }
-    .toast .flag { font-size: 18px; }
-
-    .panel { max-width: 95vw; border-radius: 16px; }
-    .panel-header { padding: 12px 16px; }
-    .panel-header h2 { font-size: 15px; }
-    .panel-body { padding: 14px 16px; gap: 12px; }
-    .field textarea { min-height: 100px; font-size: 13px; }
-    .panel-footer { padding: 12px 16px; gap: 6px; }
-    .panel-footer button { padding: 8px 14px; font-size: 13px; }
-
-    #exitFsBtn { top: 8px; right: 8px; padding: 7px 12px; font-size: 12px; }
-
-    .cert-title { font-size: 24px; letter-spacing: 8px; }
-    .cert-name-input { font-size: 20px; }
-    .cert-text { font-size: 15px; }
-  }
-  @media (max-width: 400px) {
-    .controls button, .controls select { padding: 4px 7px; font-size: 10.5px; }
-    .stat-chip { padding: 2px 6px; }
-    .stat-chip b { font-size: 10px; }
-    h1 { font-size: 12.5px; }
-  }
-  
-	.fs-keys-hint {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: none;
-  gap: 8px;
-  align-items: center;
-  padding: 8px 16px;
-  background: rgba(15, 23, 42, 0.9);
+/* === ШАПКА — тонкая, тёмная === */
+header {
+  padding: 10px 12px;
+  background: rgba(20, 22, 28, 0.95);
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  border-radius: 12px;
-  color: #94a3b8;
-  font-size: 12px;
-  font-weight: 500;
-  z-index: 2000;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border-bottom: none;
+  box-shadow: none;
+  gap: 6px;
 }
-
-body.fullscreen-mode .fs-keys-hint {
-  display: inline-flex !important;
+h1 {
+  font-size: 15px;
+  color: #fff;
+  background: none;
+  -webkit-text-fill-color: #fff;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
 }
+h1 .author { display: none; }
 
-.fs-keys-hint kbd {
-  display: inline-block;
-  padding: 2px 8px;
-  background: linear-gradient(180deg, #334155, #1e293b);
-  border: 1px solid #475569;
-  border-bottom-width: 2px;
-  border-radius: 5px;
-  font-family: 'Inter', monospace;
+.stats {
+  gap: 5px;
+  width: 100%;
+  justify-content: center;
+  margin-top: 6px;
+}
+.stat-chip {
+  background: #1a1d24;
+  padding: 5px 10px;
   font-size: 11px;
+  border-radius: 20px;
+  border: 1px solid #2a2e38;
+  gap: 4px;
+}
+.stat-chip .lbl { font-size: 10px; color: #8a91a0; }
+.stat-chip b { font-size: 12px; color: #22c55e; }
+.stat-chip.err b { color: #ef4444; }
+.stat-chip.ok b { color: #22c55e; }
+
+/* === КНОПКИ ДОСТИЖЕНИЙ / ВЫЙТИ === */
+.achievements-btn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 8px 12px;
+  background: #1a1d24;
+  border: 1px solid #2a2e38;
+  border-radius: 20px;
+  color: #fbbf24;
+  font-size: 14px;
+  box-shadow: none;
+}
+.ach-badge {
+  background: #fbbf24;
+  color: #0f1115;
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-weight: 900;
+}
+
+.logout-btn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 8px 12px;
+  background: #1a1d24;
+  border: 1px solid #2a2e38;
+  border-radius: 20px;
+  color: #ef4444;
+  font-size: 16px;
+  display: none; /* Скрываем на мобильном — доступ через паузу */
+}
+.teacher-panel-btn { display: none !important; }
+
+/* === ВЕРХНЯЯ ПАНЕЛЬ — счётчики как в StudyGe === */
+.controls {
+  padding: 0;
+  background: transparent;
+  display: block;
+  border: none;
+}
+
+/* Первая строка — 5 режимов-карточек */
+.controls button[data-mode] {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 6px;
+  margin: 8px 4px 0;
+  background: #1a1d24;
+  border: 1px solid #2a2e38;
+  border-radius: 14px;
+  color: #8a91a0;
+  font-size: 10px;
+  font-weight: 600;
+  min-width: calc((100% - 40px) / 5);
+  max-width: calc((100% - 40px) / 5);
+  white-space: normal;
+  text-align: center;
+  line-height: 1.15;
+  height: auto;
+  min-height: 66px;
+  justify-content: center;
+}
+.controls button[data-mode]:first-child { margin-left: 8px; }
+.controls button[data-mode]::before {
+  font-size: 22px;
+  display: block;
+}
+.controls button[data-mode].active {
+  background: #22c55e;
+  color: #0f1115;
+  border-color: #22c55e;
   font-weight: 700;
-  color: #38bdf8;
+  box-shadow: 0 4px 16px rgba(34,197,94,0.4);
+}
+.controls button[data-mode].active::before {
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.3));
+}
+
+/* Вторая строка — регион + инструменты */
+#regionSelect {
+  display: inline-block;
+  width: calc(100% - 16px);
+  margin: 8px 8px 0;
+  padding: 12px 14px;
+  background: #1a1d24;
+  border: 1px solid #2a2e38;
+  border-radius: 14px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a91a0' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+#styleToggle,
+#hintBtn,
+#skipBtn,
+#openPanelBtn,
+#mapStyleBtn,
+#musicBtn,
+#fullscreenBtn,
+#themeToggle {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 4px;
+  margin: 8px 3px 0;
+  background: #1a1d24;
+  border: 1px solid #2a2e38;
+  border-radius: 14px;
+  color: #8a91a0;
+  font-size: 10px;
+  font-weight: 600;
+  min-width: calc((100% - 40px) / 5);
+  max-width: calc((100% - 40px) / 5);
+  min-height: 60px;
+  height: auto;
+  position: relative;
+}
+#styleToggle:first-of-type { margin-left: 8px; }
+
+#styleToggle.active,
+#hintBtn.active {
+  background: #22c55e;
+  color: #0f1115;
+  border-color: #22c55e;
+}
+#hintBtn {
+  background: #1a1d24;
+  color: #fbbf24;
+  border-color: #2a2e38;
+}
+#hintBtn:disabled {
+  opacity: 0.4;
+  color: #8a91a0;
+}
+#hintBtn::before { content: "🔔"; font-size: 22px; }
+#skipBtn::before { content: "⏭"; font-size: 22px; }
+#styleToggle::before { content: "🎨"; font-size: 22px; }
+#openPanelBtn::before { content: "✏️"; font-size: 22px; }
+#mapStyleBtn::before { content: "🗺"; font-size: 22px; }
+#musicBtn::before { content: "🎵"; font-size: 22px; }
+#fullscreenBtn::before { content: "⛶"; font-size: 22px; }
+#themeToggle::before { content: "🌙"; font-size: 22px; }
+
+/* Скрываем текст, оставляем только иконки */
+#skipBtn { font-size: 0; }
+#skipBtn::before { font-size: 22px; }
+#openPanelBtn { font-size: 0; }
+#openPanelBtn::before { font-size: 22px; }
+#mapStyleBtn { font-size: 0; }
+#mapStyleBtn::before { font-size: 22px; }
+#musicBtn { font-size: 0; }
+#musicBtn::before { font-size: 22px; }
+#fullscreenBtn { font-size: 0; }
+#fullscreenBtn::before { font-size: 22px; }
+#themeToggle { font-size: 0; }
+#themeToggle::before { font-size: 22px; }
+
+.hint-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* === ВОПРОС — как в StudyGe === */
+.question {
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  background: rgba(20, 22, 28, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  margin: 8px;
+  min-height: auto;
+  color: #fff;
+  border: 1px solid #2a2e38;
+}
+.question .target {
+  font-size: 18px;
+  font-weight: 800;
+  color: #22c55e;
+  -webkit-text-fill-color: #22c55e;
+  background: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+  border: none;
+  box-shadow: none;
+}
+.question .hint {
+  font-size: 12px;
+  color: #8a91a0;
+  margin-top: 4px;
+}
+
+/* === КАРТА === */
+#map {
+  flex: 1;
+  min-height: 35vh;
+  border-radius: 16px;
+  margin: 8px;
+  overflow: hidden;
+}
+
+/* === ФУТЕР — компактный === */
+.footer {
+  padding: 8px 12px;
+  background: rgba(20, 22, 28, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid #2a2e38;
+  font-size: 10px;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  color: #8a91a0;
+}
+.footer > div:first-child {
+  width: 100%;
+  text-align: center;
+  order: 2;
+}
+.footer .author-foot {
+  order: 1;
+  font-size: 10px;
+  color: #8a91a0;
+}
+.footer-actions {
+  order: 3;
+  width: 100%;
+  gap: 8px;
+  justify-content: center;
+}
+.footer-btn {
+  flex: 1;
+  max-width: 180px;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 14px;
+  justify-content: center;
+}
+
+/* === МОДАЛКИ === */
+.panel {
+  max-width: 95vw;
+  border-radius: 20px;
+  background: #1a1d24;
+  border: 1px solid #2a2e38;
+}
+.panel-header {
+  padding: 16px;
+  border-bottom: 1px solid #2a2e38;
+}
+.panel-header h2 { font-size: 16px; color: #fff; }
+.panel-body { padding: 16px; gap: 12px; }
+.field label { font-size: 11px; color: #8a91a0; }
+.field textarea,
+.field input[type="text"] {
+  background: #0f1115;
+  border: 1px solid #2a2e38;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 14px;
+  padding: 12px 14px;
+}
+.panel-footer {
+  padding: 14px 16px;
+  gap: 8px;
+  background: #1a1d24;
+  border-top: 1px solid #2a2e38;
+}
+.panel-footer button {
+  padding: 12px 18px;
+  font-size: 13px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+/* === ДОСТИЖЕНИЯ === */
+.ach-panel {
+  width: 100vw;
+  background: #0f1115;
+  border: none;
+}
+.ach-header {
+  padding: 16px;
+  border-bottom: 1px solid #2a2e38;
+}
+.ach-header h2 { font-size: 17px; color: #fff; }
+.ach-item {
+  padding: 12px;
+  border-radius: 14px;
+  background: #1a1d24;
+  border: 1px solid #2a2e38;
+}
+.ach-item.unlocked {
+  background: rgba(34,197,94,0.1);
+  border-color: rgba(34,197,94,0.3);
+}
+.ach-item-icon {
+  width: 44px; height: 44px;
+  font-size: 22px;
+  border-radius: 12px;
+}
+.ach-item-name { font-size: 14px; }
+.ach-item-desc { font-size: 12px; }
+.ach-item-rarity { font-size: 10px; }
+
+.ach-notification {
+  top: 70px;
+  right: 10px;
+  left: 10px;
+  max-width: none;
+  min-width: 0;
+  border-radius: 16px;
+}
+
+/* === ПОЛНОЭКРАННЫЕ КНОПКИ === */
+.fs-side-btn {
+  top: 70px !important;
+  padding: 10px 14px;
+  font-size: 18px;
+  border-radius: 14px;
+}
+.fs-side-btn.left { left: 10px !important; }
+.fs-side-btn.right { right: 10px !important; }
+.fs-side-btn .label { font-size: 10px; }
+
+#exitFsBtn {
+  top: 10px;
+  right: 10px;
+  padding: 8px 14px;
+  font-size: 12px;
+  border-radius: 12px;
+}
+
+/* === ТАЙМЕР === */
+.timer-bar {
+  height: 6px;
+  margin: 0 8px;
+  border-radius: 3px;
+  background: #2a2e38;
+}
+.timer-fill {
+  background: linear-gradient(90deg, #22c55e, #38bdf8);
+  border-radius: 3px;
+}
+
+/* === ТОСТЫ === */
+.toast {
+  top: 100px;
+  padding: 12px 18px;
+  font-size: 13px;
+  border-radius: 14px;
+  max-width: calc(100vw - 20px);
+}
+
+/* Отключаем подсказки */
+[data-tip]::after,
+[data-tip]::before { display: none !important; }
+}
+
+/* === МАЛЕНЬКИЕ ЭКРАНЫ === */
+@media (max-width: 400px) {
+h1 { font-size: 13px; }
+.controls button[data-mode] {
+  min-height: 60px;
+  font-size: 9px;
+}
+.stat-chip { padding: 4px 8px; font-size: 10px; }
+.question { font-size: 14px; }
+.question .target { font-size: 16px; }
+.footer-btn { font-size: 11px; padding: 10px 12px; }
 }
 /* ============================================================
    ЭКРАН ВХОДА / РЕГИСТРАЦИИ
@@ -1504,18 +1451,13 @@ body.fullscreen-mode .fs-keys-hint {
   position: fixed; inset: 0;
   background: radial-gradient(circle at center, #0a1628 0%, #050a15 100%);
   z-index: 10000;
-  display: none; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   padding: 20px;
   overflow-y: auto;
   transition: opacity 0.4s ease;
 }
-.auth-screen.show {
-  display: flex;
-}
-.auth-screen.hide {
-  opacity: 0;
-  pointer-events: none;
-}
+.auth-screen.hide { opacity: 0; pointer-events: none; }
+
 .auth-card {
   background: linear-gradient(180deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95));
   backdrop-filter: blur(24px);
@@ -1792,7 +1734,7 @@ body.fullscreen-mode .fs-keys-hint {
 .achievements-btn {
   position: fixed;
   top: 14px;
-  right: 130px;
+  right: 14px;
   z-index: 1500;
   display: inline-flex;
   align-items: center;
@@ -2098,25 +2040,6 @@ body.fullscreen-mode .fs-keys-hint {
     max-width: none;
   }
 }
-/* Кнопка «Выйти» */
-.logout-btn {
-  padding: 9px 19px;
-  font-size: 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(239,68,68,0.5);
-  background: rgba(239,68,68,0.15);
-  color: #fca5a5;
-  cursor: pointer;
-  font-family: inherit;
-  font-weight: 600;
-  transition: 0.2s;
-}
-.logout-btn:hover {
-  background: rgba(239,68,68,0.3);
-  color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(239,68,68,0.3);
-}
 </style>
 </head>
 <body>
@@ -2285,16 +2208,10 @@ body.fullscreen-mode .fs-keys-hint {
 <header>
   <h1>🌍 Политическая карта мира <span class="author">· создатель Иван Лукинский</span></h1>
   <div class="stats">
-  <button class="teacher-panel-btn hidden" id="teacherPanelBtn" title="Список учеников">
-  👥 Ученики
-</button>
     <div class="stat-chip"><span class="lbl">Осталось</span> <b id="left">0</b></div>
     <div class="stat-chip ok"><span class="lbl">Верно</span> <b id="ok">0</b></div>
     <div class="stat-chip err"><span class="lbl">Ошибок</span> <b id="err">0</b></div>
   </div>
-  <button class="logout-btn" id="logoutBtn" title="Выйти из аккаунта">
-  🚪 Выйти
-</button>
 </header>
 
 <div class="controls">
@@ -2319,6 +2236,7 @@ body.fullscreen-mode .fs-keys-hint {
   <button id="openPanelBtn" class="highlight-btn">✏️ Свой список</button>
   <button id="mapStyleBtn" title="Переключить вид карты">🗺 Политическая</button>
   <button id="musicBtn" class="theme-btn" title="Фоновая музыка">🎵</button>
+  <button id="downloadBtn" class="theme-btn" title="Скачать HTML-файл">💾</button>
   <button id="fullscreenBtn" class="theme-btn" title="Полный экран (F)">⛶</button>
   <button id="themeToggle" class="theme-btn" title="Переключить тему">🌙</button>
 </div>
@@ -2331,12 +2249,9 @@ body.fullscreen-mode .fs-keys-hint {
 <div id="map"></div>
 
 <div class="footer">
-<div>Режим: <b id="modeInfo">Найди страну</b> · <span id="countInfo"></span> <span id="highlightInfo"></span></div>
-<div class="author-foot">Создатель: <b>Иван Лукинский</b></div>
-<div class="footer-actions">
-  <button id="saveProgressBtn" class="footer-btn save-btn">💾 Сохранить прогресс</button>
-  <button id="resetBtn" class="footer-btn reset-btn">🔄 Сбросить прогресс</button>
-</div>
+  <div>Режим: <b id="modeInfo">Найди страну</b> · <span id="countInfo"></span> <span id="highlightInfo"></span></div>
+  <div class="author-foot">Создатель: <b>Иван Лукинский</b></div>
+  <button id="resetBtn">🔄 Сбросить прогресс</button>
 </div>
 <!-- Сертификат -->
 <div class="cert-overlay" id="certOverlay">
@@ -2433,90 +2348,6 @@ body.fullscreen-mode .fs-keys-hint {
     <div class="ach-notif-title">ДОСТИЖЕНИЕ ПОЛУЧЕНО!</div>
     <div class="ach-notif-name" id="achNotifName">Название</div>
     <div class="ach-notif-desc" id="achNotifDesc">Описание</div>
-  </div>
-</div>
-</div>
-<!-- ============ ПАНЕЛЬ УЧИТЕЛЯ — СПИСОК УЧЕНИКОВ ============ -->
-<div class="students-overlay" id="studentsOverlay">
-<div class="students-card">
-  <div class="students-header">
-    <h2>👥 Список учеников</h2>
-    <button class="students-close" id="studentsCloseBtn">×</button>
-  </div>
-
-  <!-- Статистика -->
-  <div class="students-stats">
-    <div class="students-stat">
-      <div class="students-stat-num" id="statTotal">0</div>
-      <div class="students-stat-lbl">Всего учеников</div>
-    </div>
-    <div class="students-stat">
-      <div class="students-stat-num" id="statAvg">0</div>
-      <div class="students-stat-lbl">Средний прогресс</div>
-    </div>
-    <div class="students-stat">
-      <div class="students-stat-num" id="statBest">—</div>
-      <div class="students-stat-lbl">Лучший класс</div>
-    </div>
-  </div>
-
-  <!-- Импорт кода -->
-  <div class="students-import">
-    <label>📥 Импорт прогресса по коду ученика</label>
-    <div class="students-import-row">
-      <input type="text" id="importCodeInput" placeholder="Вставьте код от ученика…">
-      <button id="importCodeBtn">📥 Загрузить</button>
-    </div>
-    <div class="students-import-hint">
-      Ученик должен нажать «💾 Сохранить прогресс» и прислать вам код.
-    </div>
-  </div>
-
-  <!-- Фильтры -->
-  <div class="students-toolbar">
-    <input type="text" id="studentsSearch" placeholder="🔍 Поиск ученика…">
-    <select id="studentsClassFilter">
-      <option value="">Все классы</option>
-      <option value="5">5 класс</option>
-      <option value="6">6 класс</option>
-      <option value="7">7 класс</option>
-      <option value="8">8 класс</option>
-      <option value="9">9 класс</option>
-      <option value="10">10 класс</option>
-      <option value="11">11 класс</option>
-    </select>
-    <button id="studentsExportBtn">📥 CSV</button>
-  </div>
-
-  <!-- Таблица -->
-  <div class="students-table-wrap">
-    <table class="students-table">
-      <thead>
-        <tr>
-          <th>Ученик</th>
-          <th>Класс</th>
-          <th>Изучено</th>
-          <th>Ошибок</th>
-          <th>Стрик</th>
-          <th>Последний вход</th>
-        </tr>
-      </thead>
-      <tbody id="studentsTableBody">
-        <tr><td colspan="6" class="students-empty">Пока нет учеников</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-</div>
-<!-- ============ МОДАЛКА С КОДОМ ============ -->
-<div class="code-modal-overlay" id="codeModal">
-<div class="code-modal">
-  <h3>✅ Прогресс сохранён!</h3>
-  <p>Отправьте этот код учителю, чтобы он увидел ваш прогресс:</p>
-  <div class="code-box" id="codeBox">—</div>
-  <div class="code-actions">
-    <button class="btn-copy" id="copyCodeBtn">📋 Скопировать</button>
-    <button class="btn-close-code" id="closeCodeBtn">Закрыть</button>
   </div>
 </div>
 </div>
@@ -2889,9 +2720,7 @@ function startGame() {
   nextQuestion();
 }
 function restoreProgressOrStart() {
-  // НЕ восстанавливаем старый общий прогресс
-  // Прогресс берём ТОЛЬКО из аккаунта пользователя
-  localStorage.removeItem("geo_progress_final");
+  // Всегда начинаем новую игру — не восстанавливаем старое состояние
   startGame();
 }
 function nextQuestion() {
@@ -3373,6 +3202,22 @@ document.getElementById("mapStyleBtn").addEventListener("click", () => {
   applyMapStyle(currentMapStyleIndex);
 });
 
+/* СКАЧАТЬ HTML */
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  try {
+    const html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const d = new Date();
+    const pad = n => String(n).padStart(2, "0");
+    const name = `geo-map-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.html`;
+    const a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast(`Файл сохранён: ${name}`, "ok");
+  } catch (e) { showToast("Не удалось сохранить: " + e.message, "err"); }
+});
 
 /* ПОЛНОЭКРАННЫЙ РЕЖИМ */
 const fsBtn = document.getElementById("fullscreenBtn");
@@ -3473,12 +3318,6 @@ window.addEventListener("beforeunload", () => { saveProgress(); saveSettings(); 
     splash.classList.add("hide");
     setTimeout(() => {
       splash.style.display = "none";
-      // Показать экран входа ПОСЛЕ заставки
-      const authScreen = document.getElementById("authScreen");
-      if (authScreen) {
-        authScreen.classList.add("show");
-        authScreen.style.display = "flex";
-      }
       // Пересчитываем размер карты, чтобы всё правильно отрисовалось
       setTimeout(() => map.invalidateSize(), 300);
     }, 800);
@@ -3498,12 +3337,6 @@ window.addEventListener("beforeunload", () => { saveProgress(); saveSettings(); 
     clearTimeout(autoHide);
     splash.style.display = "none";
     hidden = true;
-     // Показать authScreen сразу (заставка уже показывалась)
-     const authScreen = document.getElementById("authScreen");
-    if (authScreen) {
-      authScreen.classList.add("show");
-      authScreen.style.display = "flex";
-    }
   } else {
     sessionStorage.setItem("splashShown", "yes");
   }
@@ -3843,11 +3676,6 @@ function getUserKey(first, last, cls) {
 function registerOrLogin(first, last, cls, password) {
   const key = getUserKey(first, last, cls);
   const users = getAllUsers();
-  // ПРИНУДИТЕЛЬНО очищаем состояние перед сменой пользователя
-localStorage.removeItem("geo_progress_final");
-state.solved = new Set();
-state.correct = 0;
-state.errors = 0;
 
   if (users[key]) {
     // Пользователь есть — проверяем пароль
@@ -3902,34 +3730,14 @@ function saveUserProgress() {
   }
 }
 
+// Загрузить прогресс при входе
 function loadUserProgress() {
-  if (!currentUser) {
-    state.solved = new Set();
-    state.correct = 0;
-    state.errors = 0;
-    state.hintsLeft = 10;
-    return;
-  }
-
-  const users = getAllUsers();
-  const user = users[currentUser.key];
-
-  if (!user) {
-    state.solved = new Set();
-    state.correct = 0;
-    state.errors = 0;
-    state.hintsLeft = 10;
-    return;
-  }
-
-  const p = user.progress || {};
-  // ПРИНУДИТЕЛЬНО перезаписываем состояние
+  if (!currentUser) return;
+  const p = currentUser.progress || {};
   state.solved = new Set(p.solved || []);
   state.correct = p.correct || 0;
   state.errors = p.errors || 0;
   state.hintsLeft = p.hintsLeft || 10;
-
-  console.log("[Progress] Загружен для", user.firstName, "-", state.solved.size, "стран");
 }
 
 // ============================================================
@@ -3972,10 +3780,6 @@ document.getElementById("studentForm").addEventListener("submit", e => {
   document.getElementById("authError").textContent = "";
   saveUserProgress();
   loadUserProgress();
-    // Запоминаем активность (сессия на 10 минут)
-    updateActivity();
-  // Убираем учительскую сессию
-  localStorage.removeItem("geo_teacher_session");
 
   // Если новый — показываем обучение
   if (result.isNew && !localStorage.getItem(TUTORIAL_KEY)) {
@@ -3990,37 +3794,19 @@ document.getElementById("teacherForm").addEventListener("submit", e => {
   e.preventDefault();
   const code = document.getElementById("teacherCode").value;
   if (code === ADMIN_CODE) {
-    // Запоминаем учительскую сессию
-    localStorage.setItem("geo_teacher_session", "yes");
-    updateActivity();
-    // Убираем ученическую сессию
-    localStorage.removeItem(USER_KEY);
-    currentUser = null;
-
     closeAuth();
-    // Показываем кнопку «Ученики»
-    setTimeout(() => {
-      document.getElementById("teacherPanelBtn").classList.remove("hidden");
-      openTeacherPanel();
-    }, 400);
+    setTimeout(openTeacherPanel, 400);
   } else {
     document.getElementById("teacherError").textContent = "❌ Неверный код учителя";
   }
 });
 
+// Закрыть экран входа
 function closeAuth() {
-   // Обновляем время активности (для сессии на 10 минут)
-   updateActivity();
-
   authScreen.classList.add("hide");
   setTimeout(() => { authScreen.style.display = "none"; }, 400);
+  // Обновляем приветствие
   if (currentUser) {
-    // Очищаем старый общий прогресс
-    localStorage.removeItem("geo_progress_final");
-    // Загружаем прогресс ИМЕННО этого пользователя
-    loadUserProgress();
-    // Перезапускаем игру с чистого листа для этого пользователя
-    setTimeout(() => startGame(), 300);
     console.log("[Auth] Добро пожаловать,", currentUser.firstName, currentUser.lastName);
     showToast(`👋 Привет, ${currentUser.firstName}!`, "ok");
   }
@@ -4128,32 +3914,18 @@ document.getElementById("tutorialNext").addEventListener("click", () => {
   } else {
     localStorage.setItem(TUTORIAL_KEY, "yes");
     closeTutorial();
-// Если пользователь уже зарегистрирован — закрываем экран входа
-if (currentUser) {
-  closeAuth();
-}
-// Иначе — остаёмся на экране регистрации
+    closeAuth();
   }
 });
 
 document.getElementById("tutorialSkip").addEventListener("click", () => {
   localStorage.setItem(TUTORIAL_KEY, "yes");
   closeTutorial();
-// Если пользователь уже зарегистрирован — закрываем экран входа
-if (currentUser) {
   closeAuth();
-}
-// Иначе — остаёмся на экране регистрации
 });
 
 function closeTutorial() {
   tutorialScreen.classList.remove("show");
-}
-
-// Закрыть обучение и вернуться на экран входа
-function closeTutorialAndBackToAuth() {
-  tutorialScreen.classList.remove("show");
-  // Экран входа оставляем открытым
 }
 
 // Кнопка «Узнать о функциях» из формы
@@ -4273,59 +4045,18 @@ saveProgress = function() {
 // ============================================================
 // ПРИ ЗАГРУЗКЕ — ПРОВЕРЯЕМ ПОЛЬЗОВАТЕЛЯ
 // ============================================================
-/* ============================================================
-   ПРОВЕРКА СЕССИИ (10 МИНУТ)
-   ============================================================ */
-   const SESSION_TIMEOUT = 10 * 60 * 1000; // 10 минут в миллисекундах
-
-function isSessionValid() {
-  const lastActivity = localStorage.getItem("geo_last_activity");
-  if (!lastActivity) return false;
-  const elapsed = Date.now() - parseInt(lastActivity, 10);
-  return elapsed < SESSION_TIMEOUT;
-}
-
-function updateActivity() {
-  localStorage.setItem("geo_last_activity", Date.now().toString());
-}
-
-// Обновляем активность при любом действии
-["click", "keydown", "mousemove", "touchstart"].forEach(evt => {
-  document.addEventListener(evt, updateActivity, { passive: true });
-});
-
-// Проверка при загрузке
 (function checkUser() {
   try {
-    // Проверяем сессию учителя
-    const teacherSession = localStorage.getItem("geo_teacher_session");
-    if (teacherSession === "yes" && isSessionValid()) {
-      // Учитель в сессии — открываем панель учеников
-      updateActivity();
-      setTimeout(() => {
-        authScreen.style.display = "none";
-        document.getElementById("teacherPanelBtn").classList.remove("hidden");
-        showToast("👨‍🏫 Учитель в сессии", "ok");
-        setTimeout(openTeacherPanel, 600);
-      }, 500);
-      return;
-    }
-
-    // Проверяем сессию ученика
     const saved = localStorage.getItem(USER_KEY);
-    if (saved && isSessionValid()) {
+    if (saved) {
       const u = JSON.parse(saved);
       currentUser = u;
       loadUserProgress();
-      updateActivity();
+      // Сразу входим
       setTimeout(() => {
         authScreen.style.display = "none";
         showToast(`👋 С возвращением, ${u.firstName}!`, "ok");
       }, 500);
-    } else {
-      // Сессия истекла — очищаем
-      localStorage.removeItem(USER_KEY);
-      localStorage.removeItem("geo_teacher_session");
     }
   } catch(e) {}
 })();
@@ -4384,20 +4115,17 @@ const ACHIEVEMENTS = [
   { id: "luxmax",       icon: "💎", name: "Луксмаксер",                     desc: "100% континента без подсказок и ошибок", rarity: "legendary", check: s => s.perfectContinent },
 ];
 
-function getAchKey() {
-  if (!currentUser) return "geo_achievements_guest";
-  return "geo_achievements_" + currentUser.key;
-}
+const ACH_KEY = "geo_achievements";
 
 /* ============================================================
    ХРАНИЛИЩЕ ДОСТИЖЕНИЙ
    ============================================================ */
-   function getUnlockedAchievements() {
-  try { return new Set(JSON.parse(localStorage.getItem(getAchKey()) || "[]")); }
+function getUnlockedAchievements() {
+  try { return new Set(JSON.parse(localStorage.getItem(ACH_KEY) || "[]")); }
   catch(e) { return new Set(); }
 }
 function saveUnlockedAchievements(set) {
-  try { localStorage.setItem(getAchKey(), JSON.stringify([...set])); } catch(e) {}
+  try { localStorage.setItem(ACH_KEY, JSON.stringify([...set])); } catch(e) {}
 }
 
 /* ============================================================
@@ -4445,7 +4173,7 @@ function collectStats() {
     daysSinceFirst: daysSince("geo_firstLogin"),
     daysSinceLastLogin: daysSince("geo_lastLogin"),
     streakDays: parseInt(localStorage.getItem("geo_day_streak") || "0", 10),
-    themeChanges: parseInt(localStorage.getItem(getAchKey() + "_theme_changes") || "0", 10),
+    themeChanges: parseInt(localStorage.getItem("geo_theme_changes") || "0", 10),
     speedRun20: localStorage.getItem("geo_speedrun20") === "yes",
     oceania: countRegion("Oceania"),
     maxErrorsOneCountry: parseInt(localStorage.getItem("geo_max_errors_one") || "0", 10),
@@ -4577,8 +4305,8 @@ localStorage.setItem("geo_lastLogin", new Date().toISOString());
 const _origApplyTheme = applyTheme;
 applyTheme = function(theme) {
   _origApplyTheme(theme);
-  const changes = parseInt(localStorage.getItem(getAchKey() + "_theme_changes") || "0", 10);
-  localStorage.setItem(getAchKey() + "_theme_changes", changes + 1);
+  const changes = parseInt(localStorage.getItem("geo_theme_changes") || "0", 10);
+  localStorage.setItem("geo_theme_changes", changes + 1);
 };
 
 // Подсказки — счётчик
@@ -4645,303 +4373,6 @@ setTimeout(() => {
   checkAchievements();
   renderAchList();
 }, 2000);
-/* ============================================================
-   ПАНЕЛЬ УЧИТЕЛЯ — СПИСОК УЧЕНИКОВ
-   ============================================================ */
-
-// Показать/скрыть кнопку «Ученики»
-function updateTeacherButton() {
-  const btn = document.getElementById("teacherPanelBtn");
-  if (!btn) return;
-  // Кнопка видна, если это учитель (не ученик)
-  const isTeacher = !currentUser;
-  btn.classList.toggle("hidden", !isTeacher);
-}
-
-// Открыть панель учеников
-document.getElementById("teacherPanelBtn").addEventListener("click", () => {
-  document.getElementById("studentsOverlay").classList.add("show");
-  renderStudentsTable();
-});
-
-// Закрыть панель
-document.getElementById("studentsCloseBtn").addEventListener("click", () => {
-  document.getElementById("studentsOverlay").classList.remove("show");
-});
-document.getElementById("studentsOverlay").addEventListener("click", e => {
-  if (e.target.id === "studentsOverlay") {
-    e.target.classList.remove("show");
-  }
-});
-
-// Отрисовка таблицы
-function renderStudentsTable() {
-  const users = getAllUsers();
-  const filter = document.getElementById("studentsClassFilter").value;
-  const search = (document.getElementById("studentsSearch").value || "").toLowerCase();
-
-  const list = Object.entries(users)
-    .map(([key, u]) => ({ key, ...u }))
-    .filter(u => !filter || u.class === filter)
-    .filter(u => !search ||
-      (u.firstName || "").toLowerCase().includes(search) ||
-      (u.lastName || "").toLowerCase().includes(search));
-
-  list.sort((a, b) => (a.class || "").localeCompare(b.class || ""));
-
-  // Статистика
-  document.getElementById("statTotal").textContent = list.length;
-  const avgSolved = list.length > 0
-    ? Math.round(list.reduce((s, u) => s + (u.progress?.solved?.length || 0), 0) / list.length)
-    : 0;
-  document.getElementById("statAvg").textContent = avgSolved;
-
-  const byClass = {};
-  list.forEach(u => {
-    byClass[u.class] = (byClass[u.class] || 0) + (u.progress?.solved?.length || 0);
-  });
-  let bestClass = "—", bestScore = 0;
-  Object.entries(byClass).forEach(([cls, score]) => {
-    if (score > bestScore) { bestScore = score; bestClass = cls + " кл."; }
-  });
-  document.getElementById("statBest").textContent = bestClass;
-
-  // Таблица
-  const tbody = document.getElementById("studentsTableBody");
-  if (!list.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="students-empty">Пока нет учеников</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = list.map(u => {
-    const solved = u.progress?.solved?.length || 0;
-    const errors = u.progress?.errors || 0;
-    const streak = u.progress?.streak || 0;
-    const lastLogin = u.lastLogin
-      ? new Date(u.lastLogin).toLocaleDateString("ru-RU")
-      : "—";
-    return `
-      <tr>
-        <td><b>${u.firstName || ""} ${u.lastName || ""}</b></td>
-        <td>${u.class} класс</td>
-        <td><span class="students-progress">${solved}</span></td>
-        <td>${errors}</td>
-        <td>${streak > 0 ? "🔥 " + streak : "—"}</td>
-        <td>${lastLogin}</td>
-      </tr>
-    `;
-  }).join("");
-}
-
-document.getElementById("studentsClassFilter").addEventListener("change", renderStudentsTable);
-document.getElementById("studentsSearch").addEventListener("input", renderStudentsTable);
-
-// Экспорт CSV
-document.getElementById("studentsExportBtn").addEventListener("click", () => {
-  const users = getAllUsers();
-  const rows = [["Имя", "Фамилия", "Класс", "Изучено", "Ошибок", "Стрик", "Последний вход"]];
-  Object.values(users).forEach(u => {
-    rows.push([
-      u.firstName, u.lastName, u.class,
-      u.progress?.solved?.length || 0,
-      u.progress?.errors || 0,
-      u.progress?.streak || 0,
-      u.lastLogin || ""
-    ]);
-  });
-  const csv = rows.map(r => r.map(c => `"${c}"`).join(",")).join("\n");
-  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "students_" + new Date().toISOString().slice(0,10) + ".csv";
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast("📥 CSV сохранён", "ok");
-});
-
-/* ============================================================
-   СОХРАНЕНИЕ ПРОГРЕССА УЧЕНИКОМ (КОД)
-   ============================================================ */
-function encodeProgress() {
-  if (!currentUser) return null;
-  const data = {
-    f: currentUser.firstName,
-    l: currentUser.lastName,
-    c: currentUser.class,
-    s: [...state.solved],
-    e: state.errors,
-    cor: state.correct,
-    st: parseInt(localStorage.getItem("geo_day_streak") || "0", 10),
-    ach: [...getUnlockedAchievements()],
-    ts: Date.now(),
-  };
-  try {
-    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  } catch(e) {
-    return null;
-  }
-}
-
-function decodeProgress(code) {
-  try {
-    const json = decodeURIComponent(escape(atob(code.trim())));
-    return JSON.parse(json);
-  } catch(e) {
-    return null;
-  }
-}
-
-
-
-document.getElementById("copyCodeBtn").addEventListener("click", () => {
-  const code = document.getElementById("codeBox").textContent;
-  navigator.clipboard.writeText(code).then(() => {
-    showToast("📋 Код скопирован!", "ok");
-  }).catch(() => {
-    const range = document.createRange();
-    range.selectNode(document.getElementById("codeBox"));
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
-    document.execCommand("copy");
-    showToast("📋 Код скопирован!", "ok");
-  });
-});
-
-document.getElementById("closeCodeBtn").addEventListener("click", () => {
-  document.getElementById("codeModal").classList.remove("show");
-});
-document.getElementById("codeModal").addEventListener("click", e => {
-  if (e.target.id === "codeModal") {
-    e.target.classList.remove("show");
-  }
-});
-
-/* ============================================================
-   ИМПОРТ КОДА УЧИТЕЛЕМ
-   ============================================================ */
-document.getElementById("importCodeBtn").addEventListener("click", () => {
-  const code = document.getElementById("importCodeInput").value.trim();
-  if (!code) {
-    showToast("❌ Введите код ученика", "err");
-    return;
-  }
-
-  const data = decodeProgress(code);
-  if (!data) {
-    showToast("❌ Неверный код", "err");
-    return;
-  }
-
-  const key = (data.f + "_" + data.l + "_" + data.c).toLowerCase();
-  const users = getAllUsers();
-  users[key] = {
-    firstName: data.f,
-    lastName: data.l,
-    class: data.c,
-    password: "imported",
-    createdAt: new Date(data.ts).toISOString(),
-    lastLogin: new Date(data.ts).toISOString(),
-    progress: {
-      solved: data.s || [],
-      correct: data.cor || 0,
-      errors: data.e || 0,
-      hintsLeft: 10,
-      streak: data.st || 0,
-      achievements: data.ach || [],
-    }
-  };
-  saveAllUsers(users);
-  renderStudentsTable();
-  showToast(`✅ Загружен: ${data.f} ${data.l} (${data.c} класс)`, "ok");
-  document.getElementById("importCodeInput").value = "";
-});
-
-/* ============================================================
-   ОБНОВЛЯЕМ КНОПКУ УЧИТЕЛЯ ПРИ ВХОДЕ
-   ============================================================ */
-const _origCloseAuth = closeAuth;
-closeAuth = function() {
-  _origCloseAuth();
-  setTimeout(updateTeacherButton, 100);
-};
-
-// При загрузке
-setTimeout(updateTeacherButton, 500);
-/* ============================================================
-   СОХРАНЕНИЕ ПРОГРЕССА УЧЕНИКОМ — КОД
-   ============================================================ */
-   function encodeProgress() {
-  if (!currentUser) return null;
-  const data = {
-    f: currentUser.firstName,
-    l: currentUser.lastName,
-    c: currentUser.class,
-    s: [...state.solved],
-    e: state.errors,
-    cor: state.correct,
-    st: parseInt(localStorage.getItem("geo_day_streak") || "0", 10),
-    ach: [...getUnlockedAchievements()],
-    ts: Date.now(),
-  };
-  try {
-    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  } catch(e) {
-    return null;
-  }
-}
-
-document.getElementById("saveProgressBtn").addEventListener("click", () => {
-  if (!currentUser) {
-    showToast("❌ Сначала войдите в аккаунт", "err");
-    return;
-  }
-  const code = encodeProgress();
-  if (!code) {
-    showToast("❌ Не удалось сохранить", "err");
-    return;
-  }
-  document.getElementById("codeBox").textContent = code;
-  document.getElementById("codeModal").classList.add("show");
-});
-
-document.getElementById("copyCodeBtn").addEventListener("click", () => {
-  const code = document.getElementById("codeBox").textContent;
-  navigator.clipboard.writeText(code).then(() => {
-    showToast("📋 Код скопирован!", "ok");
-  }).catch(() => {
-    const range = document.createRange();
-    range.selectNode(document.getElementById("codeBox"));
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
-    document.execCommand("copy");
-    showToast("📋 Код скопирован!", "ok");
-  });
-});
-
-document.getElementById("closeCodeBtn").addEventListener("click", () => {
-  document.getElementById("codeModal").classList.remove("show");
-});
-document.getElementById("codeModal").addEventListener("click", e => {
-  if (e.target.id === "codeModal") {
-    e.target.classList.remove("show");
-  }
-});
-/* ============================================================
-   КНОПКА «ВЫЙТИ ИЗ АККАУНТА»
-   ============================================================ */
-   document.getElementById("logoutBtn").addEventListener("click", () => {
-  if (confirm("Выйти из аккаунта?")) {
-    // Очищаем сессию
-    localStorage.removeItem("geo_last_activity");
-    localStorage.removeItem("geo_current_user");
-    localStorage.removeItem("geo_teacher_session");
-    currentUser = null;
-
-    // Обновляем страницу
-    location.reload();
-  }
-});
 loadTheme();
 updateColorSelection();
 </script>
