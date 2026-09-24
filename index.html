@@ -4167,7 +4167,6 @@ document.getElementById("teacherForm").addEventListener("submit", e => {
     // Показываем кнопку «Ученики»
     setTimeout(() => {
       document.getElementById("teacherPanelBtn").classList.remove("hidden");
-      openTeacherPanel();
     }, 400);
   } else {
     document.getElementById("teacherError").textContent = "❌ Неверный код учителя";
@@ -4472,7 +4471,7 @@ function updateActivity() {
         authScreen.style.display = "none";
         document.getElementById("teacherPanelBtn").classList.remove("hidden");
         showToast("👨‍🏫 Учитель в сессии", "ok");
-        setTimeout(openTeacherPanel, 600);
+        
       }, 500);
       return;
     }
@@ -4926,28 +4925,6 @@ document.getElementById("studentsExportBtn").addEventListener("click", () => {
   showToast("📥 CSV сохранён", "ok");
 });
 
-/* ============================================================
-   СОХРАНЕНИЕ ПРОГРЕССА УЧЕНИКОМ (КОД)
-   ============================================================ */
-function encodeProgress() {
-  if (!currentUser) return null;
-  const data = {
-    f: currentUser.firstName,
-    l: currentUser.lastName,
-    c: currentUser.class,
-    s: [...state.solved],
-    e: state.errors,
-    cor: state.correct,
-    st: parseInt(localStorage.getItem("geo_day_streak") || "0", 10),
-    ach: [...getUnlockedAchievements()],
-    ts: Date.now(),
-  };
-  try {
-    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  } catch(e) {
-    return null;
-  }
-}
 
 function decodeProgress(code) {
   try {
@@ -4959,28 +4936,101 @@ function decodeProgress(code) {
 }
 
 
+/* ============================================================
+   ОБНОВЛЯЕМ КНОПКУ УЧИТЕЛЯ ПРИ ВХОДЕ
+   ============================================================ */
+const _origCloseAuth = closeAuth;
+closeAuth = function() {
+  _origCloseAuth();
+  setTimeout(updateTeacherButton, 100);
+};
+
+/* ============================================================
+   СОХРАНЕНИЕ ПРОГРЕССА УЧЕНИКОМ — КОД
+   ============================================================ */
+   function encodeProgress() {
+  if (!currentUser) return null;
+
+  const data = {
+    f: currentUser.firstName,
+    l: currentUser.lastName,
+    c: currentUser.class,
+    s: [...state.solved],
+    e: state.errors,
+    cor: state.correct,
+    st: parseInt(localStorage.getItem("geo_day_streak") || "0", 10),
+    ach: [...getUnlockedAchievements()],
+    ts: Date.now(),
+  };
+
+  try {
+    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  } catch (e) {
+    console.error("encodeProgress error:", e);
+    return null;
+  }
+}
+
+function decodeProgress(code) {
+  try {
+    const json = decodeURIComponent(escape(atob(code.trim())));
+    return JSON.parse(json);
+  } catch (e) {
+    console.error("decodeProgress error:", e);
+    return null;
+  }
+}
+
+document.getElementById("saveProgressBtn").addEventListener("click", () => {
+  if (!currentUser) {
+    showToast("❌ Сначала войдите в аккаунт", "err");
+    return;
+  }
+  const code = encodeProgress();
+  if (!code) {
+    showToast("❌ Не удалось сохранить", "err");
+    return;
+  }
+  document.getElementById("codeBox").textContent = code;
+  document.getElementById("codeModal").classList.add("show");
+});
 
 document.getElementById("copyCodeBtn").addEventListener("click", () => {
   const code = document.getElementById("codeBox").textContent;
-  navigator.clipboard.writeText(code).then(() => {
-    showToast("📋 Код скопирован!", "ok");
-  }).catch(() => {
-    const range = document.createRange();
-    range.selectNode(document.getElementById("codeBox"));
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
+  if (!code || code === "—") {
+    showToast("❌ Код пустой", "err");
+    return;
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(() => {
+      showToast("📋 Код скопирован!", "ok");
+    }).catch(() => fallbackCopy(code));
+  } else {
+    fallbackCopy(code);
+  }
+});
+
+function fallbackCopy(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try {
     document.execCommand("copy");
     showToast("📋 Код скопирован!", "ok");
-  });
-});
+  } catch (e) {
+    showToast("❌ Не удалось скопировать", "err");
+  }
+  document.body.removeChild(ta);
+}
 
 document.getElementById("closeCodeBtn").addEventListener("click", () => {
   document.getElementById("codeModal").classList.remove("show");
 });
-document.getElementById("codeModal").addEventListener("click", e => {
-  if (e.target.id === "codeModal") {
-    e.target.classList.remove("show");
-  }
+document.getElementById("codeModal").addEventListener("click", (e) => {
+  if (e.target.id === "codeModal") e.target.classList.remove("show");
 });
 
 /* ============================================================
@@ -4992,13 +5042,11 @@ document.getElementById("importCodeBtn").addEventListener("click", () => {
     showToast("❌ Введите код ученика", "err");
     return;
   }
-
   const data = decodeProgress(code);
   if (!data) {
     showToast("❌ Неверный код", "err");
     return;
   }
-
   const key = (data.f + "_" + data.l + "_" + data.c).toLowerCase();
   const users = getAllUsers();
   users[key] = {
@@ -5015,47 +5063,13 @@ document.getElementById("importCodeBtn").addEventListener("click", () => {
       hintsLeft: 10,
       streak: data.st || 0,
       achievements: data.ach || [],
-    }
+    },
   };
   saveAllUsers(users);
   renderStudentsTable();
   showToast(`✅ Загружен: ${data.f} ${data.l} (${data.c} класс)`, "ok");
   document.getElementById("importCodeInput").value = "";
 });
-
-/* ============================================================
-   ОБНОВЛЯЕМ КНОПКУ УЧИТЕЛЯ ПРИ ВХОДЕ
-   ============================================================ */
-const _origCloseAuth = closeAuth;
-closeAuth = function() {
-  _origCloseAuth();
-  setTimeout(updateTeacherButton, 100);
-};
-
-// При загрузке
-setTimeout(updateTeacherButton, 500);
-/* ============================================================
-   СОХРАНЕНИЕ ПРОГРЕССА УЧЕНИКОМ — КОД
-   ============================================================ */
-   function encodeProgress() {
-  if (!currentUser) return null;
-  const data = {
-    f: currentUser.firstName,
-    l: currentUser.lastName,
-    c: currentUser.class,
-    s: [...state.solved],
-    e: state.errors,
-    cor: state.correct,
-    st: parseInt(localStorage.getItem("geo_day_streak") || "0", 10),
-    ach: [...getUnlockedAchievements()],
-    ts: Date.now(),
-  };
-  try {
-    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  } catch(e) {
-    return null;
-  }
-}
 
 document.getElementById("saveProgressBtn").addEventListener("click", () => {
   if (!currentUser) {
