@@ -10,6 +10,128 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
+  /* ============================================================
+   МОБИЛЬНОЕ МЕНЮ — ТОЛЬКО ДЛЯ ТЕЛЕФОНА
+   ============================================================ */
+@media (max-width: 768px) {
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, #1a3a2e 0%, #0f1115 60%);
+  z-index: 5000;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+}
+.mobile-menu.show { display: flex; }
+
+/* Скрываем игру, когда меню открыто */
+body.mobile-menu-open header,
+body.mobile-menu-open .controls,
+body.mobile-menu-open .question,
+body.mobile-menu-open .timer-bar,
+body.mobile-menu-open #map,
+body.mobile-menu-open .footer,
+body.mobile-menu-open .achievements-btn,
+body.mobile-menu-open .logout-btn {
+  display: none !important;
+}
+
+.mobile-menu-hero {
+  text-align: center;
+  padding: 20px 0 30px;
+}
+.mobile-menu-globe {
+  font-size: 72px;
+  line-height: 1;
+  margin-bottom: 16px;
+  animation: mobileGlobeFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 10px 30px rgba(34,197,94,0.4));
+}
+@keyframes mobileGlobeFloat {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+.mobile-menu-title {
+  font-size: 26px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #22c55e, #38bdf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+}
+.mobile-menu-subtitle {
+  font-size: 13px;
+  color: #8a91a0;
+}
+
+.mobile-play-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 22px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border: none;
+  border-radius: 22px;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 10px 30px rgba(34,197,94,0.4);
+  transition: 0.2s;
+}
+.mobile-play-btn:active { transform: scale(0.97); }
+.mobile-play-icon { font-size: 42px; line-height: 1; margin-bottom: 6px; }
+.mobile-play-text { font-size: 22px; font-weight: 900; }
+.mobile-play-sub { font-size: 12px; opacity: 0.85; }
+
+.mobile-menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.mobile-menu-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  padding: 18px 16px;
+  min-height: 110px;
+  background: #1a1d24;
+  border: 1px solid #2a2e38;
+  border-radius: 18px;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-family: inherit;
+  transition: 0.2s;
+  text-align: left;
+}
+.mobile-menu-card:active {
+  transform: scale(0.97);
+  background: #202430;
+}
+.mobile-card-icon { font-size: 30px; line-height: 1; margin-bottom: 6px; }
+.mobile-card-title { font-size: 15px; font-weight: 800; color: #fff; }
+.mobile-card-sub { font-size: 11px; color: #8a91a0; }
+}
+
+@media (max-width: 400px) {
+.mobile-menu { padding: 16px; }
+.mobile-menu-globe { font-size: 60px; }
+.mobile-menu-title { font-size: 22px; }
+.mobile-play-btn { padding: 18px; }
+.mobile-play-icon { font-size: 36px; }
+.mobile-play-text { font-size: 20px; }
+.mobile-menu-card { padding: 14px 12px; min-height: 100px; }
+.mobile-card-icon { font-size: 26px; }
+.mobile-card-title { font-size: 13px; }
+}
   :root {
     --bg-1: #0a0e1a;
     --bg-2: #111827;
@@ -1001,449 +1123,7 @@ body.light .country-disabled {
     transition: 0.2s;
   }
 
- /* ============================================================
-   МОБИЛЬНАЯ ВЕРСИЯ — СТИЛЬ STUDYGE
-   ============================================================ */
-@media (max-width: 768px) {
-
-/* === ОСНОВА === */
-body {
-  background: #0f1115;
-  overflow: hidden;
-}
-
-/* === ШАПКА — тонкая, тёмная === */
-header {
-  padding: 10px 12px;
-  background: rgba(20, 22, 28, 0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: none;
-  box-shadow: none;
-  gap: 6px;
-}
-h1 {
-  font-size: 15px;
-  color: #fff;
-  background: none;
-  -webkit-text-fill-color: #fff;
-  gap: 6px;
-  flex: 1;
-  min-width: 0;
-}
-h1 .author { display: none; }
-
-.stats {
-  gap: 5px;
-  width: 100%;
-  justify-content: center;
-  margin-top: 6px;
-}
-.stat-chip {
-  background: #1a1d24;
-  padding: 5px 10px;
-  font-size: 11px;
-  border-radius: 20px;
-  border: 1px solid #2a2e38;
-  gap: 4px;
-}
-.stat-chip .lbl { font-size: 10px; color: #8a91a0; }
-.stat-chip b { font-size: 12px; color: #22c55e; }
-.stat-chip.err b { color: #ef4444; }
-.stat-chip.ok b { color: #22c55e; }
-
-/* === КНОПКИ ДОСТИЖЕНИЙ / ВЫЙТИ === */
-.achievements-btn {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  padding: 8px 12px;
-  background: #1a1d24;
-  border: 1px solid #2a2e38;
-  border-radius: 20px;
-  color: #fbbf24;
-  font-size: 14px;
-  box-shadow: none;
-}
-.ach-badge {
-  background: #fbbf24;
-  color: #0f1115;
-  font-size: 10px;
-  padding: 2px 7px;
-  border-radius: 10px;
-  font-weight: 900;
-}
-
-.logout-btn {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  padding: 8px 12px;
-  background: #1a1d24;
-  border: 1px solid #2a2e38;
-  border-radius: 20px;
-  color: #ef4444;
-  font-size: 16px;
-  display: none; /* Скрываем на мобильном — доступ через паузу */
-}
-.teacher-panel-btn { display: none !important; }
-
-/* === ВЕРХНЯЯ ПАНЕЛЬ — счётчики как в StudyGe === */
-.controls {
-  padding: 0;
-  background: transparent;
-  display: block;
-  border: none;
-}
-
-/* Первая строка — 5 режимов-карточек */
-.controls button[data-mode] {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 12px 6px;
-  margin: 8px 4px 0;
-  background: #1a1d24;
-  border: 1px solid #2a2e38;
-  border-radius: 14px;
-  color: #8a91a0;
-  font-size: 10px;
-  font-weight: 600;
-  min-width: calc((100% - 40px) / 5);
-  max-width: calc((100% - 40px) / 5);
-  white-space: normal;
-  text-align: center;
-  line-height: 1.15;
-  height: auto;
-  min-height: 66px;
-  justify-content: center;
-}
-.controls button[data-mode]:first-child { margin-left: 8px; }
-.controls button[data-mode]::before {
-  font-size: 22px;
-  display: block;
-}
-.controls button[data-mode].active {
-  background: #22c55e;
-  color: #0f1115;
-  border-color: #22c55e;
-  font-weight: 700;
-  box-shadow: 0 4px 16px rgba(34,197,94,0.4);
-}
-.controls button[data-mode].active::before {
-  filter: drop-shadow(0 0 4px rgba(0,0,0,0.3));
-}
-
-/* Вторая строка — регион + инструменты */
-#regionSelect {
-  display: inline-block;
-  width: calc(100% - 16px);
-  margin: 8px 8px 0;
-  padding: 12px 14px;
-  background: #1a1d24;
-  border: 1px solid #2a2e38;
-  border-radius: 14px;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  -webkit-appearance: none;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a91a0' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  padding-right: 36px;
-}
-
-#styleToggle,
-#hintBtn,
-#skipBtn,
-#openPanelBtn,
-#mapStyleBtn,
-#musicBtn,
-#fullscreenBtn,
-#themeToggle {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 10px 4px;
-  margin: 8px 3px 0;
-  background: #1a1d24;
-  border: 1px solid #2a2e38;
-  border-radius: 14px;
-  color: #8a91a0;
-  font-size: 10px;
-  font-weight: 600;
-  min-width: calc((100% - 40px) / 5);
-  max-width: calc((100% - 40px) / 5);
-  min-height: 60px;
-  height: auto;
-  position: relative;
-}
-#styleToggle:first-of-type { margin-left: 8px; }
-
-#styleToggle.active,
-#hintBtn.active {
-  background: #22c55e;
-  color: #0f1115;
-  border-color: #22c55e;
-}
-#hintBtn {
-  background: #1a1d24;
-  color: #fbbf24;
-  border-color: #2a2e38;
-}
-#hintBtn:disabled {
-  opacity: 0.4;
-  color: #8a91a0;
-}
-#hintBtn::before { content: "🔔"; font-size: 22px; }
-#skipBtn::before { content: "⏭"; font-size: 22px; }
-#styleToggle::before { content: "🎨"; font-size: 22px; }
-#openPanelBtn::before { content: "✏️"; font-size: 22px; }
-#mapStyleBtn::before { content: "🗺"; font-size: 22px; }
-#musicBtn::before { content: "🎵"; font-size: 22px; }
-#fullscreenBtn::before { content: "⛶"; font-size: 22px; }
-#themeToggle::before { content: "🌙"; font-size: 22px; }
-
-/* Скрываем текст, оставляем только иконки */
-#skipBtn { font-size: 0; }
-#skipBtn::before { font-size: 22px; }
-#openPanelBtn { font-size: 0; }
-#openPanelBtn::before { font-size: 22px; }
-#mapStyleBtn { font-size: 0; }
-#mapStyleBtn::before { font-size: 22px; }
-#musicBtn { font-size: 0; }
-#musicBtn::before { font-size: 22px; }
-#fullscreenBtn { font-size: 0; }
-#fullscreenBtn::before { font-size: 22px; }
-#themeToggle { font-size: 0; }
-#themeToggle::before { font-size: 22px; }
-
-.hint-count {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #ef4444;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 900;
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 20px;
-  text-align: center;
-}
-
-/* === ВОПРОС — как в StudyGe === */
-.question {
-  padding: 12px 16px;
-  font-size: 15px;
-  font-weight: 600;
-  background: rgba(20, 22, 28, 0.9);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  margin: 8px;
-  min-height: auto;
-  color: #fff;
-  border: 1px solid #2a2e38;
-}
-.question .target {
-  font-size: 18px;
-  font-weight: 800;
-  color: #22c55e;
-  -webkit-text-fill-color: #22c55e;
-  background: none;
-  padding: 0;
-  margin: 4px 0 0 0;
-  border: none;
-  box-shadow: none;
-}
-.question .hint {
-  font-size: 12px;
-  color: #8a91a0;
-  margin-top: 4px;
-}
-
-/* === КАРТА === */
-#map {
-  flex: 1;
-  min-height: 35vh;
-  border-radius: 16px;
-  margin: 8px;
-  overflow: hidden;
-}
-
-/* === ФУТЕР — компактный === */
-.footer {
-  padding: 8px 12px;
-  background: rgba(20, 22, 28, 0.95);
-  backdrop-filter: blur(20px);
-  border-top: 1px solid #2a2e38;
-  font-size: 10px;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: center;
-  color: #8a91a0;
-}
-.footer > div:first-child {
-  width: 100%;
-  text-align: center;
-  order: 2;
-}
-.footer .author-foot {
-  order: 1;
-  font-size: 10px;
-  color: #8a91a0;
-}
-.footer-actions {
-  order: 3;
-  width: 100%;
-  gap: 8px;
-  justify-content: center;
-}
-.footer-btn {
-  flex: 1;
-  max-width: 180px;
-  padding: 12px 16px;
-  font-size: 12px;
-  font-weight: 700;
-  border-radius: 14px;
-  justify-content: center;
-}
-
-/* === МОДАЛКИ === */
-.panel {
-  max-width: 95vw;
-  border-radius: 20px;
-  background: #1a1d24;
-  border: 1px solid #2a2e38;
-}
-.panel-header {
-  padding: 16px;
-  border-bottom: 1px solid #2a2e38;
-}
-.panel-header h2 { font-size: 16px; color: #fff; }
-.panel-body { padding: 16px; gap: 12px; }
-.field label { font-size: 11px; color: #8a91a0; }
-.field textarea,
-.field input[type="text"] {
-  background: #0f1115;
-  border: 1px solid #2a2e38;
-  border-radius: 12px;
-  color: #fff;
-  font-size: 14px;
-  padding: 12px 14px;
-}
-.panel-footer {
-  padding: 14px 16px;
-  gap: 8px;
-  background: #1a1d24;
-  border-top: 1px solid #2a2e38;
-}
-.panel-footer button {
-  padding: 12px 18px;
-  font-size: 13px;
-  border-radius: 12px;
-  font-weight: 700;
-}
-
-/* === ДОСТИЖЕНИЯ === */
-.ach-panel {
-  width: 100vw;
-  background: #0f1115;
-  border: none;
-}
-.ach-header {
-  padding: 16px;
-  border-bottom: 1px solid #2a2e38;
-}
-.ach-header h2 { font-size: 17px; color: #fff; }
-.ach-item {
-  padding: 12px;
-  border-radius: 14px;
-  background: #1a1d24;
-  border: 1px solid #2a2e38;
-}
-.ach-item.unlocked {
-  background: rgba(34,197,94,0.1);
-  border-color: rgba(34,197,94,0.3);
-}
-.ach-item-icon {
-  width: 44px; height: 44px;
-  font-size: 22px;
-  border-radius: 12px;
-}
-.ach-item-name { font-size: 14px; }
-.ach-item-desc { font-size: 12px; }
-.ach-item-rarity { font-size: 10px; }
-
-.ach-notification {
-  top: 70px;
-  right: 10px;
-  left: 10px;
-  max-width: none;
-  min-width: 0;
-  border-radius: 16px;
-}
-
-/* === ПОЛНОЭКРАННЫЕ КНОПКИ === */
-.fs-side-btn {
-  top: 70px !important;
-  padding: 10px 14px;
-  font-size: 18px;
-  border-radius: 14px;
-}
-.fs-side-btn.left { left: 10px !important; }
-.fs-side-btn.right { right: 10px !important; }
-.fs-side-btn .label { font-size: 10px; }
-
-#exitFsBtn {
-  top: 10px;
-  right: 10px;
-  padding: 8px 14px;
-  font-size: 12px;
-  border-radius: 12px;
-}
-
-/* === ТАЙМЕР === */
-.timer-bar {
-  height: 6px;
-  margin: 0 8px;
-  border-radius: 3px;
-  background: #2a2e38;
-}
-.timer-fill {
-  background: linear-gradient(90deg, #22c55e, #38bdf8);
-  border-radius: 3px;
-}
-
-/* === ТОСТЫ === */
-.toast {
-  top: 100px;
-  padding: 12px 18px;
-  font-size: 13px;
-  border-radius: 14px;
-  max-width: calc(100vw - 20px);
-}
-
-/* Отключаем подсказки */
-[data-tip]::after,
-[data-tip]::before { display: none !important; }
-}
-
-/* === МАЛЕНЬКИЕ ЭКРАНЫ === */
-@media (max-width: 400px) {
-h1 { font-size: 13px; }
-.controls button[data-mode] {
-  min-height: 60px;
-  font-size: 9px;
-}
-.stat-chip { padding: 4px 8px; font-size: 10px; }
-.question { font-size: 14px; }
-.question .target { font-size: 16px; }
-.footer-btn { font-size: 11px; padding: 10px 12px; }
-}
+ 
 /* ============================================================
    ЭКРАН ВХОДА / РЕГИСТРАЦИИ
    ============================================================ */
@@ -2055,6 +1735,46 @@ h1 { font-size: 13px; }
   <div class="splash-name">Лукинский Иван</div>
 </div>
 <button class="splash-skip" id="skipSplash">Пропустить →</button>
+<!-- ============ МОБИЛЬНОЕ МЕНЮ (только телефон) ============ -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-hero">
+    <div class="mobile-menu-globe">🌍</div>
+    <h2 class="mobile-menu-title">География мира</h2>
+    <p class="mobile-menu-subtitle">Изучай страны, столицы и флаги</p>
+  </div>
+
+  <button class="mobile-play-btn" id="mobilePlayBtn">
+    <span class="mobile-play-icon">🎮</span>
+    <span class="mobile-play-text">Играть</span>
+    <span class="mobile-play-sub">Выбрать режим</span>
+  </button>
+
+  <div class="mobile-menu-grid">
+    <button class="mobile-menu-card" id="mobileOpenMapBtn">
+      <span class="mobile-card-icon">🗺</span>
+      <span class="mobile-card-title">Открыть карту</span>
+      <span class="mobile-card-sub">Свободный просмотр</span>
+    </button>
+
+    <button class="mobile-menu-card" id="mobileAchievementsBtn">
+      <span class="mobile-card-icon">🏆</span>
+      <span class="mobile-card-title">Достижения</span>
+      <span class="mobile-card-sub" id="mobileAchCount">0/26</span>
+    </button>
+
+    <button class="mobile-menu-card" id="mobileSettingsBtn">
+      <span class="mobile-card-icon">⚙</span>
+      <span class="mobile-card-title">Настройки</span>
+      <span class="mobile-card-sub">Тема, звук, карта</span>
+    </button>
+
+    <button class="mobile-menu-card" id="mobileContactBtn">
+      <span class="mobile-card-icon">📧</span>
+      <span class="mobile-card-title">Связь</span>
+      <span class="mobile-card-sub">Написать разработчику</span>
+    </button>
+  </div>
+</div>
 </div>
 </div>
 
@@ -4373,6 +4093,93 @@ setTimeout(() => {
   checkAchievements();
   renderAchList();
 }, 2000);
+/* ============================================================
+   МОБИЛЬНОЕ МЕНЮ
+   ============================================================ */
+   function showMobileMenu() {
+  if (window.innerWidth > 768) return;
+  document.getElementById("mobileMenu").classList.add("show");
+  document.body.classList.add("mobile-menu-open");
+  updateMobileAchCount();
+}
+
+function hideMobileMenu() {
+  document.getElementById("mobileMenu").classList.remove("show");
+  document.body.classList.remove("mobile-menu-open");
+}
+
+function updateMobileAchCount() {
+  const el = document.getElementById("mobileAchCount");
+  if (!el) return;
+  try {
+    const unlocked = getUnlockedAchievements();
+    const total = typeof ACHIEVEMENTS !== "undefined" ? ACHIEVEMENTS.length : 26;
+    el.textContent = `${unlocked.size}/${total}`;
+  } catch(e) { el.textContent = "0/26"; }
+}
+
+// 🎮 Играть
+document.getElementById("mobilePlayBtn").addEventListener("click", () => {
+  hideMobileMenu();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  showToast("🎮 Выберите режим игры", "info");
+});
+
+// 🗺 Открыть карту
+document.getElementById("mobileOpenMapBtn").addEventListener("click", () => {
+  hideMobileMenu();
+  const freeBtn = document.querySelector('.controls button[data-mode="free"]');
+  if (freeBtn) freeBtn.click();
+  showToast("🗺 Свободный просмотр карты", "info");
+});
+
+// 🏆 Достижения
+document.getElementById("mobileAchievementsBtn").addEventListener("click", () => {
+  hideMobileMenu();
+  const achPanel = document.getElementById("achPanel");
+  if (achPanel) {
+    achPanel.classList.add("show");
+    if (typeof renderAchList === "function") renderAchList();
+  }
+});
+
+// ⚙ Настройки
+document.getElementById("mobileSettingsBtn").addEventListener("click", () => {
+  showToast("⚙ Настройки — скоро", "info");
+});
+
+// 📧 Связь
+document.getElementById("mobileContactBtn").addEventListener("click", () => {
+  const email = "ivanmap548@mail.ru";
+  const subject = encodeURIComponent("География мира — обратная связь");
+  window.location.href = `mailto:${email}?subject=${subject}`;
+});
+
+// Показываем меню после входа
+const _origCloseAuthMobile = closeAuth;
+closeAuth = function() {
+  _origCloseAuthMobile();
+  if (window.innerWidth <= 768) {
+    setTimeout(() => showMobileMenu(), 500);
+  }
+};
+
+// Если сессия уже есть — сразу меню
+setTimeout(() => {
+  if (window.innerWidth <= 768) {
+    const saved = localStorage.getItem("geo_current_user");
+    if (saved) {
+      try {
+        const u = JSON.parse(saved);
+        if (u && u.firstName) showMobileMenu();
+      } catch(e) {}
+    }
+  }
+}, 1500);
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 768) hideMobileMenu();
+});
 loadTheme();
 updateColorSelection();
 </script>
