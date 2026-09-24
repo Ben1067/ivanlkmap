@@ -1426,219 +1426,6 @@ body.light .country-disabled {
       border-radius: 8px;
       gap: 3px;
     }
-    /* ============================================================
-   ЭТАП 1 — УДОБНЫЙ МОБИЛЬНЫЙ ДИЗАЙН
-   Только для телефона (max-width: 768px)
-   ============================================================ */
-@media (max-width: 768px) {
-
-/* === ШАПКА — компактная === */
-header {
-  padding: 8px 12px;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-h1 {
-  font-size: 14px;
-  gap: 4px;
-}
-h1 .author { display: none; }
-
-/* === СТАТИСТИКА — мелкие чипы === */
-.stats {
-  gap: 4px;
-  width: 100%;
-  justify-content: center;
-  margin-top: 4px;
-}
-.stat-chip {
-  padding: 4px 9px;
-  font-size: 10px;
-  border-radius: 14px;
-  gap: 4px;
-}
-.stat-chip .lbl { font-size: 9px; }
-.stat-chip b { font-size: 11px; }
-
-/* === ПАНЕЛЬ УПРАВЛЕНИЯ — крупные кнопки === */
-.controls {
-  padding: 8px 10px;
-  gap: 6px;
-}
-.controls button,
-.controls select {
-  padding: 10px 14px;
-  font-size: 13px;
-  border-radius: 10px;
-  min-height: 42px;
-  font-weight: 600;
-}
-.controls button.theme-btn {
-  padding: 10px 12px;
-  font-size: 16px;
-  min-height: 42px;
-}
-.hint-count {
-  font-size: 10px;
-  padding: 3px 6px;
-  margin-left: -2px;
-}
-
-/* === ВОПРОС — компактный === */
-.question {
-  padding: 10px 14px;
-  font-size: 15px;
-  min-height: 50px;
-  gap: 3px;
-}
-.question .target {
-  font-size: 17px;
-  padding: 4px 12px;
-}
-.question .hint { font-size: 11px; }
-
-/* === КАРТА — больше места === */
-#map {
-  flex: 1;
-  min-height: 45vh;
-}
-
-/* === ФУТЕР — компактный === */
-.footer {
-  padding: 8px 12px;
-  font-size: 11px;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.footer > div:first-child {
-  order: 1;
-  width: 100%;
-  text-align: center;
-}
-.footer .author-foot {
-  order: 2;
-  font-size: 10px;
-}
-.footer button {
-  order: 3;
-  padding: 8px 14px;
-  font-size: 12px;
-  border-radius: 8px;
-  min-height: 38px;
-}
-
-/* === ТОСТ — меньше === */
-.toast {
-  top: 90px;
-  padding: 10px 16px;
-  font-size: 13px;
-  border-radius: 12px;
-  max-width: calc(100vw - 20px);
-}
-.toast .flag { font-size: 18px; }
-
-/* === ПАНЕЛИ (Свой список, На время) === */
-.panel {
-  max-width: 95vw;
-  border-radius: 16px;
-}
-.panel-header {
-  padding: 12px 16px;
-}
-.panel-header h2 { font-size: 15px; }
-.panel-body {
-  padding: 14px 16px;
-  gap: 12px;
-}
-.field label { font-size: 11px; }
-.field textarea {
-  min-height: 100px;
-  font-size: 13px;
-}
-.panel-footer {
-  padding: 12px 16px;
-  gap: 8px;
-}
-.panel-footer button {
-  padding: 10px 16px;
-  font-size: 13px;
-  min-height: 42px;
-}
-
-/* === ДОСТИЖЕНИЯ === */
-.achievements-btn {
-  top: 8px;
-  right: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
-  min-height: 38px;
-}
-.ach-badge {
-  font-size: 10px;
-  padding: 2px 6px;
-}
-.ach-panel { width: 100vw; }
-.ach-item { padding: 10px 12px; }
-.ach-item-icon {
-  width: 40px;
-  height: 40px;
-  font-size: 22px;
-}
-.ach-item-name { font-size: 13px; }
-.ach-item-desc { font-size: 11px; }
-
-/* === РЕГИСТРАЦИЯ === */
-.auth-card {
-  padding: 24px 20px;
-  border-radius: 20px;
-}
-.auth-title { font-size: 20px; }
-.auth-globe { font-size: 44px; }
-.auth-field input,
-.auth-field select {
-  padding: 12px 14px;
-  font-size: 15px;
-  min-height: 46px;
-}
-.auth-btn {
-  padding: 14px 20px;
-  font-size: 15px;
-  min-height: 48px;
-}
-
-/* === ПОДСКАЗКИ === */
-[data-tip]::after,
-[data-tip]::before { display: none !important; }
-}
-
-/* === ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ === */
-@media (max-width: 400px) {
-h1 { font-size: 12px; }
-.controls button,
-.controls select {
-  padding: 8px 10px;
-  font-size: 12px;
-  min-height: 38px;
-}
-.controls button.theme-btn {
-  padding: 8px 10px;
-  font-size: 14px;
-  min-height: 38px;
-}
-.stat-chip {
-  padding: 3px 7px;
-  font-size: 9px;
-}
-.stat-chip .lbl { display: none; }
-.stat-chip b { font-size: 10px; }
-.question { font-size: 14px; }
-.question .target { font-size: 15px; }
-.footer button {
-  padding: 6px 10px;
-  font-size: 11px;
-}
-}
     .controls button.theme-btn { padding: 5px 8px; font-size: 13px; }
     .hint-count { font-size: 10px; padding: 3px 6px; margin-left: -3px; }
 
@@ -1713,39 +1500,188 @@ body.fullscreen-mode .fs-keys-hint {
 /* ============================================================
    ЭКРАН ВХОДА / РЕГИСТРАЦИИ
    ============================================================ */
+/* ============================================================
+   3D ЭКРАН РЕГИСТРАЦИИ — ЗЕМЛЯ НА ФОНЕ
+   ============================================================ */
    .auth-screen {
   position: fixed; inset: 0;
-  background: radial-gradient(circle at center, #0a1628 0%, #050a15 100%);
+  background: radial-gradient(circle at 50% 50%, #0a1a3a 0%, #050a15 100%);
   z-index: 10000;
-  display: none; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 20px;
-  overflow-y: auto;
+  overflow: hidden;
   transition: opacity 0.4s ease;
 }
-.auth-screen.show {
-  display: flex;
+.auth-screen.hide { opacity: 0; pointer-events: none; }
+
+/* === ЗЕМЛЯ НА ЗАДНЕМ ФОНЕ === */
+.auth-bg-earth {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vmin;
+  height: 90vmin;
+  max-width: 800px;
+  max-height: 800px;
+  pointer-events: none;
+  z-index: 0;
+  animation: earthFloat 8s ease-in-out infinite;
 }
-.auth-screen.hide {
-  opacity: 0;
+@keyframes earthFloat {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.03); }
+}
+
+.auth-earth-sphere {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  opacity: 0.75;
+  box-shadow:
+    0 0 80px rgba(56,189,248,0.4),
+    0 0 160px rgba(56,189,248,0.2),
+    inset -60px -30px 120px rgba(0,0,0,0.7),
+    inset 30px 15px 60px rgba(56,189,248,0.25);
+}
+
+.auth-earth-texture {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 25% 15% at 25% 35%, #4ade80 0%, transparent 60%),
+    radial-gradient(ellipse 20% 18% at 45% 25%, #4ade80 0%, transparent 60%),
+    radial-gradient(ellipse 18% 25% at 30% 60%, #4ade80 0%, transparent 60%),
+    radial-gradient(ellipse 22% 12% at 65% 30%, #22c55e 0%, transparent 60%),
+    radial-gradient(ellipse 25% 15% at 70% 55%, #22c55e 0%, transparent 60%),
+    radial-gradient(ellipse 15% 20% at 75% 75%, #22c55e 0%, transparent 60%),
+    radial-gradient(ellipse 12% 8% at 85% 25%, #4ade80 0%, transparent 60%),
+    radial-gradient(ellipse 10% 12% at 15% 75%, #4ade80 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, #0284c7 0%, #0369a1 40%, #075985 70%, #0c4a6e 100%);
+  background-size: 200% 100%;
+  animation: earthRotate 40s linear infinite;
+}
+@keyframes earthRotate {
+  from { background-position: 0% 50%; }
+  to { background-position: 200% 50%; }
+}
+
+.auth-earth-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.2), transparent 45%);
   pointer-events: none;
 }
+
+/* === ЗВЁЗДЫ === */
+.auth-stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 80% 20%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(2px 2px at 50% 15%, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 35% 50%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 70% 90%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 15% 15%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 85% 85%, rgba(255,255,255,0.8), transparent);
+  background-size: 100% 100%;
+  animation: starsTwinkle 4s ease-in-out infinite alternate;
+  z-index: 1;
+  pointer-events: none;
+}
+@keyframes starsTwinkle {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
+}
+
+/* === СПУТНИК === */
+.auth-orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vmin;
+  height: 100vmin;
+  max-width: 850px;
+  max-height: 850px;
+  margin-top: -50vmin;
+  margin-left: -50vmin;
+  border-radius: 50%;
+  animation: orbitRotate 25s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+@media (min-width: 900px) {
+  .auth-orbit {
+    width: 850px;
+    height: 850px;
+    margin-top: -425px;
+    margin-left: -425px;
+  }
+}
+.auth-orbit-satellite {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  filter: drop-shadow(0 0 10px rgba(56,189,248,0.9));
+}
+@keyframes orbitRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* === ФОРМА — ПОВЕРХ ЗЕМЛИ === */
 .auth-card {
-  background: linear-gradient(180deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95));
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(56,189,248,0.2);
-  border-radius: 24px;
-  padding: 32px 28px;
-  max-width: 440px;
+  position: relative;
+  z-index: 10;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(56,189,248,0.3);
+  border-radius: 18px;
+  padding: 20px 18px;
+  max-width: 320px;      /* ← было 420px */
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.7),
+    0 0 40px rgba(56,189,248,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.05);
   animation: authIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* === МОБИЛЬНАЯ ВЕРСИЯ === */
+@media (max-width: 640px) {
+  .auth-screen { padding: 15px; }
+  .auth-card {
+    max-width: 100%;
+    padding: 24px 20px;
+    border-radius: 20px;
+    background: rgba(15, 23, 42, 0.85);
+  }
+  .auth-bg-earth {
+    width: 120vmin;
+    height: 120vmin;
+    opacity: 0.5;
+  }
+  .auth-title { font-size: 20px; }
 }
 @keyframes authIn {
   from { opacity: 0; transform: translateY(20px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.auth-logo { text-align: center; margin-bottom: 24px; }
+.auth-logo { text-align: center; margin-bottom: 14px; }
 .auth-globe {
   font-size: 56px; line-height: 1;
   animation: globeSpin 8s linear infinite;
@@ -2349,75 +2285,92 @@ body.fullscreen-mode .fs-keys-hint {
 </div>
 
 <!-- ============ ЭКРАН РЕГИСТРАЦИИ / ВХОДА ============ -->
+<!-- ============ 3D ЭКРАН РЕГИСТРАЦИИ ============ -->
 <div class="auth-screen" id="authScreen">
+<!-- 3D-Земля на ФОНЕ (за формой) -->
+<div class="auth-bg-earth">
+  <div class="auth-earth-sphere">
+    <div class="auth-earth-texture"></div>
+    <div class="auth-earth-glow"></div>
+  </div>
+</div>
+
+<!-- Звёзды на фоне -->
+<div class="auth-stars"></div>
+
+<!-- Спутник на орбите -->
+<div class="auth-orbit">
+  <div class="auth-orbit-satellite">🛰</div>
+</div>
+
+<!-- Форма регистрации — ПОВЕРХ -->
 <div class="auth-card">
   <div class="auth-logo">
-    <div class="auth-globe">🌍</div>
     <h1 class="auth-title">География мира</h1>
     <p class="auth-subtitle">Войдите, чтобы начать путешествие</p>
   </div>
-  
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-tab="student">👤 Ученик</button>
-        <button class="auth-tab" data-tab="teacher">👨‍🏫 Учитель</button>
-      </div>
-  
-      <form class="auth-form" id="studentForm">
-        <div class="auth-field">
-          <label>Имя</label>
-          <input type="text" id="regFirstName" placeholder="Иван" required maxlength="30">
-        </div>
-        <div class="auth-field">
-          <label>Фамилия</label>
-          <input type="text" id="regLastName" placeholder="Лукинский" required maxlength="30">
-        </div>
-        <div class="auth-field">
-          <label>Класс</label>
-          <select id="regClass" required>
-            <option value="">Выберите класс</option>
-            <option value="5">5 класс</option>
-            <option value="6">6 класс</option>
-            <option value="7">7 класс</option>
-            <option value="8">8 класс</option>
-            <option value="9">9 класс</option>
-            <option value="10">10 класс</option>
-            <option value="11">11 класс</option>
-          </select>
-        </div>
-        <div class="auth-field">
-          <label>Пароль</label>
-          <input type="password" id="regPassword" placeholder="Минимум 4 символа" required minlength="4" maxlength="30">
-        </div>
-  
-        <button type="submit" class="auth-btn auth-btn-primary">
-          🚀 Войти / Зарегистрироваться
-        </button>
-  
-        <button type="button" class="auth-btn auth-btn-secondary" id="showTutorialBtn">
-          📖 Узнать о функциях игры
-        </button>
-  
-        <div class="auth-error" id="authError"></div>
-      </form>
-  
-      <form class="auth-form hidden" id="teacherForm">
-        <div class="auth-field">
-          <label>Код учителя</label>
-          <input type="password" id="teacherCode" placeholder="Введите код" required>
-        </div>
-  
-        <button type="submit" class="auth-btn auth-btn-primary">
-          👨‍🏫 Войти как учитель
-        </button>
-  
-        <div class="auth-error" id="teacherError"></div>
-      </form>
-  
-      <div class="auth-footer">
-        <span id="authFooterText"></span>
-      </div>
-    </div>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" data-tab="student">👤 Ученик</button>
+    <button class="auth-tab" data-tab="teacher">👨‍🏫 Учитель</button>
   </div>
+
+  <form class="auth-form" id="studentForm">
+    <div class="auth-field">
+      <label>Имя</label>
+      <input type="text" id="regFirstName" placeholder="Иван" required maxlength="30">
+    </div>
+    <div class="auth-field">
+      <label>Фамилия</label>
+      <input type="text" id="regLastName" placeholder="Лукинский" required maxlength="30">
+    </div>
+    <div class="auth-field">
+      <label>Класс</label>
+      <select id="regClass" required>
+        <option value="">Выберите класс</option>
+        <option value="5">5 класс</option>
+        <option value="6">6 класс</option>
+        <option value="7">7 класс</option>
+        <option value="8">8 класс</option>
+        <option value="9">9 класс</option>
+        <option value="10">10 класс</option>
+        <option value="11">11 класс</option>
+      </select>
+    </div>
+    <div class="auth-field">
+      <label>Пароль</label>
+      <input type="password" id="regPassword" placeholder="Минимум 4 символа" required minlength="4" maxlength="30">
+    </div>
+
+    <button type="submit" class="auth-btn auth-btn-primary">
+      🚀 Войти / Зарегистрироваться
+    </button>
+
+    <button type="button" class="auth-btn auth-btn-secondary" id="showTutorialBtn">
+      📖 Узнать о функциях игры
+    </button>
+
+    <div class="auth-error" id="authError"></div>
+  </form>
+
+  <form class="auth-form hidden" id="teacherForm">
+    <div class="auth-field">
+      <label>Код учителя</label>
+      <input type="password" id="teacherCode" placeholder="Введите код" required>
+    </div>
+
+    <button type="submit" class="auth-btn auth-btn-primary">
+      👨‍🏫 Войти как учитель
+    </button>
+
+    <div class="auth-error" id="teacherError"></div>
+  </form>
+
+  <div class="auth-footer">
+    <span id="authFooterText"></span>
+  </div>
+</div>
+</div>
   
   <!-- ============ ЭКРАН ОБУЧЕНИЯ ============ -->
   <div class="tutorial-screen" id="tutorialScreen">
