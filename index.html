@@ -778,12 +778,12 @@ body.fullscreen-mode #map {
   ::-webkit-scrollbar-thumb:hover { background: var(--accent); background-clip: padding-box; }
 
   header {
-    padding: 14px 22px;
+    padding: 8px 16px;
     background: var(--panel);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 12px;
+    flex-wrap: wrap; gap: 8px;
     border-bottom: 1px solid var(--border);
     z-index: 1000;
     box-shadow: var(--shadow-sm);
@@ -818,15 +818,336 @@ body.fullscreen-mode #map {
   .stat-chip.err b { color: var(--danger); }
   .stat-chip.ok b { color: var(--accent-3); }
 
+  /* ============ ПАНЕЛЬ УПРАВЛЕНИЯ — DROPDOWN ============ */
   .controls {
-    padding: 12px 22px;
-    background: var(--panel);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
-    border-bottom: 1px solid var(--border);
-    z-index: 999;
+  padding: 6px 14px;
+  background: var(--panel);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  z-index: 1200;
+  position: relative;
+}
+
+/* ===== DROPDOWN-КОНТЕЙНЕР ===== */
+.ctrl-dropdown {
+  position: relative;
+}
+
+/* ===== КНОПКА-РАЗДЕЛ ===== */
+.ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-3);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  height: 42px;
+}
+
+.ctrl-btn:hover {
+  background: var(--panel-hover);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2);
+}
+
+.ctrl-dropdown.open .ctrl-btn {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(168, 85, 247, 0.15));
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+}
+
+.ctrl-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.ctrl-label {
+  font-weight: 600;
+}
+
+.ctrl-arrow {
+  font-size: 10px;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.ctrl-dropdown.open .ctrl-arrow {
+  transform: rotate(180deg);
+}
+
+/* ===== ВЫПАДАЮЩЕЕ МЕНЮ ===== */
+.ctrl-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 280px;
+  background: linear-gradient(180deg, rgba(30,41,59,0.98), rgba(15,23,42,0.98));
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 16px;
+  padding: 8px;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.6),
+    0 0 40px rgba(56, 189, 248, 0.1);
+  z-index: 1300;
+  animation: dropdownIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.ctrl-dropdown.open .ctrl-menu {
+  display: flex;
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ===== ПУНКТ МЕНЮ ===== */
+.ctrl-menu > button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  text-align: left;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.ctrl-menu > button:hover {
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent);
+  transform: translateX(3px);
+}
+
+.ctrl-menu > button.active {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(168, 85, 247, 0.2));
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.25);
+}
+
+.ctrl-menu > button.active::before {
+  content: "✓";
+  position: absolute;
+  right: 12px;
+  color: var(--accent);
+  font-weight: 900;
+}
+
+.menu-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ctrl-menu > button > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.menu-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.menu-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.ctrl-menu > button.active .menu-title {
+  color: #fff;
+}
+
+.menu-badge {
+  margin-left: auto;
+  padding: 2px 8px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #7dd3fc;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* ===== ОСОБЫЕ ПУНКТЫ ===== */
+.ctrl-menu > button.highlight-item {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(124, 58, 237, 0.1));
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+.ctrl-menu > button.highlight-item:hover {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(124, 58, 237, 0.2));
+  color: #d8b4fe;
+}
+
+.ctrl-menu > button.hint-item {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(245, 158, 11, 0.1));
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+.ctrl-menu > button.hint-item:hover {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.3), rgba(245, 158, 11, 0.2));
+  color: #fde047;
+}
+
+/* ============================================================
+   МОБИЛЬНАЯ ВЕРСИЯ
+   ============================================================ */
+@media (max-width: 768px) {
+  .controls {
+    padding: 8px 10px;
+    gap: 6px;
+    justify-content: space-between;
   }
+
+  .ctrl-dropdown {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .ctrl-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 9px 8px;
+    height: 40px;
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .ctrl-label {
+    display: none;
+  }
+
+  .ctrl-icon {
+    font-size: 18px;
+  }
+
+  .ctrl-arrow {
+    display: none;
+  }
+
+  .ctrl-menu {
+    min-width: calc(100vw - 20px);
+    left: 0;
+    right: 0;
+    max-width: calc(100vw - 20px);
+  }
+}
+
+@media (max-width: 400px) {
+  .ctrl-btn {
+    height: 36px;
+    padding: 8px 6px;
+  }
+  .ctrl-icon {
+    font-size: 16px;
+  }
+}
+.controls-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.controls-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-strong);
+  margin: 0 4px;
+}
+
+.controls button,
+.controls select {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-3);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.controls button.icon-btn {
+  padding: 8px 10px;
+  font-size: 15px;
+}
+
+.controls button:hover {
+  background: var(--panel-hover);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.controls button.active {
+  background: linear-gradient(135deg, var(--accent), #0ea5e9);
+  color: #fff;
+  border-color: transparent;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+}
+
+.controls button.hint-btn {
+  background: linear-gradient(135deg, #eab308, #f59e0b);
+  border-color: transparent;
+  color: #422006;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(234, 179, 8, 0.35);
+}
+
+.controls button.highlight-btn {
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+}
+
+@media (max-width: 768px) {
+  .controls-divider { display: none; }
+  .controls-group { width: 100%; justify-content: center; }
+}
   .controls button, .controls select {
     padding: 8px 15px;
     border-radius: 10px;
@@ -890,26 +1211,26 @@ body.fullscreen-mode #map {
     border-radius: 8px;
     border: 1px solid var(--border);
   }
-	.question {
-    padding: 16px 22px;
-    text-align: center;
-    background: transparent !important;
-    background-color: transparent !important;
-    background-image: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border-bottom: none !important;
-    font-size: 17px;
-    font-weight: 500;
-    min-height: 62px;
-    z-index: 998;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 4px;
-    animation: slideDown 0.3s ease;
-  }
+  .question {
+  padding: 1px 18px;
+  text-align: center;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+  font-size: 16px;
+  font-weight: 500;
+  min-height: 48px;
+  z-index: 998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 3px;
+  animation: slideDown 0.3s ease;
+}
   @keyframes slideDown {
     from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
@@ -1017,7 +1338,7 @@ body.fullscreen-mode #map {
   }
 
   .footer {
-    padding: 10px 22px;
+    padding: 1px 3px;
     background: var(--panel);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -2488,12 +2809,123 @@ body.fullscreen-mode .fs-keys-hint {
 </header>
 
 <div class="controls">
-  <button data-mode="find" class="active">🔍 Найди страну</button>
-  <button data-mode="capital">🏛 Найди столицу</button>
-  <button data-mode="free">🎨 Свободная закраска</button>
-  <button data-mode="review">🔁 Повтор ошибок</button>
-  <button data-mode="timed" id="timedModeBtn">⏱ На время</button>
-  <select id="regionSelect">
+  <!-- 🎮 РЕЖИМЫ -->
+  <div class="ctrl-dropdown" data-dropdown="modes">
+    <button class="ctrl-btn" id="modesBtn">
+      <span class="ctrl-icon">🎮</span>
+      <span class="ctrl-label">Режимы</span>
+      <span class="ctrl-arrow">▾</span>
+    </button>
+    <div class="ctrl-menu" id="modesMenu">
+      <button data-mode="find" class="active">
+        <span class="menu-icon">🔍</span>
+        <div>
+          <div class="menu-title">Найди страну</div>
+          <div class="menu-desc">По названию страны</div>
+        </div>
+      </button>
+      <button data-mode="capital">
+        <span class="menu-icon">🏛</span>
+        <div>
+          <div class="menu-title">Найди столицу</div>
+          <div class="menu-desc">По названию города</div>
+        </div>
+      </button>
+      <button data-mode="free">
+        <span class="menu-icon">🎨</span>
+        <div>
+          <div class="menu-title">Свободная закраска</div>
+          <div class="menu-desc">Изучай страны кликом</div>
+        </div>
+      </button>
+      <button data-mode="timed" id="timedModeBtn">
+        <span class="menu-icon">⏱</span>
+        <div>
+          <div class="menu-title">На время</div>
+          <div class="menu-desc">Сколько успеешь за N сек</div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- 🌍 РЕГИОН -->
+  <div class="ctrl-dropdown" data-dropdown="region">
+    <button class="ctrl-btn" id="regionBtn">
+      <span class="ctrl-icon">🌍</span>
+      <span class="ctrl-label" id="regionLabel">Весь мир</span>
+      <span class="ctrl-arrow">▾</span>
+    </button>
+    <div class="ctrl-menu" id="regionMenu">
+      <button data-region="all" class="active">🌐 Весь мир</button>
+      <button data-region="Europe">🇪🇺 Европа</button>
+      <button data-region="Asia">🌏 Азия</button>
+      <button data-region="Africa">🌍 Африка</button>
+      <button data-region="North America">🌎 Северная Америка</button>
+      <button data-region="South America">🌎 Южная Америка</button>
+      <button data-region="Oceania">🏝 Океания</button>
+    </div>
+  </div>
+
+  <!-- 🎨 ВИД -->
+  <div class="ctrl-dropdown" data-dropdown="view">
+    <button class="ctrl-btn" id="viewBtn">
+      <span class="ctrl-icon">🎨</span>
+      <span class="ctrl-label">Вид</span>
+      <span class="ctrl-arrow">▾</span>
+    </button>
+    <div class="ctrl-menu" id="viewMenu">
+      <button id="styleToggle" class="active">
+        <span class="menu-icon">🎨</span>
+        <span>Атласная раскраска</span>
+      </button>
+      <button id="mapStyleBtn">
+        <span class="menu-icon">🗺</span>
+        <span>Стиль карты</span>
+        <span class="menu-badge" id="mapStyleLabel">Политическая</span>
+      </button>
+      <button id="themeToggle">
+        <span class="menu-icon">🌙</span>
+        <span>Тема</span>
+        <span class="menu-badge" id="themeLabel">Тёмная</span>
+      </button>
+      <button id="musicBtn">
+        <span class="menu-icon">🎵</span>
+        <span>Музыка</span>
+        <span class="menu-badge" id="musicLabel">Выкл</span>
+      </button>
+      <button id="fullscreenBtn">
+        <span class="menu-icon">⛶</span>
+        <span>Полный экран</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ⚙ ДЕЙСТВИЯ -->
+  <div class="ctrl-dropdown" data-dropdown="actions">
+    <button class="ctrl-btn" id="actionsBtn">
+      <span class="ctrl-icon">⚙</span>
+      <span class="ctrl-label">Действия</span>
+      <span class="ctrl-arrow">▾</span>
+    </button>
+    <div class="ctrl-menu" id="actionsMenu">
+      <button id="openPanelBtn" class="highlight-item">
+        <span class="menu-icon">✏️</span>
+        <span>Свой список стран</span>
+      </button>
+      <button id="hintBtn" class="hint-item">
+        <span class="menu-icon">🔔</span>
+        <span>Подсказка</span>
+        <span class="menu-badge" id="hintCount">10</span>
+      </button>
+      <button id="skipBtn">
+        <span class="menu-icon">⏭</span>
+        <span>Пропустить вопрос</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Скрытый select для совместимости -->
+  <select id="regionSelect" style="display:none;">
     <option value="all">🌐 Весь мир</option>
     <option value="Europe">Европа</option>
     <option value="Asia">Азия</option>
@@ -2502,15 +2934,6 @@ body.fullscreen-mode .fs-keys-hint {
     <option value="South America">Южная Америка</option>
     <option value="Oceania">Океания</option>
   </select>
-  <button id="styleToggle" class="active">🎨 Атлас</button>
-  <button id="hintBtn" class="hint-btn">🔔 Подсказка</button>
-  <span class="hint-count" id="hintCount">×10</span>
-  <button id="skipBtn">⏭ Пропустить</button>
-  <button id="openPanelBtn" class="highlight-btn">✏️ Свой список</button>
-  <button id="mapStyleBtn" title="Переключить вид карты">🗺 Политическая</button>
-  <button id="musicBtn" class="theme-btn" title="Фоновая музыка">🎵</button>
-  <button id="fullscreenBtn" class="theme-btn" title="Полный экран (F)">⛶</button>
-  <button id="themeToggle" class="theme-btn" title="Переключить тему">🌙</button>
 </div>
   
 <div class="question" id="question"><span class="loading-spinner"></span> Загрузка карты…</div>
@@ -3050,7 +3473,7 @@ function loadTheme() {
 }
 
 /* UI */
-const modeNames = { find:"Найди страну", capital:"Найди столицу", free:"Свободная закраска", review:"Повтор ошибок" };
+const modeNames = { find:"Найди страну", capital:"Найди столицу", free:"Свободная закраска" };
 function applySettingsToUI() {
   document.querySelectorAll(".controls button[data-mode]").forEach(b => b.classList.toggle("active", b.dataset.mode === state.mode));
   document.getElementById("modeInfo").textContent = modeNames[state.mode] || "Найди страну";
@@ -3132,10 +3555,7 @@ function nextQuestion() {
     state.current = null; return;
   }
   let pool = state.pool.filter(c => !state.solved.has(c.id));
-  if (state.mode === "review") {
-    pool = pool.filter(c => state.wrongIds.has(c.id));
-    if (pool.length === 0) { setQuestion("🎉 Ошибок нет!", "Все сложные страны изучены"); state.current = null; return; }
-  }
+
   if (pool.length === 0) { endGame(); return; }
   const next = pool[Math.floor(Math.random() * pool.length)];
   state.current = next;
@@ -5202,6 +5622,171 @@ document.getElementById("codeModal").addEventListener("click", e => {
     location.reload();
   }
 });
+/* ============================================================
+   ПАНЕЛЬ УПРАВЛЕНИЯ — DROPDOWN
+   ============================================================ */
+
+
+  /* ============ РЕЖИМЫ ============ */
+  document.querySelectorAll("#modesMenu button[data-mode]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const mode = btn.dataset.mode;
+      // Убираем active у всех
+      document.querySelectorAll("#modesMenu button[data-mode]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      // Обновляем label
+      document.querySelector(".ctrl-dropdown[data-dropdown='modes'] .ctrl-label").textContent = 
+        btn.querySelector(".menu-title").textContent;
+
+      closeAll();
+
+      // Вызываем переключение режима (как раньше)
+      const modeNames = { find:"Найди страну", capital:"Найди столицу", free:"Свободная закраска" };
+      state.mode = mode;
+      const modeInfo = document.getElementById("modeInfo");
+      if (modeInfo && modeNames[mode]) modeInfo.textContent = modeNames[mode];
+      saveSettings();
+      startGame();
+    });
+  });
+
+  /* ============ РЕГИОН ============ */
+  document.querySelectorAll("#regionMenu button[data-region]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const region = btn.dataset.region;
+
+      document.querySelectorAll("#regionMenu button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      document.getElementById("regionLabel").textContent = btn.textContent.trim().replace(/^[^\s]+\s/, "");
+      closeAll();
+
+      state.region = region;
+      // Синхронизируем скрытый select
+      const sel = document.getElementById("regionSelect");
+      if (sel) sel.value = region;
+      saveSettings();
+      startGame();
+    });
+  });
+
+  /* ============ ВИД ============ */
+  // Атлас — оставляем существующий обработчик (id="styleToggle" работает)
+  // Стиль карты — id="mapStyleBtn" работает
+  // Тема — id="themeToggle" работает
+  // Музыка — id="musicBtn" работает
+  // Полный экран — id="fullscreenBtn" работает
+
+  // Обновляем лейблы в меню
+  function updateViewLabels() {
+    const mapStyleLabel = document.getElementById("mapStyleLabel");
+    if (mapStyleLabel && typeof MAP_STYLES !== "undefined") {
+      mapStyleLabel.textContent = MAP_STYLES[currentMapStyleIndex].name;
+    }
+    const themeLabel = document.getElementById("themeLabel");
+    if (themeLabel) {
+      const isLight = document.body.classList.contains("light");
+      const saved = localStorage.getItem("geo_theme_final") || "auto";
+      themeLabel.textContent = saved === "auto" ? "Авто" : (isLight ? "Светлая" : "Тёмная");
+    }
+    const musicLabel = document.getElementById("musicLabel");
+    if (musicLabel) musicLabel.textContent = musicOn ? "Вкл" : "Выкл";
+  }
+
+  // Обновляем после каждого клика
+  ["styleToggle", "mapStyleBtn", "themeToggle", "musicBtn"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("click", () => setTimeout(updateViewLabels, 100));
+  });
+
+  setTimeout(updateViewLabels, 500);
+
+  /* ============ ДЕЙСТВИЯ ============ */
+   
+
+  (function initDropdowns() {
+  const dropdowns = document.querySelectorAll(".ctrl-dropdown");
+  const isTouch = window.matchMedia("(hover: none)").matches;
+  let hoverTimer = null;
+  let closeTimer = null;
+
+  function closeAll(except = null) {
+    dropdowns.forEach(d => {
+      if (d !== except) d.classList.remove("open");
+    });
+  }
+
+  function openDropdown(dropdown) {
+    clearTimeout(closeTimer);
+    clearTimeout(hoverTimer);
+    closeAll(dropdown);
+    dropdown.classList.add("open");
+  }
+
+  function scheduleClose(dropdown) {
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(() => {
+      dropdown.classList.remove("open");
+    }, 250);
+  }
+
+  dropdowns.forEach(dropdown => {
+    const btn = dropdown.querySelector(".ctrl-btn");
+    const menu = dropdown.querySelector(".ctrl-menu");
+
+    /* ============ НАВЕДЕНИЕ (десктоп) ============ */
+    if (!isTouch) {
+      dropdown.addEventListener("mouseenter", () => {
+        clearTimeout(hoverTimer);
+        hoverTimer = setTimeout(() => openDropdown(dropdown), 80);
+      });
+
+      dropdown.addEventListener("mouseleave", () => {
+        clearTimeout(hoverTimer);
+        scheduleClose(dropdown);
+      });
+
+      menu.addEventListener("mouseenter", () => {
+        clearTimeout(closeTimer);
+      });
+
+      menu.addEventListener("mouseleave", () => {
+        scheduleClose(dropdown);
+      });
+    }
+
+    /* ============ КЛИК (везде) ============ */
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = dropdown.classList.contains("open");
+      closeAll();
+      if (!isOpen) dropdown.classList.add("open");
+    });
+
+    // При клике на пункт меню — закрыть (только для мобилки)
+    if (isTouch) {
+      menu.addEventListener("click", () => {
+        setTimeout(() => dropdown.classList.remove("open"), 150);
+      });
+    }
+  });
+
+  // Закрыть при клике вне
+  document.addEventListener("click", () => closeAll());
+
+  // Закрыть по Escape
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAll();
+  });
+
+  // Предотвращаем закрытие при клике внутри меню (десктоп)
+  if (!isTouch) {
+    document.querySelectorAll(".ctrl-menu").forEach(menu => {
+      menu.addEventListener("click", (e) => e.stopPropagation());
+    });
+  }
+})();
 loadTheme();
 updateColorSelection();
 </script>
