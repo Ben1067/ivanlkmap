@@ -506,6 +506,7 @@ body.fullscreen-mode #map {
    БЛОК ВОПРОСА (АККУРАТНОЕ СВЕЧЕНИЕ)
    ============================================================ */
 .question {
+  
   padding: 12px 24px 14px 24px;
   text-align: center;
   position: relative;
@@ -1275,6 +1276,11 @@ body.fullscreen-mode #map {
     border: 1px solid var(--border);
   }
   .question {
+    display: flex !important; /* Принудительно показываем */
+  min-height: 60px !important; /* Даем высоту */
+  opacity: 1 !important; /* Убираем прозрачность */
+  visibility: visible !important; /* Делаем видимым */
+  
   padding: 1px 18px;
   text-align: center;
   background: transparent !important;
@@ -2805,11 +2811,11 @@ button:disabled {
   <form class="auth-form" id="studentForm">
     <div class="auth-field">
       <label>Имя</label>
-      <input type="text" id="regFirstName" placeholder="Иван" required maxlength="30" autocomplete="off">
+      <input type="text" id="regFirstName" placeholder="Иван" required maxlength="30">
     </div>
     <div class="auth-field">
       <label>Фамилия</label>
-      <input type="text" id="regLastName" placeholder="Лукинский" required maxlength="30" autocomplete="off">
+      <input type="text" id="regLastName" placeholder="Лукинский" required maxlength="30">
     </div>
     <div class="auth-field">
       <label>Класс</label>
@@ -2826,7 +2832,7 @@ button:disabled {
     </div>
     <div class="auth-field">
       <label>Пароль</label>
-    <input type="password" id="regPassword" placeholder="Минимум 4 символа" required minlength="4" maxlength="30" autocomplete="new-password">
+      <input type="password" id="regPassword" placeholder="Минимум 4 символа" required minlength="4" maxlength="30">
     </div>
 
     <button type="submit" class="auth-btn auth-btn-primary">
@@ -3561,6 +3567,7 @@ const state = {
   wrongIds:new Set(), solved:new Set(), freeClicked:new Set(),
   layers:{}, layerData:{}, highlights:{}, savedLists:[],
   hintsLeft:10, hintsUsedThisQuestion:false, hintedCountryId:null,
+   modeChosen: false, // ← НОВОЕ ПОЛЕ
 };
 
 /* СТИЛИ СТРАН */
@@ -3683,6 +3690,7 @@ function getPool() {
   return all.filter(c => (c.region || "").toLowerCase().includes(state.region.toLowerCase()));
 }
 function startGame() {
+  document.getElementById("question").innerHTML = "";
   state.solved.clear();
   state.wrongIds.clear();
   state.correct = 0;
@@ -3718,7 +3726,21 @@ function startGame() {
   updateStats();
   updateHintUI();
   clearProgress();
+   if (!state.modeChosen && !subjectModeActive) {
+    document.getElementById("question").innerHTML = `
+      <div style="font-size: 20px; font-weight: 800; color: #38bdf8; margin-bottom: 4px;">
+        👋 Добро пожаловать в Географию мира!
+      </div>
+      <div style="font-size: 14px; color: #94a3b8;">
+        Выберите режим в меню «🎮 Режимы» сверху
+      </div>
+    `;
+  } else if (subjectModeActive) {
+  nextSubjectQuestion(); // Если субъекты — сразу вопрос
+} else {
   nextQuestion();
+}
+
 }
 function restoreProgressOrStart() {
   // НЕ восстанавливаем старый общий прогресс
@@ -5148,45 +5170,43 @@ function updateActivity() {
   localStorage.setItem("geo_last_activity", Date.now().toString());
 }
 
-// Обновляем активность при любом действии
-["click", "keydown", "mousemove", "touchstart"].forEach(evt => {
-  document.addEventListener(evt, updateActivity, { passive: true });
-});
-
-// Проверка при загрузке
 (function checkUser() {
   try {
-    // Проверяем сессию учителя
-    const teacherSession = localStorage.getItem("geo_teacher_session");
-    if (teacherSession === "yes" && isSessionValid()) {
-      // Учитель в сессии — открываем панель учеников
-      updateActivity();
-      setTimeout(() => {
-        authScreen.style.display = "none";
-        document.getElementById("teacherPanelBtn").classList.remove("hidden");
-        showToast("👨‍🏫 Учитель в сессии", "ok");
-        
-      }, 500);
-      return;
-    }
+     state.modeChosen = false; // ← СБРОС
+    // 🔥 ПРИНУДИТЕЛЬНЫЙ СБРОС ВСЕХ СЕССИЙ ПРИ ЗАГРУЗКЕ 🔥
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem("geo_teacher_session");
+    localStorage.removeItem("geo_last_activity");
+    
+    // Показываем экран входа
+    authScreen.style.display = "flex";
+    
+    // Скрываем кнопку "Ученики"
+    const teacherBtn = document.getElementById("teacherPanelBtn");
+    if (teacherBtn) teacherBtn.classList.add("hidden");
 
-    // Проверяем сессию ученика
-    const saved = localStorage.getItem(USER_KEY);
-    if (saved && isSessionValid()) {
-      const u = JSON.parse(saved);
-      currentUser = u;
-      loadUserProgress();
-      updateActivity();
-      setTimeout(() => {
-        authScreen.style.display = "none";
-        showToast(`👋 С возвращением, ${u.firstName}!`, "ok");
-      }, 500);
-    } else {
-      // Сессия истекла — очищаем
-      localStorage.removeItem(USER_KEY);
-      localStorage.removeItem("geo_teacher_session");
-    }
-  } catch(e) {}
+    // 👇 ДОБАВЛЯЕМ ПРИВЕТСТВИЕ ВМЕСТО ВОПРОСА 👇
+    document.getElementById("question").innerHTML = `
+      <div style="font-size: 20px; font-weight: 800; color: #38bdf8; margin-bottom: 4px;">
+        👋 Добро пожаловать в Географию мира!
+      </div>
+      <div style="font-size: 14px; color: #94a3b8;">
+        Выберите режим в меню «🎮 Режимы» сверху
+      </div>
+    `;
+    // 👆 КОНЕЦ ПРИВЕТСТВИЯ 👆
+
+    // Обнуляем статистику на всякий случай
+    state.solved.clear();
+    state.correct = 0;
+    state.errors = 0;
+    state.pool = [];
+    updateStats();
+
+    console.log("[Auth] Сессия сброшена. Войдите заново.");
+  } catch(e) {
+    console.error(e);
+  }
 })();
 /* ============================================================
    СИСТЕМА ДОСТИЖЕНИЙ — 26 штук, Brawl Stars Style
@@ -5802,10 +5822,10 @@ document.getElementById("codeModal").addEventListener("click", e => {
   }
 });
 document.getElementById("logoutBtn").addEventListener("click", () => {
-  if (confirm("⚠️ ВНИМАНИЕ!\n\nЕсли вы выйдете из аккаунта, ВЕСЬ ваш текущий прогресс (изученные страны, монеты, достижения) будет сброшен.\n\nВы уверены, что хотите выйти?")) {
+  if (confirm("⚠️ ВНИМАНИЕ!\n\nЕсли вы выйдете из аккаунта, ВЕСЬ ваш текущий прогресс (изученные страны, монеты и достижения) будет сброшен.\n\nВы уверены, что хотите выйти?")) {
     
-    // 🔥 ПРИНУДИТЕЛЬНЫЙ СБРОС ВСЕХ РЕЖИМОВ 🔥
-    // 1. Сбрасываем режим субъектов
+    
+    // 👇 СБРАСЫВАЕМ РЕЖИМ СУБЪЕКТОВ 👇
     if (typeof subjectModeActive !== "undefined" && subjectModeActive) {
       if (typeof subjectsLayer !== "undefined" && subjectsLayer) {
         map.removeLayer(subjectsLayer);
@@ -5815,31 +5835,15 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
       if (typeof subjectPool !== "undefined") subjectPool = [];
       if (typeof solvedSubjects !== "undefined") solvedSubjects.clear();
     }
-    
-    // 2. Возвращаем все страны в нормальный вид
-    if (typeof state !== "undefined" && state.layers) {
-      Object.keys(state.layers).forEach(id => {
-        state.layers[id].setStyle(getBaseStyle(id));
-      });
-    }
-    
-    // 3. Сбрасываем атлас (если был выключен)
-    state.atlasMode = true;
-    
-    // 4. Очищаем сохранённую позицию карты
-    localStorage.removeItem("geo_map_position");
-    
-    // 5. Очищаем сессию
+    // 👆 КОНЕЦ СБРОСА 👆
+
     localStorage.removeItem("geo_last_activity");
     localStorage.removeItem("geo_current_user");
     localStorage.removeItem("geo_teacher_session");
     currentUser = null;
-    
-    // Перезагружаем страницу (чтобы всё точно сбросилось)
     location.reload();
   }
 });
-    
 /* ============================================================
    ПАНЕЛЬ УПРАВЛЕНИЯ — DROPDOWN
    ============================================================ */
@@ -5849,6 +5853,7 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
   document.querySelectorAll("#modesMenu button[data-mode]").forEach(btn => {
     btn.addEventListener("click", () => {
       const mode = btn.dataset.mode;
+      state.modeChosen = true; // ← ДОБАВЬ ЭТУ СТРОКУ
       // Убираем active у всех
       document.querySelectorAll("#modesMenu button[data-mode]").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
@@ -5856,8 +5861,7 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
       // Обновляем label
       document.querySelector(".ctrl-dropdown[data-dropdown='modes'] .ctrl-label").textContent = 
         btn.querySelector(".menu-title").textContent;
-
-      closeAll();
+        if (typeof closeAll === "function") closeAll();
 
       // Вызываем переключение режима (как раньше)
       const modeNames = { find:"Найди страну", capital:"Найди столицу", free:"Свободная закраска" };
@@ -6134,7 +6138,9 @@ function loadSubjectsData() {
 
 // 2. Запуск режима субъектов
 function startSubjectsGame() {
-  if (!subjectsLoaded) {
+  console.log("Клик по кнопке Субъекты сработал!"); // ← Проверка
+   if (!subjectsLoaded) {
+  document.getElementById("question").innerHTML = "";
     loadSubjectsData();
     return;
   }
@@ -6182,8 +6188,33 @@ function startSubjectsGame() {
   nextSubjectQuestion();
 }
 
-// 3. Вопрос
+
+function exitSubjectsGame() {
+  if (!subjectModeActive) return;
+  
+  subjectModeActive = false;
+  if (subjectsLayer) map.removeLayer(subjectsLayer);
+  
+  // Возвращаем все страны в нормальный вид
+  if (typeof state.layers !== "undefined") {
+    Object.keys(state.layers).forEach(id => {
+      state.layers[id].setStyle(getBaseStyle(id));
+    });
+  }
+  
+  // Возвращаем кнопку "Свой список"
+  const panelBtn = document.getElementById("openPanelBtn");
+  if (panelBtn) {
+    panelBtn.innerHTML = `<span class="menu-icon">✏️</span><span>Свой список стран</span>`;
+  }
+  
+  state.mode = "find";
+  document.getElementById("modeInfo").textContent = "Найди страну";
+  startGame();
+}
+
 function nextSubjectQuestion() {
+  state.hintsUsedThisQuestion = false; 
   const remaining = subjectPool.filter(s => !solvedSubjects.has(s.name));
   
   if (remaining.length === 0) {
@@ -6194,10 +6225,15 @@ function nextSubjectQuestion() {
 
   currentSubject = remaining[Math.floor(Math.random() * remaining.length)];
   
+  // 👇 ПРОСТАЯ ВСТАВКА ТЕКСТА 👇
   const q = document.getElementById("question");
   if (q) {
-    q.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="14" style="vertical-align: middle; margin-right: 6px; border-radius: 2px;"><rect width="24" height="8" y="0" fill="#fff"/><rect width="24" height="8" y="8" fill="#0039a6"/><rect width="24" height="8" y="16" fill="#d52b1e"/></svg> Закрась: <span class="target">${currentSubject.name}</span><span class="hint">Найдите регион на карте России</span>`;
+    q.innerHTML = `Закрась: <span class="target">${currentSubject.name}</span><span class="hint">Найдите регион на карте России</span>`;
+    console.log("Вопрос вставлен:", currentSubject.name);
+  } else {
+    console.error("Элемент #question не найден!");
   }
+  // 👆 КОНЕЦ 👆
 }
 
 // 4. Клик
@@ -6263,11 +6299,6 @@ function checkGradeAndStart() {
     if (btn) btn.style.display = "none";
     
     loadSubjectsData();
-     setTimeout(() => {
-    if (subjectsLoaded) {
-      startSubjectsGame();
-    }
-  }, 1000);
   } else {
         // Скрываем бейдж
     const badge = document.getElementById("subjectBadge");
@@ -6289,7 +6320,18 @@ function checkGradeAndStart() {
     if (subjectsLayer) map.removeLayer(subjectsLayer);
     subjectModeActive = false;
   }
+
 }
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("#subjectsModeBtn");
+  if (!btn) return;
+
+  if (subjectModeActive) {
+    exitSubjectsGame();
+  } else {
+    startSubjectsGame();
+  }
+});
 loadTheme();
 updateColorSelection();
 </script>
