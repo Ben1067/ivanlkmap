@@ -6151,17 +6151,7 @@ function startSubjectsGame() {
   if (panelBtn) {
     panelBtn.innerHTML = `<span class="menu-icon">✏️</span><span>Свой список субъектов</span>`;
   }
-      // Все страны мира — СПЛОШНОЙ СЕРЫЙ
-  if (typeof state.layers !== "undefined") {
-    Object.keys(state.layers).forEach(id => {
-      state.layers[id].setStyle({ 
-        color: "#1e293b",     // Тёмная обводка
-        weight: 0.5,          // Тонкая граница
-        fillColor: "#475569", // Серый цвет (сплошной)
-        fillOpacity: 1.0      // Без прозрачности (полностью непрозрачный)
-      });
-    });
-  }
+    
 
   // Показываем субъекты
   subjectsLayer.addTo(map);
