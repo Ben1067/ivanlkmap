@@ -499,23 +499,86 @@ body.fullscreen-mode #map {
   height: 100vh;
 }
 
-/* Вопрос в fullscreen — по центру сверху, без фона */
-body.fullscreen-mode .question {
-  position: fixed;
-  top: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: transparent !important;
-  border: none !important;
-  z-index: 1500;
-  min-height: auto;
-  padding: 0;
-  pointer-events: none;
+/* ============================================================
+   КРАСИВЫЙ БЛОК ВОПРОСА (GLASSMORPHISM + СВЕЧЕНИЕ)
+   ============================================================ */
+/* ============================================================
+   БЛОК ВОПРОСА (АККУРАТНОЕ СВЕЧЕНИЕ)
+   ============================================================ */
+.question {
+  padding: 12px 24px 14px 24px;
+  text-align: center;
+  position: relative;
+  z-index: 998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 64px;
+  
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.85));
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  
+  /* Тонкая рамка и мягкая тень (без яркого свечения) */
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 4px 15px rgba(0, 0, 0, 0.3);
+  
+  animation: questionAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-body.fullscreen-mode .question .target {
-  font-size: 22px !important;
-  padding: 6px 20px !important;
+@keyframes questionAppear {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Декоративные точки (теперь без свечения) */
+.question::before,
+.question::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0.5;
+}
+.question::before {
+  top: 12px; left: 20px;
+  background: #38bdf8;
+}
+.question::after {
+  bottom: 12px; right: 20px;
+  background: #a855f7;
+}
+
+/* Анимация появления */
+@keyframes questionAppear {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Декоративные светящиеся точки по краям */
+.question::before,
+.question::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 15px #38bdf8;
+  opacity: 0.8;
+}
+.question::before {
+  top: 10px; left: 20px;
+}
+.question::after {
+  bottom: 10px; right: 20px;
+  background: #a855f7;
+  box-shadow: 0 0 15px #a855f7;
 }
 
 .fs-side-btn {
@@ -1235,24 +1298,25 @@ body.fullscreen-mode #map {
     from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
   }
-	.question .target {
+	
+.question .target {
   display: inline-block !important;
-  background: var(--panel) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-radius: 12px !important;
-  padding: 4px 14px !important;
-  margin: 6px auto 0 auto !important;
-  border: 1px solid var(--border-strong) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
-  font-weight: 800 !important;
-  font-size: 18px !important;
-  color: var(--accent) !important;
-  -webkit-text-fill-color: var(--accent) !important;
-  -webkit-background-clip: padding-box !important;
-  background-clip: padding-box !important;
-  text-align: center !important;
+  background: rgba(56, 189, 248, 0.12) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-radius: 10px !important;
+  padding: 6px 18px !important;
+  margin: 4px auto 0 auto !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+  font-weight: 900 !important;
+  font-size: 20px !important;
+  color: #38bdf8 !important;
+  -webkit-text-fill-color: #38bdf8 !important;
+  letter-spacing: 0.5px !important;
+  /* Убрали пульсацию и text-shadow */
 }
+
   .question .hint { color: var(--text-dim); font-size: 12.5px; }
 
   .loading-spinner {
@@ -1310,7 +1374,7 @@ body.fullscreen-mode #map {
   .leaflet-control-attribution a { color: var(--accent) !important; }
 
   .toast {
-    position: fixed; top: 140px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    position: fixed; top: 50px; left: 50%; transform: translateX(-50%) translateY(-20px);
     padding: 12px 24px;
     border-radius: 14px;
     font-weight: 700;
@@ -1890,6 +1954,7 @@ body.fullscreen-mode .fs-keys-hint {
   box-shadow:
     0 0 80px rgba(56,189,248,0.4),
     0 0 160px rgba(56,189,248,0.2),
+     0 0 300px rgba(56,189,248,0.15),
     inset -60px -30px 120px rgba(0,0,0,0.7),
     inset 30px 15px 60px rgba(56,189,248,0.25);
 }
@@ -1936,9 +2001,19 @@ body.fullscreen-mode .fs-keys-hint {
     radial-gradient(2px 2px at 50% 15%, rgba(255,255,255,0.9), transparent),
     radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.6), transparent),
     radial-gradient(1px 1px at 35% 50%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,1), transparent),
+    radial-gradient(2px 2px at 50% 15%, rgba(255,255,255,3), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,2), transparent),
+    radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,19), transparent),
+    radial-gradient(2px 2px at 50% 15%, rgba(255,255,255,15), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,10), transparent),
+    radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,4), transparent),
+    radial-gradient(2px 2px at 50% 15%, rgba(255,255,255,5), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,6), transparent),
     radial-gradient(1.5px 1.5px at 70% 90%, rgba(255,255,255,0.7), transparent),
     radial-gradient(1px 1px at 15% 15%, rgba(255,255,255,0.6), transparent),
     radial-gradient(2px 2px at 85% 85%, rgba(255,255,255,0.8), transparent);
+
   background-size: 100% 100%;
   animation: starsTwinkle 4s ease-in-out infinite alternate;
   z-index: 1;
@@ -2285,7 +2360,7 @@ body.fullscreen-mode .fs-keys-hint {
 /* Кнопка достижений */
 .achievements-btn {
   position: fixed;
-  top: 14px;
+  top: 9px;
   right: 130px;
   z-index: 1500;
   display: inline-flex;
@@ -2611,6 +2686,73 @@ body.fullscreen-mode .fs-keys-hint {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(239,68,68,0.3);
 }
+
+/* ============================================================
+   КАСТОМНЫЕ КУРСОРЫ (КОМПАКТНЫЕ 28x28)
+   ============================================================ */
+
+/* 1. Курсор-ЛУПА для карты и стран */
+.leaflet-container,
+.leaflet-container .leaflet-interactive {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><defs><radialGradient id="g" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="%23fff" stop-opacity="0.9"/><stop offset="40%" stop-color="%237dd3fc" stop-opacity="0.6"/><stop offset="80%" stop-color="%230284c7" stop-opacity="0.8"/><stop offset="100%" stop-color="%230c4a6e" stop-opacity="1"/></radialGradient><linearGradient id="f" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23fff2b2"/><stop offset="50%" stop-color="%23fde047"/><stop offset="100%" stop-color="%23b8860b"/></linearGradient><linearGradient id="h" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%234a3218"/><stop offset="100%" stop-color="%231a1005"/></linearGradient><filter id="s"><feDropShadow dx="1" dy="1.5" stdDeviation="1" flood-opacity="0.5"/></filter></defs><g filter="url(%23s)"><line x1="18" y1="18" x2="25" y2="25" stroke="url(%23h)" stroke-width="3.5" stroke-linecap="round"/><circle cx="12" cy="12" r="9" fill="none" stroke="url(%23f)" stroke-width="2.5"/><circle cx="12" cy="12" r="7.5" fill="url(%23g)" stroke="%23fff" stroke-width="0.5" stroke-opacity="0.3"/><ellipse cx="8.5" cy="8" rx="3" ry="1.8" fill="%23fff" opacity="0.6" transform="rotate(-30, 8.5, 8)"/><circle cx="16" cy="16" r="1" fill="%23fff" opacity="0.3"/><circle cx="5" cy="12" r="0.7" fill="%23fde047"/><circle cx="12" cy="5" r="0.7" fill="%23fde047"/><circle cx="19" cy="12" r="0.7" fill="%23fde047"/><circle cx="12" cy="19" r="0.7" fill="%23fde047"/></g></svg>') 12 12, crosshair !important;
+}
+
+/* 2. Курсор-РУКА, когда карту ТАЩАТ */
+.leaflet-container.leaflet-dragging,
+.leaflet-container.leaflet-dragging .leaflet-interactive {
+  cursor: grabbing !important;
+}
+
+/* 3. Курсор-УКАЗАТЕЛЬ на кнопках */
+button, .ctrl-btn, .skin-action {
+  cursor: pointer;
+}
+
+/* 4. Курсор-ЗАПРЕТ на неактивных кнопках */
+button:disabled {
+  cursor: not-allowed;
+}
+
+.subject-badge {
+  padding: 6px 14px;
+  background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(168,85,247,0.2));
+  border: 1px solid rgba(56,189,248,0.4);
+  border-radius: 20px;
+  color: #38bdf8;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(56,189,248,0.2);
+}
+
+/* Блики (лучи света) */
+.auth-light-rays {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120vmin; height: 120vmin;
+  background: 
+    conic-gradient(from 0deg at 50% 50%, 
+      transparent 0deg, 
+      rgba(255,255,255,0.05) 10deg, 
+      transparent 20deg,
+      transparent 80deg,
+      rgba(255,255,255,0.04) 90deg,
+      transparent 100deg
+    );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  animation: raysRotate 60s linear infinite;
+}
+@keyframes raysRotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
 </style>
 </head>
 <body>
@@ -2796,6 +2938,9 @@ body.fullscreen-mode .fs-keys-hint {
 <header>
   <h1>🌍 Политическая карта мира <span class="author">· создатель Иван Лукинский</span></h1>
   <div class="stats">
+    <div class="subject-badge" id="subjectBadge" style="display: none;">
+  🏛 Режим: Субъекты РФ
+</div>
   <button class="teacher-panel-btn hidden" id="teacherPanelBtn" title="Список учеников">
   👥 Ученики
 </button>
@@ -2823,7 +2968,19 @@ body.fullscreen-mode .fs-keys-hint {
           <div class="menu-title">Найди страну</div>
           <div class="menu-desc">По названию страны</div>
         </div>
-      </button>
+     <button data-mode="subjects" id="subjectsModeBtn" style="display: none;">
+  <span class="menu-icon">
+    <svg viewBox="0 0 24 24" width="24" height="24" style="display: block; border-radius: 50%;">
+      <rect width="24" height="8" y="0" fill="#fff"/>
+      <rect width="24" height="8" y="8" fill="#0039a6"/>
+      <rect width="24" height="8" y="16" fill="#d52b1e"/>
+    </svg>
+  </span>
+  <div>
+    <div class="menu-title">Субъекты РФ</div>
+    <div class="menu-desc">Найди регион России</div>
+  </div>
+</button>
       <button data-mode="capital">
         <span class="menu-icon">🏛</span>
         <div>
@@ -3347,6 +3504,35 @@ function atlasColor(name) { return ATLAS_PALETTE[hashStr(name) % ATLAS_PALETTE.l
 /* КАРТА */
 const map = L.map('map', { center:[20,0], zoom:2, minZoom:2, maxZoom:19, worldCopyJump:true, zoomControl:true });
 
+// ============================================================
+// СОХРАНЕНИЕ ПОЗИЦИИ КАРТЫ
+// ============================================================
+
+// 1. Загружаем сохранённую позицию при старте
+const savedMapPos = localStorage.getItem("geo_map_position");
+if (savedMapPos) {
+  try {
+    const pos = JSON.parse(savedMapPos);
+    // Если позиция сохранена — применяем её
+    if (pos.lat && pos.lng && pos.zoom) {
+      map.setView([pos.lat, pos.lng], pos.zoom);
+    }
+  } catch(e) {
+    console.warn("Ошибка загрузки позиции карты", e);
+  }
+}
+
+// 2. Сохраняем позицию при каждом перемещении
+map.on("moveend", () => {
+  const center = map.getCenter();
+  const zoom = map.getZoom();
+  localStorage.setItem("geo_map_position", JSON.stringify({
+    lat: center.lat,
+    lng: center.lng,
+    zoom: zoom
+  }));
+});
+
 /* ВИДЫ КАРТЫ */
 const MAP_STYLES = [
   { id:"political", name:"Политическая", icon:"🗺",
@@ -3570,10 +3756,45 @@ function setQuestion(html, hint) {
   document.getElementById("question").innerHTML = html + (hint ? `<span class="hint">${hint}</span>` : "");
 }
 
-/* ПОДСКАЗКА */
 document.getElementById("hintBtn").addEventListener("click", () => {
-  if (state.hintsLeft <= 0 || !state.current) return;
+  if (state.hintsLeft <= 0) return;
+
+  // 👇 ЕСЛИ АКТИВЕН РЕЖИМ СУБЪЕКТОВ 👇
+  if (subjectModeActive && currentSubject) {
+    if (state.hintsUsedThisQuestion) {
+      showToast("Подсказка уже использована", "info");
+      return;
+    }
+    
+    state.hintsLeft--;
+    state.hintsUsedThisQuestion = true;
+    
+    // Подсвечиваем текущий субъект
+    const layer = currentSubject.layer;
+    if (layer) {
+      layer.setStyle({
+        color: "#eab308",
+        weight: 4,
+        fillColor: "#fde047",
+        fillOpacity: 0.7,
+        className: "hint-flash"
+      });
+      layer.bringToFront();
+      
+      // Добавляем анимацию
+      const p = layer.getElement && layer.getElement();
+      if (p) p.classList.add("hint-flash");
+    }
+    
+    showToast(`🔔 Подсказка: ${currentSubject.name} мигает жёлтым!`, "hint");
+    updateHintUI();
+    return;
+  }
+
+  // 👇 СТАРЫЙ КОД ДЛЯ СТРАН (если не субъекты) 👇
+  if (!state.current) return;
   if (state.hintsUsedThisQuestion) { showToast("Подсказка уже использована в этом вопросе", "info"); return; }
+  
   const id = state.current.id;
   const layer = state.layers[id];
   if (!layer) return;
@@ -3582,7 +3803,6 @@ document.getElementById("hintBtn").addEventListener("click", () => {
   state.hintsUsedThisQuestion = true;
   state.hintedCountryId = id;
 
-  // Подсветка — мигает и ОСТАЁТСЯ, пока не нажмут
   layer.setStyle(hintStyle());
   layer.bringToFront();
   const p = layer.getElement && layer.getElement();
@@ -3591,24 +3811,6 @@ document.getElementById("hintBtn").addEventListener("click", () => {
   showToast(`🔔 Подсказка: страна мигает жёлтым!`, "hint", state.current.name);
   updateHintUI(); saveProgress(); saveSettings();
 });
-
-/* Снимаем подсказку при клике по любой стране */
-const _origClick = onCountryClick;
-onCountryClick = function(id) {
-  // Убираем мигание подсказки (если была)
-  if (state.hintedCountryId) {
-    const hintLayer = state.layers[state.hintedCountryId];
-    if (hintLayer) {
-      const p = hintLayer.getElement && hintLayer.getElement();
-      if (p) p.classList.remove("hint-flash");
-      if (!state.solved.has(state.hintedCountryId)) {
-        hintLayer.setStyle(getBaseStyle(state.hintedCountryId));
-      }
-    }
-    state.hintedCountryId = null;
-  }
-  _origClick(id);
-};
 
 /* КЛИК ПО СТРАНЕ */
 function onCountryClick(id) {
@@ -3965,7 +4167,9 @@ fetch(DATA_URL)
     }
 
     state.layers[iso] = layer;
-    state.layerData[iso] = { name: ruName, enName, iso, region: props.CONTINENT || props.continent };
+        // Используем правильные названия полей из Natural Earth
+    const continent = props.CONTINENT || props.REGION_UN || props.SUBREGION || "Unknown";
+    state.layerData[iso] = { name: ruName, enName, iso, region: continent };
     layer.bindTooltip(ruName, { permanent:false, direction:"center", className:"country-tooltip" });
     layer.on("mouseover", () => {
       if (!state.solved.has(iso) && !state.freeClicked.has(iso) && state.mode !== "free") layer.setStyle(hoverStyle);
@@ -4134,21 +4338,22 @@ window.addEventListener("beforeunload", () => { saveProgress(); saveSettings(); 
   let hidden = false;
 
   function hideSplash() {
-    if (hidden) return;
-    hidden = true;
-    splash.classList.add("hide");
-    setTimeout(() => {
-      splash.style.display = "none";
-      // Показать экран входа ПОСЛЕ заставки
-      const authScreen = document.getElementById("authScreen");
-      if (authScreen) {
-        authScreen.classList.add("show");
-        authScreen.style.display = "flex";
-      }
-      // Пересчитываем размер карты, чтобы всё правильно отрисовалось
-      setTimeout(() => map.invalidateSize(), 300);
-    }, 800);
+  if (hidden) return;
+  hidden = true;
+  
+  // Сначала показываем Auth Screen (он перекроет карту)
+  const authScreen = document.getElementById("authScreen");
+  if (authScreen) {
+    authScreen.classList.add("show");
+    authScreen.style.display = "flex";
   }
+  
+  // Потом плавно скрываем заставку
+  splash.classList.add("hide");
+  setTimeout(() => {
+    splash.style.display = "none";
+  }, 800);
+}
 
   // Автоматически скрываем через 3 секунды
   const autoHide = setTimeout(hideSplash, 3000);
@@ -4676,10 +4881,19 @@ document.getElementById("teacherForm").addEventListener("submit", e => {
 function closeAuth() {
    // Обновляем время активности (для сессии на 10 минут)
    updateActivity();
+    
 
   authScreen.classList.add("hide");
   setTimeout(() => { authScreen.style.display = "none"; }, 400);
   if (currentUser) {
+    if (typeof subjectModeActive !== "undefined" && subjectModeActive) {
+      if (typeof subjectsLayer !== "undefined" && subjectsLayer) {
+        map.removeLayer(subjectsLayer);
+      }
+      subjectModeActive = false;
+      state.mode = "find";
+    }
+    checkGradeAndStart(); 
     // Очищаем старый общий прогресс
     localStorage.removeItem("geo_progress_final");
     // Загружаем прогресс ИМЕННО этого пользователя
@@ -4691,62 +4905,42 @@ function closeAuth() {
   }
 }
 
-// ============================================================
-// ОБУЧЕНИЕ
-// ============================================================
 const TUTORIAL_SLIDES = [
   {
     icon: "🌍",
     title: "Добро пожаловать в Географию мира!",
-    text: "Это игра-путешествие, где вы выучите страны, столицы и флаги всего мира.",
+    text: "Это игра-путешествие, где ты выучишь страны, столицы и регионы. Играй, ошибайся и запоминай — здесь не страшно ошибиться.",
     list: []
   },
   {
-    icon: "🔍",
-    title: "Режим «Найди страну»",
-    text: "Кликните по стране, которую назовёт игра. Так вы запомните её расположение.",
+    icon: "🖱️",
+    title: "Как играть?",
+    text: "Вверху появляется задание (например, «Закрась: Франция»). Твоя задача — найти эту страну на карте и кликнуть по ней. Если угадал — страна станет зелёной, если нет — красной.",
     list: []
   },
   {
-    icon: "🏛",
-    title: "Найди столицу",
-    text: "Игра называет столицу, а вы ищете страну, к которой она относится.",
+    icon: "🎮",
+    title: "Выбирай режим",
+    text: "В меню «Режимы» можно выбрать, что учить: страны, столицы или просто свободно кликать по карте. А в меню «Регион» — ограничить игру одним континентом.",
     list: []
   },
-  {
-    icon: "🎯",
-    title: "5 режимов игры",
-    text: "",
-    list: [
-      "🔍 Найди страну — по названию",
-      "🏛 Найди столицу — по городу",
-      "🎨 Свободная закраска — изучение",
-      "🔁 Повтор ошибок — сложные страны",
-      "⏱ На время — с таймером"
-    ]
-  },
-  {
-    icon: "✏️",
-    title: "Свой список",
-    text: "Создайте свой список стран — например, только для контрольной. Игра будет спрашивать только их.",
+
+    {
+    icon: `<svg viewBox="0 0 24 24" width="64" height="64" style="display: block; margin: 0 auto; border-radius: 50%;"><rect width="24" height="8" y="0" fill="#fff"/><rect width="24" height="8" y="8" fill="#0039a6"/><rect width="24" height="8" y="16" fill="#d52b1e"/></svg>`,
+    title: "Особый режим для 8 и 9 классов",
+    text: "Если ты в 8 или 9 классе, у тебя появится режим «Субъекты РФ». Карта мира станет серой, а Россия — разноцветной. Игра будет спрашивать регионы России.",
     list: []
   },
   {
     icon: "🏆",
-    title: "Достижения и сертификаты",
-    text: "Изучите континент на 100% — получите сертификат! Скачайте PNG и покажите друзьям.",
-    list: []
-  },
-  {
-    icon: "📊",
-    title: "Прогресс сохраняется",
-    text: "Войдите с того же имени и фамилии на любом устройстве — прогресс подтянется.",
+    title: "Достижения и прогресс",
+    text: "За успехи ты получаешь достижения (иконка кубка вверху). Игра автоматически сохраняет твой прогресс и позицию карты.",
     list: []
   },
   {
     icon: "🚀",
-    title: "Готовы начать?",
-    text: "Нажмите «Начать игру» и отправляйтесь в путешествие по миру!",
+    title: "Готов начать?",
+    text: "Нажми «Начать игру» — и в путь! Если что-то непонятно, нажми на кнопку «Узнать о функциях игры» ещё раз.",
     list: []
   }
 ];
@@ -5607,18 +5801,26 @@ document.getElementById("codeModal").addEventListener("click", e => {
     e.target.classList.remove("show");
   }
 });
-/* ============================================================
-   КНОПКА «ВЫЙТИ ИЗ АККАУНТА»
-   ============================================================ */
-   document.getElementById("logoutBtn").addEventListener("click", () => {
-  if (confirm("Выйти из аккаунта?")) {
-    // Очищаем сессию
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  if (confirm("⚠️ ВНИМАНИЕ!\n\nЕсли вы выйдете из аккаунта, ВЕСЬ ваш текущий прогресс (изученные страны, монеты и достижения) будет сброшен.\n\nВы уверены, что хотите выйти?")) {
+    
+    
+    // 👇 СБРАСЫВАЕМ РЕЖИМ СУБЪЕКТОВ 👇
+    if (typeof subjectModeActive !== "undefined" && subjectModeActive) {
+      if (typeof subjectsLayer !== "undefined" && subjectsLayer) {
+        map.removeLayer(subjectsLayer);
+      }
+      subjectModeActive = false;
+      state.mode = "find";
+      if (typeof subjectPool !== "undefined") subjectPool = [];
+      if (typeof solvedSubjects !== "undefined") solvedSubjects.clear();
+    }
+    // 👆 КОНЕЦ СБРОСА 👆
+
     localStorage.removeItem("geo_last_activity");
     localStorage.removeItem("geo_current_user");
     localStorage.removeItem("geo_teacher_session");
     currentUser = null;
-
-    // Обновляем страницу
     location.reload();
   }
 });
@@ -5651,26 +5853,47 @@ document.getElementById("codeModal").addEventListener("click", e => {
     });
   });
 
-  /* ============ РЕГИОН ============ */
+  /* ============ РЕГИОН (ИСПРАВЛЕННЫЙ) ============ */
   document.querySelectorAll("#regionMenu button[data-region]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const region = btn.dataset.region;
+    // Удаляем старые слушатели, чтобы не было конфликтов
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
 
+    newBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const region = newBtn.dataset.region;
+      
+      // 1. Обновляем визуал
       document.querySelectorAll("#regionMenu button").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      document.getElementById("regionLabel").textContent = btn.textContent.trim().replace(/^[^\s]+\s/, "");
-      closeAll();
-
+      newBtn.classList.add("active");
+      document.getElementById("regionLabel").textContent = newBtn.textContent.trim().replace(/^[^\s]+\s/, "");
+      
+      // 2. Обновляем глобальное состояние
       state.region = region;
-      // Синхронизируем скрытый select
+      
+      // 3. Синхронизируем скрытый select
       const sel = document.getElementById("regionSelect");
       if (sel) sel.value = region;
+      
+      // 4. Закрываем меню (если функция closeAll доступна)
+      if (typeof closeAll === "function") closeAll();
+      else {
+        const parent = newBtn.closest(".ctrl-dropdown");
+        if (parent) parent.classList.remove("open");
+      }
+
+      // 5. ПРИНУДИТЕЛЬНЫЙ СБРОС И ЗАПУСК
       saveSettings();
-      startGame();
+      
+      // Вызываем startGame с небольшой задержкой, чтобы DOM обновился
+      setTimeout(() => {
+        startGame();
+        showToast(`Выбран регион: ${newBtn.textContent.trim()}`, "info");
+        // Принудительно обновляем счетчик
+        document.getElementById("countInfo").textContent = `· Стран в регионе: ${state.pool.length}`;
+      }, 50);
     });
   });
-
   /* ============ ВИД ============ */
   // Атлас — оставляем существующий обработчик (id="styleToggle" работает)
   // Стиль карты — id="mapStyleBtn" работает
@@ -5787,6 +6010,265 @@ document.getElementById("codeModal").addEventListener("click", e => {
     });
   }
 })();
+/* ============================================================
+   СУБЪЕКТЫ РФ (ТОЛЬКО ДЛЯ 9 КЛАССА)
+   ============================================================ */
+const SUBJECTS_URL = "ru-subjects-contour.geojson";
+
+let subjectsLayer = null;
+let subjectsLoaded = false;
+let subjectPool = [];
+let currentSubject = null;
+let solvedSubjects = new Set();
+let subjectModeActive = false;
+let isNinthGrade = false; // Флаг: это 9 класс?
+
+// 1. Загрузка данных
+function loadSubjectsData() {
+  if (subjectsLoaded) return;
+  
+  showToast("⏳ Загрузка карты России...", "info");
+  
+  fetch(SUBJECTS_URL)
+    .then(r => {
+      if (!r.ok) throw new Error("Ошибка сервера: " + r.status);
+      return r.json();
+    })
+    .then(geo => {
+            // Палитра для субъектов (как на политической карте)
+      const SUBJECT_PALETTE = [
+        "#f4a261", "#e76f51", "#2a9d8f", "#e9c46a", "#90be6d", "#f94144", 
+        "#577590", "#f9844a", "#43aa8b", "#f9c74f", "#4d908e", "#f8961e",
+        "#277da1", "#9c6644", "#c77dff", "#7b2cbf", "#ff99c8", "#ffb4a2",
+        "#b5838d", "#a3b18a", "#588157", "#bc6c25", "#dda15e", "#6d597a"
+      ];
+      
+      function getSubjectColor(name) {
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+          hash = (hash * 31 + name.charCodeAt(i)) | 0;
+        }
+        return SUBJECT_PALETTE[Math.abs(hash) % SUBJECT_PALETTE.length];
+      }
+
+      subjectsLayer = L.geoJSON(geo, {
+        style: (feature) => {
+          const name = feature.properties.name || "Регион";
+          return {
+            color: "#1e293b",
+            weight: 1,
+            fillColor: getSubjectColor(name),
+            fillOpacity: 0.8
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          const name = feature.properties.name || "Регион";
+          const fo = feature.properties.fo || "Неизвестно";
+          
+          layer.bindTooltip(name, { 
+  permanent: false, 
+  direction: "center",
+  className: "country-tooltip"
+});
+      // 👇 ПОДСВЕТКА ПРИ НАВЕДЕНИИ 👇
+      layer.on("mouseover", () => {
+        if (subjectModeActive && !solvedSubjects.has(name)) {
+          layer.setStyle({
+            color: "#38bdf8",
+            weight: 2.5,
+            fillColor: getSubjectColor(name),
+            fillOpacity: 0.95
+          });
+          layer.bringToFront();
+        }
+      });
+      
+      layer.on("mouseout", () => {
+        if (subjectModeActive && !solvedSubjects.has(name)) {
+          layer.setStyle({
+            color: "#1e293b",
+            weight: 1,
+            fillColor: getSubjectColor(name),
+            fillOpacity: 0.8
+          });
+        }
+      });
+          
+          layer.on("click", () => {
+            if (subjectModeActive) {
+              handleSubjectClick(name, layer);
+            }
+          });
+        }
+      });
+      
+      subjectsLoaded = true;
+      showToast("✅ Карта России загружена!", "ok");
+      
+      // Если 9 класс — сразу запускаем режим
+      if (isNinthGrade) {
+        startSubjectsGame();
+      }
+    })
+    .catch(err => {
+      console.error("Ошибка загрузки субъектов:", err);
+      showToast("❌ Не удалось загрузить карту России.", "err");
+    });
+}
+
+// 2. Запуск режима субъектов
+function startSubjectsGame() {
+  if (!subjectsLoaded) {
+    loadSubjectsData();
+    return;
+  }
+  state.atlasMode = false; 
+
+    // Меняем текст кнопки "Свой список"
+  const panelBtn = document.getElementById("openPanelBtn");
+  if (panelBtn) {
+    panelBtn.innerHTML = `<span class="menu-icon">✏️</span><span>Свой список субъектов</span>`;
+  }
+      // Все страны мира — СПЛОШНОЙ СЕРЫЙ
+  if (typeof state.layers !== "undefined") {
+    Object.keys(state.layers).forEach(id => {
+      state.layers[id].setStyle({ 
+        color: "#1e293b",     // Тёмная обводка
+        weight: 0.5,          // Тонкая граница
+        fillColor: "#475569", // Серый цвет (сплошной)
+        fillOpacity: 1.0      // Без прозрачности (полностью непрозрачный)
+      });
+    });
+  }
+
+  // Показываем субъекты
+  subjectsLayer.addTo(map);
+  map.fitBounds(subjectsLayer.getBounds());
+
+  subjectModeActive = true;
+  subjectPool = subjectsLayer.getLayers().map(l => ({
+    name: l.feature.properties.name,
+    fo: l.feature.properties.fo,
+    layer: l
+  }));
+
+  solvedSubjects.clear();
+  state.correct = 0;
+  state.errors = 0;
+
+  document.getElementById("modeInfo").textContent = "Субъекты РФ";
+  document.getElementById("countInfo").textContent = `· Регионов: ${subjectPool.length}`;
+  
+  // Скрываем кнопку "Субъекты" из меню, т.к. мы уже в нём
+  const btn = document.getElementById("subjectsModeBtn");
+  if (btn) btn.style.display = "flex";
+
+  nextSubjectQuestion();
+}
+
+// 3. Вопрос
+function nextSubjectQuestion() {
+  const remaining = subjectPool.filter(s => !solvedSubjects.has(s.name));
+  
+  if (remaining.length === 0) {
+    showToast("🎉 Все субъекты изучены!", "ok");
+    startSubjectsGame();
+    return;
+  }
+
+  currentSubject = remaining[Math.floor(Math.random() * remaining.length)];
+  
+  const q = document.getElementById("question");
+  if (q) {
+    q.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="14" style="vertical-align: middle; margin-right: 6px; border-radius: 2px;"><rect width="24" height="8" y="0" fill="#fff"/><rect width="24" height="8" y="8" fill="#0039a6"/><rect width="24" height="8" y="16" fill="#d52b1e"/></svg> Закрась: <span class="target">${currentSubject.name}</span><span class="hint">Найдите регион на карте России</span>`;
+  }
+}
+
+// 4. Клик
+function handleSubjectClick(name, layer) {
+  if (!currentSubject) return;
+
+  if (name === currentSubject.name) {
+    layer.setStyle({
+    color: "#22c55e",
+    weight: 2.5,
+    fillColor: "#22c55e",
+    fillOpacity: 0.8
+  });
+  const p = layer.getElement && layer.getElement();
+  if (p) {
+    p.classList.remove("hint-flash");
+    p.classList.remove("pulse");
+  }
+    layer.setStyle({ fillColor: "#22c55e", fillOpacity: 0.8 });
+    solvedSubjects.add(name);
+    state.correct++;
+    showToast(`Верно! ${name}`, "ok");
+    updateStats();
+    setTimeout(nextSubjectQuestion, 800);
+  } else {
+    layer.setStyle({ fillColor: "#ef4444", fillOpacity: 0.8 });
+    state.errors++;
+    showToast(`Это ${name}. Нужно: ${currentSubject.name}`, "err");
+    updateStats();
+    setTimeout(() => {
+      if (!solvedSubjects.has(name)) {
+        layer.setStyle({ fillColor: "#1e293b", fillOpacity: 0.6 });
+      }
+    }, 800);
+  }
+}
+
+function checkGradeAndStart() {
+  if (!currentUser || !currentUser.class) return;
+  
+  const cls = parseInt(currentUser.class);
+  
+  if (cls === 8 || cls === 9) {
+    isNinthGrade = true;
+    
+        // Показываем бейдж
+    const badge = document.getElementById("subjectBadge");
+    if (badge) badge.style.display = "inline-flex";
+    // 👇 СКРЫВАЕМ "Найди страну" и "Найди столицу" 👇
+    const modeFind = document.querySelector('#modesMenu button[data-mode="find"]');
+    const modeCapital = document.querySelector('#modesMenu button[data-mode="capital"]');
+    if (modeFind) modeFind.style.display = "none";
+    if (modeCapital) modeCapital.style.display = "none";
+    // 👆 КОНЕЦ СКРЫТИЯ 👆
+
+     const modeFree = document.querySelector('#modesMenu button[data-mode="free"]');
+  if (modeFree) modeFree.style.display = "none";
+
+    const regionDropdown = document.querySelector('.ctrl-dropdown[data-dropdown="region"]');
+    if (regionDropdown) regionDropdown.style.display = "none";
+    
+    const btn = document.getElementById("subjectsModeBtn");
+    if (btn) btn.style.display = "none";
+    
+    loadSubjectsData();
+  } else {
+        // Скрываем бейдж
+    const badge = document.getElementById("subjectBadge");
+    if (badge) badge.style.display = "none";
+    isNinthGrade = false;
+    
+    const regionDropdown = document.querySelector('.ctrl-dropdown[data-dropdown="region"]');
+    if (regionDropdown) regionDropdown.style.display = "flex";
+
+    // Для остальных — показываем обратно
+    const modeFind = document.querySelector('#modesMenu button[data-mode="find"]');
+    const modeCapital = document.querySelector('#modesMenu button[data-mode="capital"]');
+    if (modeFind) modeFind.style.display = "flex";
+    if (modeCapital) modeCapital.style.display = "flex";
+
+    const modeFree = document.querySelector('#modesMenu button[data-mode="free"]');
+  if (modeFree) modeFree.style.display = "flex";
+    
+    if (subjectsLayer) map.removeLayer(subjectsLayer);
+    subjectModeActive = false;
+  }
+}
 loadTheme();
 updateColorSelection();
 </script>
