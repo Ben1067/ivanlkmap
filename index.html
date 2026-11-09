@@ -2805,11 +2805,11 @@ button:disabled {
   <form class="auth-form" id="studentForm">
     <div class="auth-field">
       <label>Имя</label>
-      <input type="text" id="regFirstName" placeholder="Иван" required maxlength="30">
+      <input type="text" id="regFirstName" placeholder="Иван" required maxlength="30" autocomplete="off">
     </div>
     <div class="auth-field">
       <label>Фамилия</label>
-      <input type="text" id="regLastName" placeholder="Лукинский" required maxlength="30">
+      <input type="text" id="regLastName" placeholder="Лукинский" required maxlength="30" autocomplete="off">
     </div>
     <div class="auth-field">
       <label>Класс</label>
@@ -2826,7 +2826,7 @@ button:disabled {
     </div>
     <div class="auth-field">
       <label>Пароль</label>
-      <input type="password" id="regPassword" placeholder="Минимум 4 символа" required minlength="4" maxlength="30">
+    <input type="password" id="regPassword" placeholder="Минимум 4 символа" required minlength="4" maxlength="30" autocomplete="new-password">
     </div>
 
     <button type="submit" class="auth-btn auth-btn-primary">
@@ -5802,10 +5802,10 @@ document.getElementById("codeModal").addEventListener("click", e => {
   }
 });
 document.getElementById("logoutBtn").addEventListener("click", () => {
-  if (confirm("⚠️ ВНИМАНИЕ!\n\nЕсли вы выйдете из аккаунта, ВЕСЬ ваш текущий прогресс (изученные страны, монеты и достижения) будет сброшен.\n\nВы уверены, что хотите выйти?")) {
+  if (confirm("⚠️ ВНИМАНИЕ!\n\nЕсли вы выйдете из аккаунта, ВЕСЬ ваш текущий прогресс (изученные страны, монеты, достижения) будет сброшен.\n\nВы уверены, что хотите выйти?")) {
     
-    
-    // 👇 СБРАСЫВАЕМ РЕЖИМ СУБЪЕКТОВ 👇
+    // 🔥 ПРИНУДИТЕЛЬНЫЙ СБРОС ВСЕХ РЕЖИМОВ 🔥
+    // 1. Сбрасываем режим субъектов
     if (typeof subjectModeActive !== "undefined" && subjectModeActive) {
       if (typeof subjectsLayer !== "undefined" && subjectsLayer) {
         map.removeLayer(subjectsLayer);
@@ -5815,15 +5815,31 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
       if (typeof subjectPool !== "undefined") subjectPool = [];
       if (typeof solvedSubjects !== "undefined") solvedSubjects.clear();
     }
-    // 👆 КОНЕЦ СБРОСА 👆
-
+    
+    // 2. Возвращаем все страны в нормальный вид
+    if (typeof state !== "undefined" && state.layers) {
+      Object.keys(state.layers).forEach(id => {
+        state.layers[id].setStyle(getBaseStyle(id));
+      });
+    }
+    
+    // 3. Сбрасываем атлас (если был выключен)
+    state.atlasMode = true;
+    
+    // 4. Очищаем сохранённую позицию карты
+    localStorage.removeItem("geo_map_position");
+    
+    // 5. Очищаем сессию
     localStorage.removeItem("geo_last_activity");
     localStorage.removeItem("geo_current_user");
     localStorage.removeItem("geo_teacher_session");
     currentUser = null;
+    
+    // Перезагружаем страницу (чтобы всё точно сбросилось)
     location.reload();
   }
 });
+    
 /* ============================================================
    ПАНЕЛЬ УПРАВЛЕНИЯ — DROPDOWN
    ============================================================ */
@@ -6247,6 +6263,11 @@ function checkGradeAndStart() {
     if (btn) btn.style.display = "none";
     
     loadSubjectsData();
+     setTimeout(() => {
+    if (subjectsLoaded) {
+      startSubjectsGame();
+    }
+  }, 1000);
   } else {
         // Скрываем бейдж
     const badge = document.getElementById("subjectBadge");
